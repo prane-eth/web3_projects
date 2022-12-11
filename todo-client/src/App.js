@@ -18,6 +18,7 @@ const App = () => {
     const contractABI = config.abi;
     const [darkMode, setDarkMode] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("");
+    const [balance, setBalance] = useState(null);
 
     const toggleDarkMode = () => {
         localStorage.setItem("darkMode", !darkMode);
@@ -39,6 +40,15 @@ const App = () => {
             const accounts = await ethereum.request({ method: "eth_accounts" });
             if (accounts) {
                 setAccount(accounts[0]);
+                setIsWalletInstalled(true);
+
+                // get balance
+                const balance = await ethereum.request({
+                    method: "eth_getBalance",
+                    params: [accounts[0], "latest"],
+                });
+                setBalance(ethers.utils.formatEther(balance));
+                
             } else {
                 console.log("No authorized account found");
             }
@@ -287,6 +297,7 @@ const App = () => {
             return (
                 <div className="connectedAs">
                     <p>Connected as: {account}</p>
+                    <p>Balance: {balance} ETH</p>
                 </div>
             );
         }
