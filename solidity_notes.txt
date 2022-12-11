@@ -1,0 +1,570 @@
+https://www.tutorialspoint.com/solidity/
+
+
+pragma solidity ^0.4.0; ensures code wont compile if
+   solidity version is below 0.4.0 or above 0.5.0
+
+
+pragma solidity ^0.5.0;
+contract SolidityTest {
+   constructor() public{
+   }
+   function getResult() public view returns(uint){
+      uint a = 1;
+      uint b = 2;
+      uint result = a + b;
+      return result;
+   }
+}
+
+function getResult() public view returns(uint){
+   // This is a comment. It is similar to comments in C++
+
+   /*
+      * This is a multi-line comment in solidity
+      * It is very similar to comments in C Programming
+   */
+   uint a = 1;
+   uint b = 2;
+   uint result = a + b;
+   return result;
+}
+
+address x = 0x212;
+address myAddress = this;
+if (x.balance < 10 && myAddress.balance >= 10) x.transfer(10);
+
+
+data types
+https://tutorialspoint.com/solidity/solidity_types.htm
+
+
+Global Variables
+blockhash(uint blockNumber) returns (bytes32) - Hash of the given block
+    - only works for 256 most recent, excluding current, blocks
+block.coinbase (address payable) - Current block miner's address
+block.difficulty (uint) - Current block difficulty
+block.gaslimit (uint) - Current block gaslimit
+block.number (uint) - Current block number
+block.timestamp (uint) - Current block timestamp as seconds since unix epoch
+gasleft() returns (uint256) - Remaining gas
+msg.data (bytes calldata) - Complete calldata
+msg.sender (address payable) - Sender of the message (current caller)
+msg.sig (bytes4) - First four bytes of the calldata (function identifier)
+msg.value (uint) - Number of wei sent with the message
+now (uint) - Current block timestamp
+tx.gasprice (uint) - Gas price of the transaction
+tx.origin (address payable) - Sender of the transaction
+
+
+inheritance & access level of variables
+
+Public − Public state variables can be accessed internally as well as via messages.
+   For a public state variable, an automatic getter function is generated.
+Internal − Internal state variables can be accessed only internally from the current
+   contract or contract deriving from it without using this.
+Private − Private state variables can be accessed only internally from the current
+   contract they are defined not in the derived contract from it.
+
+contract C {
+   uint public data = 30;
+   uint internal iData= 10;
+   function x() public returns (uint) {
+      data = 3; // internal access
+      return data;
+   }
+}
+// in other contract
+   C c = new C();
+   return c.data(); //external access
+contract D is C {  // inheritance
+   // in a function
+      iData = 3; // internal access
+      uint a = 1; // local variable
+
+inheritance with arguments
+contract Base {
+   uint data;
+   constructor(uint _data) public {
+      data = _data;   
+   }
+}
+contract Derived is Base (5) {
+   constructor() public {}
+}
+// or
+contract Derived is Base {
+   constructor(uint _info) Base(_info * _info) public {}
+}
+
+interface
+interface Calculator {
+   function getResult() external view returns(uint);
+}
+contract Test is Calculator {
+   constructor() public {}
+   function getResult() external view returns(uint){
+      uint a = 1; 
+      uint b = 2;
+      uint result = a + b;
+      return result;
+   }
+}
+
+More preferred way is to use byte types instead of String as string operation
+   requires more gas as compared to byte operation
+Solidity provides inbuilt conversion between bytes to string and vice versa
+bytes32 data = "test";
+
+Bytes to String Conversion
+Bytes can be converted to String using string() constructor.
+bytes memory bstr = new bytes(10);
+string message = string(bstr);
+
+
+function integerToString(uint _i) internal pure returns (string memory) {
+   if (_i == 0) {
+      return "0";
+   }
+   uint j = _i;
+   uint len;
+   
+   while (j != 0) {
+      len++;
+      j /= 10;
+   }
+   bytes memory bstr = new bytes(len);
+   uint k = len - 1;
+   
+   while (_i != 0) {
+      bstr[k--] = byte(uint8(48 + _i % 10));
+      _i /= 10;
+   }
+   return string(bstr);
+}
+
+pure vs view
+view - Promise not to modify the state
+pure - Promise not to modify or read from the state
+Both of these don't cost any gas to call if they're called externally from outside
+   the contract (but they do cost gas if called internally by another function)
+
+external functions can be called by other contracts and via
+   transactions and via frontend/client. cant be called internally
+   if needed to be called internally,
+   function testExternalFunction() external pure returns (uint value) {
+      value = 66;
+   }
+   function testDatatypes() public returns (uint value) {
+      (bool success, bytes memory data) = address(this).call(abi.encodeWithSignature("testExternalFunction()"));
+      require(success, "External call failed");
+      value = abi.decode(data, (uint));
+   }  // returns transaction. run wait function in frontend/client
+
+
+public vs external
+public - can be called internally and externally
+external - can only be called externally
+public uses almost double the gas as external
+because in public, solidity copies arguments because it may be called internally
+
+access levels
+public - all can access
+external - only other contracts can access
+internal - only this contract and contracts deriving from it can access
+private - only this contract can access
+
+arrays
+uint balance[3] = [1, 2, 3];
+or uint balance[] = ...
+balance[2] = 5;
+
+function testArray() public pure returns (uint[] memory) {
+   uint len = 7; 
+   // dynamic array
+   uint[] memory a = new uint[](7);
+   // bytes is same as byte[]
+   bytes memory b = new bytes(len);
+
+   assert(a.length == 7);
+   assert(b.length == len);
+   
+   // access array variable
+   a[6] = 8;
+   
+   // test array variable
+   assert(a[6] == 8);
+   
+   // static array
+   uint[3] memory c = [uint(1) , 2, 3];
+   assert(c.length == 3);
+
+   // set all values of a to 1
+   for (uint i = 0; i < a.length; i++) {
+      a[i] = 1;
+   }
+   return a;
+}
+
+Enums restrict a variable to have one of only a few predefined values.
+   The values in this enumerated list are called enums.
+With the use of enums it is possible to reduce the number of bugs in your code.
+For example, if we consider an application for a fresh juice shop,
+   it would be possible to restrict the glass size to small, medium, and large
+
+contract test {
+   enum FreshJuiceSize{ SMALL, MEDIUM, LARGE }
+   FreshJuiceSize choice;
+   FreshJuiceSize constant defaultChoice = FreshJuiceSize.MEDIUM;
+
+   function setLarge() public {
+      choice = FreshJuiceSize.LARGE;
+   }
+   function getChoice() public view returns (FreshJuiceSize) {
+      return choice;
+   }
+   function getDefaultChoice() public pure returns (uint) {
+      return uint(defaultChoice);
+   }
+}
+
+
+Defining a Struct
+
+contract test {
+   struct Book { 
+      string title;
+      string author;
+      uint book_id;
+   }
+   Book book;
+   function setBook() public {
+      book = Book('Learn Java', 'TP', 1);
+   }
+   function getBookId() public view returns (uint) {
+      return book.book_id;
+   }
+}
+
+
+Mapping
+
+mapping(address => uint) public balances;
+function updateBalance(uint newBalance) public {
+   balances[msg.sender] = newBalance;
+}
+function getBalance() public view returns (uint) {
+   if (balances[msg.sender] > 0) {
+      return balances[msg.sender];
+   } else {
+      return 0;
+   }
+}
+
+Return multiple values in function - 
+function getMultipleValues() public pure returns (uint, bool, uint) {
+   return (1, true, 2);
+}
+
+declaring return variables in returns
+function getReturnValues() public pure returns (uint sum, uint product) {
+   uint a = 1;  // local variable
+   uint b = 2;
+   sum = a + b;
+   product = a * b;
+}
+
+Type conversions
+
+int8 y = -3;
+uint x = uint(y);  // error: Explicit type conversion not allowed from "int8" to "uint256"
+
+Conversion to smaller types removes the higher order bits
+   uint32 a = 0x12345678;
+   uint16 b = uint16(a);  // b = 0x5678
+
+Conversion to larger types zero-extends the value.
+   uint16 a = 0x1234;
+   uint32 b = uint32(a);  // b = 0x00001234
+
+For bytes, conversion to smaller types truncates the value - from last
+   bytes2 a = 0x1234;
+   bytes1 b = bytes1(a);  // b = 0x12
+
+Conversion to larger types zero-extends the value.
+   bytes2 a = 0x1234;
+   bytes4 b = bytes4(a);  // b = 0x12340000
+
+Conversion between fixed size bytes and uint is only possible if both are of the same size.
+   bytes2 a = 0x1234;
+   uint32 b = uint32(a);  // b = 0x00001234
+   uint32 c = uint32(bytes4(a));  // c = 0x12340000
+   uint8 d = uint8(bytes16(a));  // d = 0x34
+   uint8 e = uint8(bytes1(a));  // e = 0x12
+
+Hexadecimals numbers can be assigned to any integer type if no truncation is needed.
+   uint8 a = 12;  // no error
+   uint32 b = 1234;  // no error
+   uint16 c = 0x123456;  // error, as truncation required to 0x3456
+
+
+Ether units
+   assert(1 wei == 1);
+   assert(1 szabo == 1e12);
+   assert(1 finney == 1e15);
+   assert(1 ether == 1e18);
+   assert(2 ether == 2000 finney);
+
+Time units
+   assert(1 seconds == 1);
+   assert(1 minutes == 60 seconds);
+   assert(1 hours == 60 minutes);
+   assert(1 days == 24 hours);  // unsure days or day
+   assert(1 weeks == 7 days);  // unsure weeks or week
+
+Coding standards
+2 blank lines between contract definitions
+1 blank line between function definitions
+no blank line if function is just declared instead of defined
+Max line length is 79 characters
+Wrapping rules (for functions with long names)
+   each argument on a new line.
+   opening bracket on same line as function
+   closing bracket on new line );
+   ex:
+      function_with_a_very_long_name(
+         parameter1,
+         parameter2,
+         parameter3
+      );
+      uint variable = function_with_a_very_long_name(
+         parameter1,
+         parameter2,
+         parameter3
+      );
+      event MultipleArguments(
+         uint indexed indexedArg1,
+         uint indexed indexedArg2,
+         uint notIndexedArg1,
+         uint notIndexedArg2
+      );
+      // calling
+      MultipleArguments(
+         indexedArg1,
+         indexedArg2,
+         notIndexedArg1,
+         notIndexedArg2
+      );
+Order of functions - grouped as per their visibility
+   order - constructor, external, external view, external pure, public, internal, private
+Avoid extra spaces inside brackets or paranthesis
+
+In if-else, new braces should open on same line as close
+   if (x < 3) {
+      x += 1;
+   } else if {
+      ....
+
+for functions, always add visibility label
+   function kill() public onlyOwner {
+      selfdestruct(owner);
+   }
+
+mapping declaration - avoid whitespaces after "mapping" keyword
+variable declaration - avoid whitespaces after declaring array variables
+   uint[] x;  // not uint [] x;
+string declaration - use double quotes. not single quotes
+
+order of layout - pragma solidity, imports, interfaces, libraries, contracts
+within interfaces, libraries or contracts - type declarations, state variables, events, functions
+Contract and Library names should match file names and should have CapWords style
+struct names, event names, enum names - CapWordsStyle
+function names, local & state variables, modifier names - mixedCaseStyle
+constant variables - ALL_CAPS_STYLE
+
+ex:
+   pragma solidity ^0.5.0;
+   contract Owned {
+      address public owner;
+      constructor() public {
+         owner = msg.sender;
+      }
+      modifier costs(uint price) {
+         if (msg.value >= price) {
+            _;
+         }
+         // to use in function foo() costs(100) public { }
+      }
+      modifier onlyOwner {
+         require(msg.sender == owner);
+         _;
+      }
+      function transferOwnership(address newOwner) public onlyOwner {
+         owner = newOwner;
+      }
+   }
+
+when defining modifier, we should add prerequisites, then _; in place of function code
+we should use modifier in function definition, so it can use function code in _; place
+
+pure functions can use revert() and require() functions
+   to revert potential state changes if an error occurs
+   but cannot use assert()
+
+Fallback function
+   called when non-existent function is called
+   required to be marked external
+   cannot have arguments or return values
+   only one fallback function can be defined per contract
+   if not marked payable, throws exception if ether is sent to contract without data
+   ex:
+      function() external payable {
+         x = 1;
+         // other fallback code
+      }
+
+Cryptographic functions
+   keccak256(bytes memory) returns (bytes32) - compute keccak-256 hash
+   ripemd160(bytes memory) returns (bytes20) - compute RIPEMD-160 hash
+   sha256(bytes memory) returns (bytes32) - compute SHA-256 hash
+   ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address) -
+      recover address associated with public key from elliptic curve signature
+      or return zero on error
+   addmod(uint x, uint y, uint k) returns (uint) - compute (x + y) % k
+      where the addition is performed with arbitrary precision and does not
+      wrap around at 2^256
+   mulmod(uint x, uint y, uint k) returns (uint) - compute (x * y) % k
+
+Withdrawal pattern
+      // insecure
+   function withdraw() public {
+      uint amount = balances[msg.sender];
+      // msg.sender.transfer(amount);
+      require(sent, "Failed to send Ether");
+      balances[msg.sender] = 0;
+   }
+      // secure
+   function addPendingWithdrawal() public payable {
+      pendingWithdrawals[msg.sender] += msg.value;
+   }
+   function withdraw() public {
+      uint amount = pendingWithdrawals[msg.sender];
+      pendingWithdrawals[msg.sender] = 0;
+      msg.sender.transfer(amount);
+   }
+
+Restricted access
+   a common practice
+   we can restrict who ca  modify contract's state or call a function
+   ex:
+      address public owner = msg.sender;
+      uint public creationTime = now;
+      modifier onlyBy(address _account) {
+         require(
+            msg.sender == _account,
+            "Sender not authorized."
+         );
+         _;
+      }
+      function changeOwner(address _newOwner) public onlyBy(owner) {
+         owner = _newOwner;
+      }
+      modifier onlyAfter(uint _time) {
+         require(
+            now >= _time,
+            "Function called too early."
+         );
+         _;
+      }
+      function disown() public onlyBy(owner) onlyAfter(creationTime + 6 weeks) {
+         delete owner;
+      }
+
+
+Libraries are similar to Contracts but are mainly intended for reuse. 
+A Library cannot be inherited.
+library Search {
+   function indexOf(uint[] storage self, uint value) public view returns (uint) {
+      for (uint i = 0; i < self.length; i++) if (self[i] == value) return i;
+      return uint(-1);
+   }
+}
+contract Test {
+   uint[] data;
+   constructor() public {
+      data.push(1);  // 2, 3, 4, ...
+   }
+   function isValuePresent() external view returns(uint){
+      uint value = 4;
+      
+      //search if value is present in the array using Library function
+      uint index = Search.indexOf(data, value);
+      return index;
+   }
+}
+
+Inline Assembly
+Solidity provides an option to use assembly language to write inline assembly within Solidity source code.
+Standalone Assembly is an intermediate language for a Solidity compiler and it converts the Solidity code into a Standalone Assembly and then to byte code.
+Inline assembly code can be interleaved within Solidity code base to have more fine-grain control over EVM and is used especially while writing the library functions.
+library Sum {   
+   function sumUsingInlineAssembly(uint[] memory _data) public pure returns (uint o_sum) {
+      for (uint i = 0; i < _data.length; ++i) {
+         assembly {
+            o_sum := add(o_sum, mload(add(add(_data, 0x20), mul(i, 0x20))))
+         }
+      }
+   }
+}
+contract Test {
+   uint[] data;
+   constructor() public {
+      data.push(1);  // 2, 3, 4, ...
+   }
+   function sum() external view returns(uint){      
+      return Sum.sumUsingInlineAssembly(data);
+   }
+}
+
+
+Event
+Event is an inheritable member of a contract. An event is emitted, it stores the arguments passed in transaction logs. These logs are stored on blockchain and are accessible using address of the contract till the contract is present on the blockchain. An event generated is not accessible from within contracts, not even the one which have created and emitted them.
+contract Test {
+   event Deposit(address indexed _from, bytes32 indexed _id, uint _value);
+   function deposit(bytes32 _id) public payable {      
+      emit Deposit(msg.sender, _id, msg.value);
+   }
+}
+
+
+_________________________________________________________
+
+Error Handling
+
+Solidity provides various functions for error handling. Generally when an error occurs, the state is reverted back to its original state. Other checks are to prevent unauthorized code access.
+
+assert(bool condition) − In case condition is not met, this method call causes an invalid opcode and any changes done to state got reverted. This method is to be used for internal errors.
+require(bool condition) − In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components.
+require(bool condition, string memory message) − In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components. It provides an option to provide a custom message.
+revert() − This method aborts the execution and revert any changes done to the state.
+revert(string memory reason) − This method aborts the execution and revert any changes done to the state. It provides an option to provide a custom message.
+
+contract Vendor {
+   address public seller;
+   modifier onlySeller() {
+      require(
+         msg.sender == seller,
+         "Only seller can call this."
+      );
+      _;
+   }
+   function sell(uint amount) public payable onlySeller { 
+      if (amount > msg.value / 2 ether)
+         revert("Not enough Ether provided.");
+      // Perform the sell operation.
+   }
+}
+
+
+Quick guide
+https://www.tutorialspoint.com/solidity/solidity_quick_guide.htm

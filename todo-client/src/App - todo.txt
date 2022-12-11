@@ -1,0 +1,74 @@
+
+All thinkable new features for this project
+I recommend not to read these
+
+swipe task left to right to finish
+swipe task right to left to delete
+
+drag tasks up and down to change position locally
+    later change position in blockchain with new function
+
+search online:
+html slide right to delete
+react swipe to delete
+w3schools ondrag Event
+https://www.educative.io/blog/react-hooks-tutorial-todo-list
+
+
+enable button to clear all finished tasks
+make checkbox better and in round shape. enable green tick
+change background color for finished tasks
+show number of tasks remaining - display on top or bottom
+enable edit option
+enable random colors when displaying in react
+text input border color should be same as button color
+on hover, delete button bin should get opened
+right click to show deposit, finish, edit, delete buttons
+custom scroll bar on right side
+when list is empty or all tasks are finished, it should display green text in green box mentioning there are no tasks incomplete
+enable sorting by date or name
+enable donation buttons for contract and owner
+enable option to hide finished tasks
+when text box is not already selected and user presses enter, make text box active
+increase size of addTask button until task is added/failed
+avoid duplicate tasks
+enable multiple files in multiple tabs
+enable separate list for each person using their wallet id
+make site mobile-friendly. test in chrome F12 mode
+use segoe ui light font or Gilroy font
+when on top of page, scroll up to refresh tasks
+
+enable sub-tasks
+find how to make transactions to blockchain instantly so we can add tasks instantly
+enable custom colors when creating or editing task
+allow user to unfinish task
+enable deadline. allow sorting by deadline
+    show default options when adding deadline, like 1 day/week/month
+
+do same project in react-native
+add a <hr> line between completed and incomplete tasks
+enable tags like home, office, star, friends, etc
+refund of deposit should be less if there is delay than deadline
+    calculate amount depending on delay/daysAfterAddingTask
+enable random rewards if deposit amount is > 0.5 and task is done before deadline
+
+for everyone, reduce some commission before refund. free if prime member
+reserve some features for only prime members
+enable a background for top 30% of page
+enable pagination
+allow option to assign task to someone else, give reward to them
+enable accessibility mode
+Enable option to logout by disconnecting wallet
+enable nice loading animation when loading anything
+
+when only 1 task is remaining and that is completed, enable firework animation with only css
+allow them to store locally if they dont want blockchain or dont have wallet installed
+enable custom themes, animations, styles for prime members
+create pro and prime memberships, with lifetime or monthly/yearly options, free trial. money will be paid to owner by contract
+add refresh button
+rename app to metodo or meto (meta + todo)
+enable badges and free prime membership for regular users
+allow users to request data erasure
+if task is long, allow to display in multiple lines
+after making changes, dont load tasks. instead make change locally
+enable refreshing automatically every 1 minute
