@@ -1,27 +1,26 @@
-import { Contract, ethers } from "ethers";
 import { useEffect, useState } from "react";
-import contractABI from "./assets/contractABI.json";
+import "./App.css";
 import {
-	initStateVariables,
+	setStateVariables,
 	connectWallet,
 	withdrawMoney,
     handleMint,
     pricePerToken,
     imageSize,
-    data
+    data,
+	bindNFTContract
 } from "./components/NftFunctions";
-import "./App.css";
 
 function App() {
 	const [account, setAccount] = useState(null);
-	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
+	const [walletInstalled, setWalletInstalled] = useState(false);
 	const [NFTContract, setNFTContract] = useState(null);
 	const [mintingTxn, setMintingTxn] = useState("");
-	initStateVariables(
+	setStateVariables(
 		account,
 		setAccount,
-		isWalletInstalled,
-		setIsWalletInstalled,
+		walletInstalled,
+		setWalletInstalled,
 		NFTContract,
 		setNFTContract,
 		mintingTxn,
@@ -30,19 +29,13 @@ function App() {
 
 	useEffect(() => {
 		if (window.ethereum) {
-			setIsWalletInstalled(true);
+			setWalletInstalled(true);
 		}
 	}, []);
-
 	useEffect(() => {
-		if (!account) {
-			return;
+		if (account) {
+			bindNFTContract();
 		}
-		const provider = new ethers.providers.Web3Provider(window.ethereum);
-		const signer = provider.getSigner();
-		setNFTContract(
-			new Contract(contractABI.contractAddress, contractABI.abi, signer)
-		);
 	}, [account]);
 
 	if (account === null) {
@@ -53,7 +46,7 @@ function App() {
 				<h2>NFT Marketplace</h2>
 				<p>Buy an NFT from our marketplace.</p>
 
-				{isWalletInstalled ? (
+				{walletInstalled ? (
 					<button onClick={connectWallet}>Connect Wallet</button>
 				) : (
 					<p>Install Metamask wallet</p>

@@ -1,5 +1,7 @@
+import { ethers, Contract } from "ethers";
+import contractABI from "../assets/contractABI.json";
 
-export const folderURL =
+const folderURL =
 	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
 // const folderURL = "./assets/images/"
 export const pricePerToken = 0.01;
@@ -11,13 +13,24 @@ export const data = [...Array(nftCount).keys()].map((i) => ({
 	url: folderURL + (i + 1) + ".png",
 }));
 
-var account, setAccount, isWalletInstalled, setIsWalletInstalled, NFTContract, setNFTContract, mintingTxn, setMintingTxn;
+var account, setAccount, walletInstalled, setWalletInstalled,
+	NFTContract, setNFTContract, mintingTxn, setMintingTxn;
 
-export function initStateVariables(accountState, setAccountState, isWalletInstalledState, setIsWalletInstalledState, NFTContractState, setNFTContractState, mintingTxnState, setMintingTxnState) {
+export const bindNFTContract = () => {
+	const provider = new ethers.providers.Web3Provider(window.ethereum);
+	const signer = provider.getSigner();
+	setNFTContract(
+		new Contract(contractABI.contractAddress, contractABI.abi, signer)
+	);
+};
+
+export function setStateVariables(accountState, setAccountState,
+		walletInstalledState, setWalletInstalledState, NFTContractState,
+		setNFTContractState, mintingTxnState, setMintingTxnState) {
 	account = accountState;
 	setAccount = setAccountState;
-	isWalletInstalled = isWalletInstalledState;
-	setIsWalletInstalled = setIsWalletInstalledState;
+	walletInstalled = walletInstalledState;
+	setWalletInstalled = setWalletInstalledState;
 	NFTContract = NFTContractState;
 	setNFTContract = setNFTContractState;
 	mintingTxn = mintingTxnState;
@@ -34,6 +47,7 @@ export async function connectWallet() {
 		})
 		.catch((error) => {
 			alert("Something went wrong");
+			console.error(error);
 		});
 }
 
