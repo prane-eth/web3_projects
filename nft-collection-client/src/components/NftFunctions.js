@@ -1,9 +1,9 @@
 import { ethers, Contract } from "ethers";
 import contractABI from "../assets/contractABI.json";
 
-const folderURL =
-	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
-// const folderURL = "./assets/images/"
+// const folderURL =
+// 	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
+const folderURL = "./assets/images/"
 export const pricePerToken = 0.01;
 export const imageSize = 250;
 
