@@ -59,11 +59,11 @@ tx.origin (address payable) - Sender of the transaction
 
 inheritance & access level of variables
 
-Public − Public state variables can be accessed internally as well as via messages.
+Public -> Public state variables can be accessed internally as well as via messages.
    For a public state variable, an automatic getter function is generated.
-Internal − Internal state variables can be accessed only internally from the current
+Internal -> Internal state variables can be accessed only internally from the current
    contract or contract deriving from it without using this.
-Private − Private state variables can be accessed only internally from the current
+Private -> Private state variables can be accessed only internally from the current
    contract they are defined not in the derived contract from it.
 
 contract C {
@@ -543,11 +543,11 @@ Error Handling
 
 Solidity provides various functions for error handling. Generally when an error occurs, the state is reverted back to its original state. Other checks are to prevent unauthorized code access.
 
-assert(bool condition) − In case condition is not met, this method call causes an invalid opcode and any changes done to state got reverted. This method is to be used for internal errors.
-require(bool condition) − In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components.
-require(bool condition, string memory message) − In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components. It provides an option to provide a custom message.
-revert() − This method aborts the execution and revert any changes done to the state.
-revert(string memory reason) − This method aborts the execution and revert any changes done to the state. It provides an option to provide a custom message.
+assert(bool condition) -> In case condition is not met, this method call causes an invalid opcode and any changes done to state got reverted. This method is to be used for internal errors.
+require(bool condition) -> In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components.
+require(bool condition, string memory message) -> In case condition is not met, this method call reverts to original state. - This method is to be used for errors in inputs or external components. It provides an option to provide a custom message.
+revert() -> This method aborts the execution and revert any changes done to the state.
+revert(string memory reason) -> This method aborts the execution and revert any changes done to the state. It provides an option to provide a custom message.
 
 contract Vendor {
    address public seller;
@@ -602,4 +602,9 @@ sign message using public key
 
 Recover the Public Key
    return secp.recoverPublicKey(msgHash, signature, recoveryBit)
+
+To get the ethereum address from the public key!
+   const publicKeyWithoutFormat = publicKey.slice(1);
+   const hash = keccak256(publicKeyWithoutFormat);
+   const address = hash.slice(-20);
 
