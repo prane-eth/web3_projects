@@ -568,3 +568,38 @@ contract Vendor {
 
 Quick guide
 https://www.tutorialspoint.com/solidity/solidity_quick_guide.htm
+
+
+
+to import ethereum-cryptography functions to js
+   npm install ethereum-cryptography
+   for reference: https://github.com/ethereum/js-ethereum-cryptography\
+
+
+calculating hash of string
+   const a = "apple";
+   const aBytes = utf8ToBytes(a);
+   const aHash = sha256(aBytes);
+   // has in hex form is
+   toHex(aHash)
+
+hashing messages
+   const bytes = utf8ToBytes(message);
+   const hash = keccak256(bytes);
+
+secp256k1
+   refer https://github.com/paulmillr/noble-secp256k1#signmsghash-privatekey
+
+sign message using public key
+   const secp = require("ethereum-cryptography/secp256k1");
+   const hashMessage = require('./hashMessage');
+   const PRIVATE_KEY = "6b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e";
+   async function signMessage(msg) {
+      const hash = await hashMessage(msg)
+      const [signature, recoveryBit] = await secp.sign(hash, PRIVATE_KEY, { recovered: true })
+      return [signature, recoveryBit]
+   }
+
+Recover the Public Key
+   return secp.recoverPublicKey(msgHash, signature, recoveryBit)
+
