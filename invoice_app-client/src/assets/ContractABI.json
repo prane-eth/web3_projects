@@ -1,0 +1,135 @@
+{
+	"abi": [
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_buyerPAN",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_sellerPAN",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_invoiceAmount",
+					"type": "uint256"
+				}
+			],
+			"name": "addInvoice",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_buyerPAN",
+					"type": "string"
+				}
+			],
+			"name": "getInvoicesByPAN",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "string",
+							"name": "buyerPAN",
+							"type": "string"
+						},
+						{
+							"internalType": "string",
+							"name": "sellerPAN",
+							"type": "string"
+						},
+						{
+							"internalType": "uint256",
+							"name": "invoiceAmount",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "invoiceDate",
+							"type": "uint256"
+						},
+						{
+							"internalType": "bool",
+							"name": "paid",
+							"type": "bool"
+						}
+					],
+					"internalType": "struct Invoice.InvoiceData[]",
+					"name": "",
+					"type": "tuple[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "invoiceData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "buyerPAN",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "sellerPAN",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "invoiceAmount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "invoiceDate",
+					"type": "uint256"
+				},
+				{
+					"internalType": "bool",
+					"name": "paid",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_buyerPAN",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_index",
+					"type": "uint256"
+				}
+			],
+			"name": "payInvoiceByPAN",
+			"outputs": [],
+			"stateMutability": "payable",
+			"type": "function"
+		}
+	]
+}
