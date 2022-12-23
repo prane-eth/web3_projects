@@ -1,14 +1,22 @@
 .bottom-button {
-	margin-left: 5%;
-	margin-right: 5%;
+    margin-left: 5%;
+    margin-right: 5%;
 }
 
 .mainContainer {
-	background: radial-gradient(circle, rgba(253, 255, 162, 1) 0%, rgba(229, 255, 204, 1) 67%);
+    background: radial-gradient(circle, rgba(253, 255, 162, 1) 0%, rgba(229, 255, 204, 1) 67%);
     display: flex;
     justify-content: center;
     height: 100vh;
     width: 100%;
+}
+
+.content-container {
+    width: 98vw;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0 10vw;
 }
 
 #navbar {
@@ -32,39 +40,49 @@
 }
 
 .darkModeToggle {
-	width: fit-content;
-    box-shadow: 0 0.5px 10px #9281ff;
-    border-radius: 9999px;
-    padding: 0.75rem
+    margin-right: 1rem;
+    width: fit-content;
+    box-shadow: 0 0.5px 15px orange;
+    border-radius: 50%;
+    padding: 0.6rem;
+    cursor: pointer;
 }
 
 .darkmode {
-	background: radial-gradient(circle, rgba(30, 30, 30, 1) 0%, rgba(60, 60, 60, 1) 67%);
-	color: white;
+    background: radial-gradient(circle, rgba(30, 30, 30, 1) 0%, rgba(60, 60, 60, 1) 67%);
+    color: white;
 }
+
 .darkmode .darkModeToggle {
     color: white;
 }
+
 .darkmode .loading {
     color: white;
 }
+
 .darkmode .connectedAs {
     color: rgb(125, 246, 125);
 }
+
 .darkmode input {
     background: #1d2230;
     color: white;
 }
+
 .darkmode button {
     color: white;
 }
+
 .darkmode table {
-	color: white;
+    color: white;
 }
+
 .darkmode .table-striped>tbody>tr:nth-of-type(odd)>* {
     color: white;
 }
+
 .darkmode .card-body {
-	background: #1d2230;
-	color: white;
+    background: #1d2230;
+    color: white;
 }

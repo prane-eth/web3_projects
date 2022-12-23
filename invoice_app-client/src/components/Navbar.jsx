@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 
 import { ethers } from "ethers";
-import { FaSun, FaMoon } from "react-icons/fa";
-import { AiOutlineWallet } from "react-icons/ai";
+import { FaSun } from "react-icons/fa";
+import { HiOutlineMoon } from "react-icons/hi";
 import { MdOutlineAccountBalance } from "react-icons/md";
 import { BsFillPersonLinesFill } from "react-icons/bs";
+import { AiOutlineWallet } from "react-icons/ai";
 import { buyerPAN } from "./Utils";
 
 const Navbar = (props) => {
@@ -86,7 +87,7 @@ const Navbar = (props) => {
 			<h1>Invoice App</h1>
 			<div id="walletDiv">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
-					{darkMode ? <FaSun /> : <FaMoon />}
+					{darkMode ? <FaSun /> : <HiOutlineMoon />}
 				</span>
 				{account ? (
 					<div className="connectedAs">

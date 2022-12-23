@@ -64,51 +64,53 @@ const Home = () => {
 			<div className="container text-center">
 				<Navbar onRun={getAllInvoices} darkMode={darkMode} setDarkMode={setDarkMode} />
 
-				<table className="table table-striped mt-5">
-					<thead>
-						<tr>
-							<th> Buyer PAN </th>
-							<th> Seller PAN </th>
-							<th> Amount </th>
-							<th> Date </th>
-							<th> Payment status </th>
-						</tr>
-					</thead>
-					<tbody>
-						{invoices.map((invoice, index) => {
-							const invoiceAmountEther = ethers.utils.formatEther(
-								invoice.invoiceAmount
-							);
-							const invoiceDateFormatted = new Date(
-								invoice.invoiceDate * 1000
-							).toLocaleDateString("en-IN");
+				<div className="content-container">
+					<table className="table table-striped mt-5">
+						<thead>
+							<tr>
+								<th> Buyer PAN </th>
+								<th> Seller PAN </th>
+								<th> Amount </th>
+								<th> Date </th>
+								<th> Payment status </th>
+							</tr>
+						</thead>
+						<tbody>
+							{invoices.map((invoice, index) => {
+								const invoiceAmountEther = ethers.utils.formatEther(
+									invoice.invoiceAmount
+								);
+								const invoiceDateFormatted = new Date(
+									invoice.invoiceDate * 1000
+								).toLocaleDateString("en-IN");
 
-							return (
-								<tr key={index}>
-									<td>{invoice.buyerPAN}</td>
-									<td>{invoice.sellerPAN}</td>
-									<td>{invoiceAmountEther} ETH</td>
-									<td>{invoiceDateFormatted}</td>
-									<td>
-										{invoice.paid ? (
-											<button className="btn btn-success">
-												<GiCheckMark /> Paid
-											</button>
-										) : (
-											<button className="btn btn-warning"
-												onClick={() =>
-													payInvoice(index, invoiceAmountEther)
-												}
-											>
-												<FaEthereum /> Pay now
-											</button>
-										)}
-									</td>
-								</tr>
-							);
-						})}
-					</tbody>
-				</table>
+								return (
+									<tr key={index}>
+										<td>{invoice.buyerPAN}</td>
+										<td>{invoice.sellerPAN}</td>
+										<td>{invoiceAmountEther} ETH</td>
+										<td>{invoiceDateFormatted}</td>
+										<td>
+											{invoice.paid ? (
+												<button className="btn btn-success">
+													<GiCheckMark /> Paid
+												</button>
+											) : (
+												<button className="btn btn-warning"
+													onClick={() =>
+														payInvoice(index, invoiceAmountEther)
+													}
+												>
+													<FaEthereum /> Pay now
+												</button>
+											)}
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
 				<Link to="/createInvoice" className="btn btn-primary btn-lg active">
 					<AiOutlinePlus /> Create Invoice
 				</Link>
