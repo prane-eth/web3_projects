@@ -1,19 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+import { Link, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
-import { Link } from "react-router-dom";
-import {
-	Button,
-	Table,
-} from "react-bootstrap";
+import { AiOutlinePlus } from "react-icons/ai";
+import { FaEthereum } from "react-icons/fa";
+import { GiCheckMark } from "react-icons/gi";
 
 import WalletButton from "./WalletFunctions";
 import config from "../assets/ContractABI.json";
 import { contractAddress } from "../assets/ContractAddress.json";
 
 const Home = () => {
+	const navigateTo = useNavigate();
 	const [loadingMessage, setLoadingMessage] = useState("");
-
 	const [invoices, setInvoices] = useState([]);
 
 	const buyerPAN = "123456";
@@ -21,10 +20,12 @@ const Home = () => {
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
 
-	const payInvoice = async (id) => {
+	const payInvoice = async (index, amount) => {
 		setLoadingMessage("Paying invoice");
 		try {
-			await contract.payInvoiceByPAN(buyerPAN, id);
+			await contract.payInvoiceByPAN(buyerPAN, index, {
+				value: ethers.utils.parseEther(amount),
+			});
 		} catch (error) {
 			console.error(error);
 		}
@@ -41,21 +42,34 @@ const Home = () => {
 		setLoadingMessage("");
 	};
 
+	// press enter to create invoice
+	const handleKeyPress = (e) => {
+		// press enter to create invoice
+		if (e.key === "Enter") {
+			navigateTo("/createInvoice");
+		}
+	};
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyPress);
+		return () => {
+			window.removeEventListener("keydown", handleKeyPress);
+		};
+	}, []);
+
 	return (
-		<>
+		<div className="container text-center mt-5">
 			<WalletButton onRun={getAllInvoices} />
 
-			{loadingMessage && (
-				<div className="loading">{loadingMessage}...</div>
-			)}
-			<Table>
+			Buyer PAN: {buyerPAN}
+
+			<table className="table table-striped mt-5">
 				<thead>
-					<tr>
-						<th>Buyer PAN</th>
-						<th>Seller PAN</th>
-						<th>Amount</th>
-						<th>Date</th>
-						<th>Actions</th>
+					<tr className="text-center">
+						<th> Buyer PAN </th>
+						<th> Seller PAN </th>
+						<th> Amount </th>
+						<th> Date </th>
+						<th> Payment status </th>
 					</tr>
 				</thead>
 				<tbody>
@@ -71,33 +85,35 @@ const Home = () => {
 							<tr key={index}>
 								<td>{invoice.buyerPAN}</td>
 								<td>{invoice.sellerPAN}</td>
-								<td>{invoiceAmountEther}</td>
+								<td>{invoiceAmountEther} ETH</td>
 								<td>{invoiceDateFormatted}</td>
 								<td>
 									{invoice.paid ? (
-										<Button className="btn btn-success">
-											Paid
-										</Button>
+										<button className="btn btn-success">
+											<GiCheckMark /> Paid
+										</button>
 									) : (
-										<Button
-											className="btn btn-primary"
+										<button className="btn btn-warning"
 											onClick={() =>
-												payInvoice(index)
+												payInvoice(index, invoiceAmountEther)
 											}
 										>
-											Pay now
-										</Button>
+											<FaEthereum /> Pay now
+										</button>
 									)}
 								</td>
 							</tr>
 						);
 					})}
 				</tbody>
-			</Table>
-			<Link to="/createInvoice" className="btn btn-primary">
-				Create Invoice
+			</table>
+			<Link to="/createInvoice" className="btn btn-primary btn-lg active">
+				<AiOutlinePlus /> Create Invoice
 			</Link>
-		</>
+			{loadingMessage && (
+				<div className="loading mt-5">{loadingMessage}...</div>
+			)}
+		</div>
 	);
 };
 

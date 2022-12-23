@@ -5,9 +5,9 @@ const main = async () => {
 	await contract.deployed();
 	
 	// Add Invoice
-	const buyerPAN = "1234567890";
+	const buyerPAN = "BAJPC4350M";
 	const invoiceAmount = hre.ethers.utils.parseEther("0.1");
-	let result = await contract.addInvoice(buyerPAN, "0987654321", invoiceAmount);
+	let result = await contract.addInvoice(buyerPAN, "DAJPC4150P", invoiceAmount);
 	await result.wait();
 	console.log("Invoice added");
 

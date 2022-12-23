@@ -65,8 +65,10 @@ const WalletButton = (props) => {
 	if (account) {
 		return (
 			<div className="connectedAs">
-				<p>Connected as: {account}</p>
-				<p>Balance: {balance} ETH</p>
+				<div>Connected as: {account}</div>
+				{balance && (
+					<div>Balance: {balance} ETH</div>
+				)}
 			</div>
 		);
 	} else {

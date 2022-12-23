@@ -4,3 +4,12 @@ body {
 	min-width: unset;
 	min-height: unset;
 }
+body {
+	background: rgb(253,255,162);
+	background: radial-gradient(circle, rgba(253,255,162,1) 0%, rgba(229,255,204,1) 67%);
+}
+
+.bottom-button {
+	margin-left: 5%;
+	margin-right: 5%;
+}
