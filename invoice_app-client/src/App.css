@@ -1,15 +1,46 @@
-body {
-	display: unset;
-	place-items: unset;
-	min-width: unset;
-	min-height: unset;
-}
-body {
-	background: rgb(253,255,162);
-	background: radial-gradient(circle, rgba(253,255,162,1) 0%, rgba(229,255,204,1) 67%);
-}
-
 .bottom-button {
 	margin-left: 5%;
 	margin-right: 5%;
+}
+
+.mainContainer {
+	background: radial-gradient(circle, rgba(253, 255, 162, 1) 0%, rgba(229, 255, 204, 1) 67%);
+    /* background: linear-gradient(180deg, #7a0bf1 0%, #8196d3 100%); */
+    height: 100vh;
+    width: 100vw;
+
+    display: flex;
+    justify-content: center;
+    width: 100%; 
+}
+
+.darkmode {
+	background: radial-gradient(circle, rgba(30, 30, 30, 1) 0%, rgba(60, 60, 60, 1) 67%);
+	color: white;
+}
+.darkmode .darkModeToggle {
+    color: white;
+}
+.darkmode .darkModeToggle:hover {
+    background: slategrey;
+}
+.darkmode .loading {
+    color: white;
+}
+.darkmode .connectedAs {
+    color: rgb(125, 246, 125);
+}
+.darkmode input {
+    background: #1d2230;
+    color: white;
+}
+.darkmode button {
+    color: white;
+}
+.darkmode .table {
+	color: white;
+}
+.darkmode .card-body {
+	background: #1d2230;
+	color: white;
 }

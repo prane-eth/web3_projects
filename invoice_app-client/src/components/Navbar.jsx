@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
 import { ethers } from "ethers";
+import { FaSun, FaMoon } from "react-icons/fa";
 
-const WalletButton = (props) => {
+const Navbar = (props) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
 	const [account, setAccount] = useState(null);
@@ -49,6 +50,20 @@ const WalletButton = (props) => {
 			});
 	};
 
+	// get darkMode, setDarkMode from props
+	const { darkMode, setDarkMode, onRun } = props;
+
+	const toggleDarkMode = () => {
+		localStorage.setItem("darkMode", !darkMode);
+		setDarkMode(!darkMode);
+	};
+
+	const DarkModeToggle = () => (
+		<span className="darkModeToggle" onClick={toggleDarkMode}>
+			{darkMode ? <FaSun /> : <FaMoon />}
+		</span>
+	)
+
 	useEffect(() => {
 		if (window.ethereum) {
 			setIsWalletInstalled(true);
@@ -56,23 +71,29 @@ const WalletButton = (props) => {
 		checkIfWalletIsConnected();
 	}, []);
 	useEffect(() => {
-		if (props.onRun) props.onRun();
+		if (onRun) onRun();
 	}, [account]);
 
 	if (account) {
 		return (
-			<div className="connectedAs">
-				<div>Connected as: {account}</div>
-				{balance && (
-					<div>Balance: {balance} ETH</div>
-				)}
-			</div>
+			<>
+				<DarkModeToggle />
+				<div className="connectedAs">
+					<div>Connected as: {account}</div>
+					{balance && (
+						<div>Balance: {balance} ETH</div>
+					)}
+				</div>
+			</>
 		);
 	} else {
 		if (isWalletInstalled)
-			return <button onClick={connectWallet}>Connect Wallet</button>;
+			return <>
+				<DarkModeToggle />
+				<button onClick={connectWallet}>Connect Wallet</button>
+			</>;
 		return <p>Install Metamask wallet</p>;
 	}
 };
 
-export default WalletButton;
+export default Navbar;

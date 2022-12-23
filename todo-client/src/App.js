@@ -332,6 +332,11 @@ const App = () => {
 		// get dark mode from local storage
 		const localDarkMode = localStorage.getItem("darkMode");
 		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
+		
+		window.addEventListener("keydown", handleKeyPress);
+		return () => {
+			window.removeEventListener("keydown", handleKeyPress);
+		};
 	}, []);
 	useEffect(() => {
 		getAllTasks();
