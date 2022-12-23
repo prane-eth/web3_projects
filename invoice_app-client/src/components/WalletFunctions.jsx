@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import { ethers } from "ethers";
 
-
 const WalletButton = (props) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
@@ -38,7 +37,6 @@ const WalletButton = (props) => {
 	};
 
 	const connectWallet = async () => {
-		setLoadingMessage("Connecting wallet");
 		await window.ethereum
 			.request({
 				method: "eth_requestAccounts",
@@ -49,7 +47,6 @@ const WalletButton = (props) => {
 			.catch((error) => {
 				alert("Something went wrong");
 			});
-		setLoadingMessage(null);
 	};
 
 	useEffect(() => {

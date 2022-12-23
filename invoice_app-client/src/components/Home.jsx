@@ -15,7 +15,7 @@ const Home = () => {
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [invoices, setInvoices] = useState([]);
 
-	const buyerPAN = "123456";
+	const buyerPAN = localStorage.getItem('buyerPAN');
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
@@ -23,9 +23,13 @@ const Home = () => {
 	const payInvoice = async (index, amount) => {
 		setLoadingMessage("Paying invoice");
 		try {
-			await contract.payInvoiceByPAN(buyerPAN, index, {
+			const txn = await contract.payInvoiceByPAN(buyerPAN, index, {
 				value: ethers.utils.parseEther(amount),
 			});
+			console.log("Mining...", txn.hash);
+			await txn.wait();
+			console.log("Mined");
+			getAllInvoices();
 		} catch (error) {
 			console.error(error);
 		}

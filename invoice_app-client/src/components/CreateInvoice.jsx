@@ -9,14 +9,13 @@ import WalletButton from "./WalletFunctions";
 import config from "../assets/ContractABI.json";
 import { contractAddress } from "../assets/ContractAddress.json";
 
-
 const CreateInvoice = () => {
 	const navigateTo = useNavigate();
 	const [sellerPAN, setSellerPAN] = useState("");
 	const [invoiceAmount, setInvoiceAmount] = useState("");
 	const [loadingMessage, setLoadingMessage] = useState("");
 
-	const buyerPAN = "123456";
+	const buyerPAN = localStorage.getItem('buyerPAN');
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
@@ -30,13 +29,17 @@ const CreateInvoice = () => {
 		try {
 			setLoadingMessage("Creating invoice");
 			// parse ether for invoiceAmount
-			await contract.addInvoice(
+			const txn = await contract.addInvoice(
 				buyerPAN,
 				sellerPAN,
 				ethers.utils.parseEther(invoiceAmount)
 			);
-			setSellerPAN("");
-			setInvoiceAmount("");
+			console.log("Mining...", txn.hash);
+			await txn.wait();
+			console.log("Mined");
+			// setSellerPAN("");
+			// setInvoiceAmount("");
+			navigateTo("/")
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -67,10 +70,7 @@ const CreateInvoice = () => {
 				<div className="col-md-10 mt-5">
 					<div className="card card-body">
 						<WalletButton />
-						Buyer PAN: {buyerPAN}
-						{loadingMessage && (
-							<div className="loading">{loadingMessage}...</div>
-						)}
+						<p> Buyer PAN: {buyerPAN} </p>
 						<br />
 						<br />
 
@@ -99,6 +99,9 @@ const CreateInvoice = () => {
 								<IoArrowBack /> {" "} Cancel
 							</Link>
 						</form>
+						{loadingMessage && (
+							<div className="loading">{loadingMessage}...</div>
+						)}
 					</div>
 				</div>
 			</div>
