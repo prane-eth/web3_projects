@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 
 import { ethers } from "ethers";
 import { FaSun, FaMoon } from "react-icons/fa";
+import { AiOutlineWallet } from "react-icons/ai";
+import { MdOutlineAccountBalance } from "react-icons/md";
+import { BsFillPersonLinesFill } from "react-icons/bs";
 import { buyerPAN } from "./Utils";
 
 const Navbar = (props) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
 	const [account, setAccount] = useState(null);
+	const [accountShort, setAccountShort] = useState(null);
 
 	const checkIfWalletIsConnected = async () => {
 		if (account) {
@@ -29,7 +33,9 @@ const Navbar = (props) => {
 					method: "eth_getBalance",
 					params: [accounts[0], "latest"],
 				});
-				setBalance(ethers.utils.formatEther(walletBalance));
+				const balance = ethers.utils.formatEther(walletBalance);
+				const balanceShort = balance.slice(0, 5);
+				setBalance(balanceShort);
 			} else {
 				console.log("No authorized account found");
 			}
@@ -57,12 +63,6 @@ const Navbar = (props) => {
 		setDarkMode(!darkMode);
 	};
 
-	const DarkModeToggle = () => (
-		<span className="darkModeToggle" onClick={toggleDarkMode}>
-			{darkMode ? <FaSun /> : <FaMoon />}
-		</span>
-	)
-
 	useEffect(() => {
 		if (window.ethereum) {
 			setIsWalletInstalled(true);
@@ -74,27 +74,36 @@ const Navbar = (props) => {
 	}, []);
 	useEffect(() => {
 		if (onRun) onRun();
+		const accountShortValue = account ? account.slice(0, 6) + "..." + account.slice(-4) : null;
+		setAccountShort(accountShortValue);
 	}, [account]);
 
 	return (
-		<>
-			<DarkModeToggle />
-			{account ? (
-				<div className="connectedAs">
-					<div>Connected as: {account}</div>
-					{balance && (
-						<div>Balance: {balance} ETH</div>
-					)}
-				</div>
-			) : (
-				isWalletInstalled ? (
-					<button onClick={connectWallet}>Connect Wallet</button>
+		<nav id="navbar">
+			<div id="panDiv">
+				<p> <BsFillPersonLinesFill />: {buyerPAN} </p>
+			</div>
+			<h1>Invoice App</h1>
+			<div id="walletDiv">
+				<span className="darkModeToggle" onClick={toggleDarkMode}>
+					{darkMode ? <FaSun /> : <FaMoon />}
+				</span>
+				{account ? (
+					<div className="connectedAs">
+						<div><MdOutlineAccountBalance /> {accountShort}</div>
+						{balance && (
+							<div><AiOutlineWallet /> {balance} ETH</div>
+						)}
+					</div>
 				) : (
-					<p>Install Metamask wallet</p>
-				)
-			)}
-			<p> Buyer PAN: {buyerPAN} </p>
-		</>
+					isWalletInstalled ? (
+						<button onClick={connectWallet}>Connect Wallet</button>
+					) : (
+						<p>Install Metamask wallet</p>
+					)
+				)}
+			</div>
+		</nav>
 	);
 };
 

@@ -61,7 +61,7 @@ const Home = () => {
 		<div
 			className={darkMode ? "mainContainer darkmode" : "mainContainer"}
 		>
-			<div className="container text-center mt-5">
+			<div className="container text-center">
 				<Navbar onRun={getAllInvoices} darkMode={darkMode} setDarkMode={setDarkMode} />
 
 				<table className="table table-striped mt-5">

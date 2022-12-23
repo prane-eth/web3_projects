@@ -65,10 +65,10 @@ const CreateInvoice = () => {
 			className={darkMode ? "mainContainer darkmode" : "mainContainer"}
 		>
 			<div className="container">
+							<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 				<div className="row">
 					<div className="col-md-10 mt-5">
 						<div className="card card-body">
-							<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
 							<h3>Create Invoice</h3>
 							<form onSubmit={addInvoice}>
