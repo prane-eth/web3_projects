@@ -18,8 +18,8 @@ fi
 # if onlyBackend is not empty, then only create the backend
 if [ -z "$onlyBackend" ]; then
     echo "Creating a React app in $folder-client"
-    # npm create vite@latest "$folder-client" -- --template react
-    npx create-react-app "$folder-client"
+    npm create vite@latest "$folder-client" -- --template react
+    # npx create-react-app "$folder-client"
     cd "$folder-client"
     npm i ethers
     cd ..
