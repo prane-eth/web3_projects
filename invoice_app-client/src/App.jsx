@@ -3,10 +3,6 @@ import './App.css'
 import Home from './components/Home'
 import CreateInvoice from './components/CreateInvoice'
 
-if (!localStorage.getItem('buyerPAN')) {
-  localStorage.setItem('buyerPAN', 'BAJPC4350M')
-}
-
 const App = () => {
   return (
     <Router>

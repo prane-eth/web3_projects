@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 import { ethers } from "ethers";
 import { FaSun, FaMoon } from "react-icons/fa";
+import { buyerPAN } from "./Utils";
 
 const Navbar = (props) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -41,11 +42,9 @@ const Navbar = (props) => {
 		await window.ethereum
 			.request({
 				method: "eth_requestAccounts",
-			})
-			.then((accounts) => {
+			}).then((accounts) => {
 				setAccount(accounts[0]);
-			})
-			.catch((error) => {
+			}).catch((error) => {
 				alert("Something went wrong");
 			});
 	};
@@ -69,31 +68,34 @@ const Navbar = (props) => {
 			setIsWalletInstalled(true);
 		}
 		checkIfWalletIsConnected();
+
+		const localDarkMode = localStorage.getItem("darkMode");
+		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
 	}, []);
 	useEffect(() => {
 		if (onRun) onRun();
 	}, [account]);
 
-	if (account) {
-		return (
-			<>
-				<DarkModeToggle />
+	return (
+		<>
+			<DarkModeToggle />
+			{account ? (
 				<div className="connectedAs">
 					<div>Connected as: {account}</div>
 					{balance && (
 						<div>Balance: {balance} ETH</div>
 					)}
 				</div>
-			</>
-		);
-	} else {
-		if (isWalletInstalled)
-			return <>
-				<DarkModeToggle />
-				<button onClick={connectWallet}>Connect Wallet</button>
-			</>;
-		return <p>Install Metamask wallet</p>;
-	}
+			) : (
+				isWalletInstalled ? (
+					<button onClick={connectWallet}>Connect Wallet</button>
+				) : (
+					<p>Install Metamask wallet</p>
+				)
+			)}
+			<p> Buyer PAN: {buyerPAN} </p>
+		</>
+	);
 };
 
 export default Navbar;

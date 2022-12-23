@@ -6,20 +6,14 @@ import { IoArrowBack } from "react-icons/io5";
 import { BsPlusSquare } from "react-icons/bs";
 
 import Navbar from "./Navbar";
-import config from "../assets/ContractABI.json";
-import { contractAddress } from "../assets/ContractAddress.json";
+import getContract, { buyerPAN } from "./Utils";
 
 const CreateInvoice = () => {
 	const navigateTo = useNavigate();
 	const [sellerPAN, setSellerPAN] = useState("");
 	const [invoiceAmount, setInvoiceAmount] = useState("");
 	const [loadingMessage, setLoadingMessage] = useState("");
-	const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") || false);
-
-	const buyerPAN = localStorage.getItem('buyerPAN');
-	const provider = new ethers.providers.Web3Provider(window.ethereum);
-	const signer = provider.getSigner();
-	const contract = new ethers.Contract(contractAddress, config.abi, signer);
+	const [darkMode, setDarkMode] = useState(false);
 
 	const addInvoice = async (e) => {
 		e.preventDefault();
@@ -27,8 +21,9 @@ const CreateInvoice = () => {
 			alert("Please fill all fields");
 			return;
 		}
+		setLoadingMessage("Creating invoice");
 		try {
-			setLoadingMessage("Creating invoice");
+			const contract = await getContract();
 			// parse ether for invoiceAmount
 			const txn = await contract.addInvoice(
 				buyerPAN,
@@ -74,9 +69,6 @@ const CreateInvoice = () => {
 					<div className="col-md-10 mt-5">
 						<div className="card card-body">
 							<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-							<p> Buyer PAN: {buyerPAN} </p>
-							<br />
-							<br />
 
 							<h3>Create Invoice</h3>
 							<form onSubmit={addInvoice}>

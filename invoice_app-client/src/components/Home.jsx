@@ -7,23 +7,18 @@ import { FaEthereum } from "react-icons/fa";
 import { GiCheckMark } from "react-icons/gi";
 
 import Navbar from "./Navbar";
-import config from "../assets/ContractABI.json";
-import { contractAddress } from "../assets/ContractAddress.json";
+import getContract, { buyerPAN } from "./Utils";
 
 const Home = () => {
 	const navigateTo = useNavigate();
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [invoices, setInvoices] = useState([]);
-
-	const buyerPAN = localStorage.getItem('buyerPAN');
-	const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") || false);
-	const provider = new ethers.providers.Web3Provider(window.ethereum);
-	const signer = provider.getSigner();
-	const contract = new ethers.Contract(contractAddress, config.abi, signer);
+	const [darkMode, setDarkMode] = useState(false);
 
 	const payInvoice = async (index, amount) => {
 		setLoadingMessage("Paying invoice");
 		try {
+			const contract = await getContract();
 			const txn = await contract.payInvoiceByPAN(buyerPAN, index, {
 				value: ethers.utils.parseEther(amount),
 			});
@@ -39,6 +34,7 @@ const Home = () => {
 	const getAllInvoices = async () => {
 		setLoadingMessage("Fetching invoices");
 		try {
+			const contract = await getContract();
 			const invoices = await contract.getInvoicesByPAN(buyerPAN);
 			setInvoices(invoices);
 		} catch (error) {
@@ -67,8 +63,6 @@ const Home = () => {
 		>
 			<div className="container text-center mt-5">
 				<Navbar onRun={getAllInvoices} darkMode={darkMode} setDarkMode={setDarkMode} />
-
-				Buyer PAN: {buyerPAN}
 
 				<table className="table table-striped mt-5">
 					<thead>

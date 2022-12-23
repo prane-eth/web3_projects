@@ -14,15 +14,16 @@
     width: 100%; 
 }
 
+.darkModeToggle {
+	width: fit-content;
+}
+
 .darkmode {
 	background: radial-gradient(circle, rgba(30, 30, 30, 1) 0%, rgba(60, 60, 60, 1) 67%);
 	color: white;
 }
 .darkmode .darkModeToggle {
     color: white;
-}
-.darkmode .darkModeToggle:hover {
-    background: slategrey;
 }
 .darkmode .loading {
     color: white;
