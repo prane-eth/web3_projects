@@ -1,0 +1,6 @@
+body {
+	display: unset;
+	place-items: unset;
+	min-width: unset;
+	min-height: unset;
+}
