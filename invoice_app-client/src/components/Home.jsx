@@ -7,7 +7,6 @@ import WalletButton from "./WalletFunctions";
 import config from "../assets/ContractABI.json";
 import { contractAddress } from "../assets/ContractAddress.json";
 
-
 const Home = () => {
 	const [loadingMessage, setLoadingMessage] = useState("");
 
@@ -52,37 +51,47 @@ const Home = () => {
 					<table className="table table-striped">
 						<thead>
 							<tr>
-								<th>Name</th>
+								<th>Buyer PAN</th>
+								<th>Seller PAN</th>
 								<th>Amount</th>
 								<th>Date</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
-							{invoices.map((invoice, index) => (
-								<tr key={index}>
-									<td>{invoice.buyerPAN}</td>
-									<td>{invoice.sellerPAN}</td>
-									<td>{ethers.utils.formatEther(invoice.invoiceAmount)}</td>
-									<td>{invoice.invoiceDate}</td>
-									<td>
-										{invoice.paid ? (
-											<button className="btn btn-success">
-												Paid
-											</button>
-										) : (
-											<button
-												className="btn btn-primary"
-												onClick={() =>
-													payInvoice(index)
-												}
-											>
-												Pay now
-											</button>
-										)}
-									</td>
-								</tr>
-							))}
+							{invoices.map((invoice, index) => {
+								const invoiceAmountEther = ethers.utils.formatEther(
+									invoice.invoiceAmount
+								);
+								const invoiceDateFormatted = new Date(
+									invoice.invoiceDate * 1000
+								).toLocaleDateString("en-IN");
+
+								return (
+									<tr key={index}>
+										<td>{invoice.buyerPAN}</td>
+										<td>{invoice.sellerPAN}</td>
+										<td>{invoiceAmountEther}</td>
+										<td>{invoiceDateFormatted}</td>
+										<td>
+											{invoice.paid ? (
+												<button className="btn btn-success">
+													Paid
+												</button>
+											) : (
+												<button
+													className="btn btn-primary"
+													onClick={() =>
+														payInvoice(index)
+													}
+												>
+													Pay now
+												</button>
+											)}
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 					<Link to="/createInvoice" className="btn btn-primary">
