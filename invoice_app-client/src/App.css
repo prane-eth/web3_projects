@@ -38,8 +38,11 @@
 .darkmode button {
     color: white;
 }
-.darkmode .table {
+.darkmode table {
 	color: white;
+}
+.darkmode .table-striped>tbody>tr:nth-of-type(odd)>* {
+    color: white;
 }
 .darkmode .card-body {
 	background: #1d2230;
