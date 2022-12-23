@@ -64,7 +64,7 @@ const Home = () => {
 			<div className="container text-center">
 				<Navbar onRun={getAllInvoices} darkMode={darkMode} setDarkMode={setDarkMode} />
 
-				<div className="content-container">
+				<div className="content-container mt-5">
 					<table className="table table-striped mt-5">
 						<thead>
 							<tr>
@@ -111,7 +111,7 @@ const Home = () => {
 						</tbody>
 					</table>
 				</div>
-				<Link to="/createInvoice" className="btn btn-primary btn-lg active">
+				<Link to="/createInvoice" className="btn btn-primary btn-lg active mt-5">
 					<AiOutlinePlus /> Create Invoice
 				</Link>
 				{loadingMessage && (

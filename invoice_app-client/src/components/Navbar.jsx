@@ -98,7 +98,9 @@ const Navbar = (props) => {
 					</div>
 				) : (
 					isWalletInstalled ? (
-						<button onClick={connectWallet}>Connect Wallet</button>
+						<button id="connectMetamask" className="btn btn-primary btn-lg active" onClick={connectWallet}>
+							<AiOutlineWallet /> Connect Wallet
+						</button>
 					) : (
 						<p>Install Metamask wallet</p>
 					)

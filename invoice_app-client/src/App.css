@@ -26,6 +26,7 @@
     align-items: center;
     top: 0;
     width: 97vw;
+    margin-top: 1rem;
 }
 
 #walletDiv {
@@ -35,8 +36,56 @@
     align-items: center;
 }
 
+#connectMetamask {
+    margin-right: 1rem;
+    width: fit-content;
+    box-shadow: 0 0.5px 15px blue;
+    cursor: pointer;
+    border-radius: 2em 2em 2em 2em;
+    padding: 0.6rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 80%;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    background: black;
+    color: white;
+}
+
 .container {
     margin-left: 0;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+}
+
+table th,
+table td {
+    padding: 12px 15px;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
 }
 
 .darkModeToggle {
@@ -84,5 +133,10 @@
 
 .darkmode .card-body {
     background: #1d2230;
+    color: white;
+}
+
+.darkmode #connectMetamask {
+    background: blue;
     color: white;
 }

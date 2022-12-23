@@ -65,24 +65,28 @@ const CreateInvoice = () => {
 			className={darkMode ? "mainContainer darkmode" : "mainContainer"}
 		>
 			<div className="container">
-							<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-				<div className="row">
-					<div className="col-md-10 mt-5">
+				<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+
+				<div className="content-container">
+					<div className="col-md-5 mt-5">
 						<div className="card card-body">
 
 							<h3>Create Invoice</h3>
 							<form onSubmit={addInvoice}>
+								<label className="mt-4">Seller PAN</label>
 								<input
 									type="text"
-									className="form-control mt-4"
+									className="form-control mt-1"
 									placeholder="Seller PAN"
 									name="sellerPAN"
 									onChange={(e) => setSellerPAN(e.target.value)}
 									value={sellerPAN}
 								/>
+
+								<label className="mt-4">Amount in ETH</label>
 								<input
 									type="text"
-									className="form-control mt-2"
+									className="form-control mt-1"
 									placeholder="Amount in ETH"
 									name="amount"
 									onChange={(e) => setInvoiceAmount(e.target.value)}
