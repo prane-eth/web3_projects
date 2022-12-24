@@ -1,142 +1,158 @@
 .bottom-button {
-    margin-left: 5%;
-    margin-right: 5%;
+	margin-left: 5%;
+	margin-right: 5%;
 }
 
 .mainContainer {
-    background: radial-gradient(circle, rgba(253, 255, 162, 1) 0%, rgba(229, 255, 204, 1) 67%);
-    display: flex;
-    justify-content: center;
-    height: 100vh;
-    width: 100%;
+	background: radial-gradient(
+		circle,
+		rgba(253, 255, 162, 1) 0%,
+		rgba(229, 255, 204, 1) 67%
+	);
+	display: flex;
+	justify-content: center;
+	height: 100vh;
+	width: 100%;
 }
 
 .content-container {
-    width: 98vw;
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0 10vw;
+	width: 98vw;
+	display: flex;
+	justify-content: center;
+	margin: 0;
+	padding: 0 10vw;
 }
 
 #navbar {
-    /* align items to left, middle and right */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    top: 0;
-    width: 97vw;
-    margin-top: 1rem;
+	/* align items to left, middle and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	top: 0;
+	width: 97vw;
+	margin-top: 1rem;
 }
 
 #walletDiv {
-    /* align items to left and right */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	/* align items to left and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 #connectMetamask {
-    margin-right: 1rem;
-    width: fit-content;
-    box-shadow: 0 0.5px 15px blue;
-    cursor: pointer;
-    border-radius: 2em 2em 2em 2em;
-    padding: 0.6rem;
-    font-size: 1.1rem;
-    font-weight: 600;
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px blue;
+	cursor: pointer;
+	border-radius: 2em 2em 2em 2em;
+	padding: 0.6rem;
+	font-size: 1.1rem;
+	font-weight: 600;
 }
 
 .form-control {
-    width: 80%;
+	width: 80%;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    background: black;
-    color: white;
+	box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+	background: black;
+	color: white;
 }
 
 .container {
-    margin-left: 0;
+	margin-left: 0;
 }
 
 table {
-    border-collapse: collapse;
-    margin: 25px 0;
-    font-size: 0.9em;
-    font-family: sans-serif;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+	border-collapse: collapse;
+	margin: 25px 0;
+	font-size: 0.9em;
+	font-family: sans-serif;
+	min-width: 400px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
 table thead tr {
-    background-color: #009879;
-    color: #ffffff;
+	background-color: #009879;
+	color: #ffffff;
 }
 
 table th,
 table td {
-    padding: 12px 15px;
+	padding: 12px 15px;
 }
 
 table tbody tr {
-    border-bottom: 1px solid #dddddd;
+	border-bottom: 1px solid #dddddd;
 }
 
 table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+	border-bottom: 2px solid #009879;
+}
+
+.flex-vertical {
+	display: flex;
+	flex-direction: column;
+}
+.create-invoice-btn {
+	width: fit-content;
 }
 
 .darkModeToggle {
-    margin-right: 1rem;
-    width: fit-content;
-    box-shadow: 0 0.5px 15px orange;
-    border-radius: 50%;
-    padding: 0.6rem;
-    cursor: pointer;
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px orange;
+	border-radius: 50%;
+	padding: 0.6rem;
+	cursor: pointer;
 }
 
 .darkmode {
-    background: radial-gradient(circle, rgba(30, 30, 30, 1) 0%, rgba(60, 60, 60, 1) 67%);
-    color: white;
+	background: radial-gradient(
+		circle,
+		rgba(30, 30, 30, 1) 0%,
+		rgba(60, 60, 60, 1) 67%
+	);
+	color: white;
 }
 
 .darkmode .darkModeToggle {
-    color: white;
+	color: white;
 }
 
 .darkmode .loading {
-    color: white;
+	color: white;
 }
 
 .darkmode .connectedAs {
-    color: rgb(125, 246, 125);
+	color: rgb(125, 246, 125);
 }
 
 .darkmode input {
-    background: #1d2230;
-    color: white;
+	background: #1d2230;
+	color: white;
 }
 
 .darkmode button {
-    color: white;
+	color: white;
 }
 
 .darkmode table {
-    color: white;
+	color: white;
 }
 
-.darkmode .table-striped>tbody>tr:nth-of-type(odd)>* {
-    color: white;
+.darkmode .table-striped > tbody > tr:nth-of-type(odd) > * {
+	color: white;
 }
 
 .darkmode .card-body {
-    background: #1d2230;
-    color: white;
+	background: #1d2230;
+	color: white;
 }
 
 .darkmode #connectMetamask {
-    background: blue;
-    color: white;
+	background: blue;
+	color: white;
 }

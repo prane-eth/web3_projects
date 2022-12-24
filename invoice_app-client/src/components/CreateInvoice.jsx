@@ -14,11 +14,21 @@ const CreateInvoice = () => {
 	const [invoiceAmount, setInvoiceAmount] = useState("");
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [darkMode, setDarkMode] = useState(false);
+	const [account, setAccount] = useState(null);
 
 	const addInvoice = async (e) => {
 		e.preventDefault();
 		if (!sellerPAN || !invoiceAmount) {
 			alert("Please fill all fields");
+			return;
+		}
+		if (!validatePAN(sellerPAN)) {
+			alert("Invalid Seller PAN");
+			return;
+		}
+		// check if invoice amount is valid
+		if (isNaN(invoiceAmount) || invoiceAmount <= 0) {
+			alert("Invalid invoice amount");
 			return;
 		}
 		setLoadingMessage("Creating invoice");
@@ -43,6 +53,35 @@ const CreateInvoice = () => {
 		}
 	};
 
+	const validatePAN = (pan) => {
+		// check if pan is valid
+		// pan should be 10 characters long
+		if (pan.length !== 10) {
+			return false;
+		}
+        // PAN format [AAAAA1111A]
+		// first 5 characters should be alphabets
+		// next 4 characters should be numbers
+		// last character should be alphabet
+		const regex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+		if (!regex.test(pan)) {
+			return false;
+		}
+
+        // 4th character can be P, C, H, A, B, G, J, L, F or I
+		const validChar8 = "PCAHBGJLFI";
+		if (!validChar8.includes(pan[3])) {
+			return false;
+		}
+
+		// number part can't be 0001
+		if (pan.slice(5, 9) === "0001") {
+			return false;
+		}
+
+		return true;
+	};
+
 	const handleKeyPress = (e) => {
 		// press enter to create invoice
 		if (e.key === "Enter") {
@@ -65,7 +104,12 @@ const CreateInvoice = () => {
 			className={darkMode ? "mainContainer darkmode" : "mainContainer"}
 		>
 			<div className="container">
-				<Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+				<Navbar
+					account={account}
+					setAccount={setAccount}
+					darkMode={darkMode}
+					setDarkMode={setDarkMode}
+				/>
 
 				<div className="content-container">
 					<div className="col-md-5 mt-5">
@@ -85,7 +129,7 @@ const CreateInvoice = () => {
 
 								<label className="mt-4">Amount in ETH</label>
 								<input
-									type="text"
+									type="number"
 									className="form-control mt-1"
 									placeholder="Amount in ETH"
 									name="amount"

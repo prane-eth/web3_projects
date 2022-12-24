@@ -14,6 +14,7 @@ const Home = () => {
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [invoices, setInvoices] = useState([]);
 	const [darkMode, setDarkMode] = useState(false);
+	const [account, setAccount] = useState(null);
 
 	const payInvoice = async (index, amount) => {
 		setLoadingMessage("Paying invoice");
@@ -58,66 +59,92 @@ const Home = () => {
 	}, []);
 
 	return (
-		<div
-			className={darkMode ? "mainContainer darkmode" : "mainContainer"}
-		>
+		<div className={darkMode ? "mainContainer darkmode" : "mainContainer"}>
 			<div className="container text-center">
-				<Navbar onRun={getAllInvoices} darkMode={darkMode} setDarkMode={setDarkMode} />
+				<Navbar
+					account={account}
+					setAccount={setAccount}
+					darkMode={darkMode}
+					setDarkMode={setDarkMode}
+					onRun={getAllInvoices}
+				/>
 
-				<div className="content-container mt-5">
-					<table className="table table-striped mt-5">
-						<thead>
-							<tr>
-								<th> Buyer PAN </th>
-								<th> Seller PAN </th>
-								<th> Amount </th>
-								<th> Date </th>
-								<th> Payment status </th>
-							</tr>
-						</thead>
-						<tbody>
-							{invoices.map((invoice, index) => {
-								const invoiceAmountEther = ethers.utils.formatEther(
-									invoice.invoiceAmount
-								);
-								const invoiceDateFormatted = new Date(
-									invoice.invoiceDate * 1000
-								).toLocaleDateString("en-IN");
-
-								return (
-									<tr key={index}>
-										<td>{invoice.buyerPAN}</td>
-										<td>{invoice.sellerPAN}</td>
-										<td>{invoiceAmountEther} ETH</td>
-										<td>{invoiceDateFormatted}</td>
-										<td>
-											{invoice.paid ? (
-												<button className="btn btn-success">
-													<GiCheckMark /> Paid
-												</button>
-											) : (
-												<button className="btn btn-warning"
-													onClick={() =>
-														payInvoice(index, invoiceAmountEther)
-													}
-												>
-													<FaEthereum /> Pay now
-												</button>
-											)}
-										</td>
+				<div className="content-container mt-5 flex-vertical">
+					{!account ? "Please connect to metamask" : null}
+					{!invoices.length
+						? "No invoices found. Please create a new invoice"
+						: null}
+					{account && invoices ? (
+						<>
+							<table className="table table-striped mt-5">
+								<thead>
+									<tr>
+										<th> Buyer PAN </th>
+										<th> Seller PAN </th>
+										<th> Amount </th>
+										<th> Date </th>
+										<th> Payment status </th>
 									</tr>
-								);
-							})}
-						</tbody>
-					</table>
+								</thead>
+								<tbody>
+									{invoices.map((invoice, index) => {
+										const invoiceAmountEther =
+											ethers.utils.formatEther(
+												invoice.invoiceAmount
+											);
+										const invoiceDateFormatted = new Date(
+											invoice.invoiceDate * 1000
+										).toLocaleDateString("en-IN");
+
+										return (
+											<tr key={index}>
+												<td>{invoice.buyerPAN}</td>
+												<td>{invoice.sellerPAN}</td>
+												<td>
+													{invoiceAmountEther} ETH
+												</td>
+												<td>{invoiceDateFormatted}</td>
+												<td>
+													{invoice.paid ? (
+														<button className="btn btn-success">
+															<GiCheckMark /> Paid
+														</button>
+													) : (
+														<button
+															className="btn btn-warning"
+															onClick={() =>
+																payInvoice(
+																	index,
+																	invoiceAmountEther
+																)
+															}
+														>
+															<FaEthereum /> Pay
+															now
+														</button>
+													)}
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+							<Link
+								to="/createInvoice"
+								className="btn btn-primary btn-md active mt-5 create-invoice-btn"
+							>
+								<AiOutlinePlus /> Create Invoice
+							</Link>
+							{loadingMessage && (
+								<div className="loading mt-5">
+									{loadingMessage}...
+								</div>
+							)}
+						</>
+					) : null}
 				</div>
-				<Link to="/createInvoice" className="btn btn-primary btn-lg active mt-5">
-					<AiOutlinePlus /> Create Invoice
-				</Link>
-				{loadingMessage && (
-					<div className="loading mt-5">{loadingMessage}...</div>
-				)}
-			</div></div>
+			</div>
+		</div>
 	);
 };
 

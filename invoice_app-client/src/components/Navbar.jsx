@@ -11,8 +11,9 @@ import { buyerPAN } from "./Utils";
 const Navbar = (props) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
-	const [account, setAccount] = useState(null);
 	const [accountShort, setAccountShort] = useState(null);
+
+	const { account, setAccount, darkMode, setDarkMode, onRun } = props;
 
 	const checkIfWalletIsConnected = async () => {
 		if (account) {
@@ -55,9 +56,6 @@ const Navbar = (props) => {
 				alert("Something went wrong");
 			});
 	};
-
-	// get darkMode, setDarkMode from props
-	const { darkMode, setDarkMode, onRun } = props;
 
 	const toggleDarkMode = () => {
 		localStorage.setItem("darkMode", !darkMode);
