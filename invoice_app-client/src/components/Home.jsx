@@ -71,10 +71,10 @@ const Home = () => {
 
 				<div className="content-container mt-5 flex-vertical">
 					{!account ? "Please connect to metamask" : null}
-					{!invoices.length
+					{account && !invoices.length
 						? "No invoices found. Please create a new invoice"
 						: null}
-					{account && invoices ? (
+					{account && invoices.length ? (
 						<>
 							<table className="table table-striped mt-5">
 								<thead>
