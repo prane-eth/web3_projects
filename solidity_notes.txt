@@ -608,3 +608,34 @@ To get the ethereum address from the public key!
    const hash = keccak256(publicKeyWithoutFormat);
    const address = hash.slice(-20);
 
+
+
+
+Code to mine blocks
+
+   const TARGET_DIFFICULTY = BigInt(0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+   const MAX_TRANSACTIONS = 10;
+   const mempool = [];
+   const blocks = [];
+   function addTransaction(transaction) {
+      mempool.push(transaction)
+   }
+   function mine() {
+      const transactions = [];
+      while (transactions.length < MAX_TRANSACTIONS && mempool.length) {
+         transactions.push(mempool.pop())
+      }
+      const block = {
+         id: blocks.length,
+         transactions: transactions,
+         nonce: 0
+      }
+      block.hash = SHA256(JSON.stringify(block))
+      while (BigInt(`0x${block.hash}`) >= TARGET_DIFFICULTY) {
+         block.nonce++
+         block.hash = SHA256(JSON.stringify(block))
+      }
+      blocks.push(block)
+   }
+
+
