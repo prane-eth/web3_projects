@@ -1,15 +1,22 @@
 import { ethers, Contract } from "ethers";
 import contractABI from "../assets/contractABI.json";
+import Image1 from "../assets/images/1.png";
+import Image2 from "../assets/images/2.png";
+import Image3 from "../assets/images/3.png";
+import Image4 from "../assets/images/4.png";
+import Image5 from "../assets/images/5.png";
 
-// const folderURL =
-// 	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
-const folderURL = "./assets/images/"
+const images = [Image1, Image2, Image3, Image4, Image5];
+
+const folderURL =
+	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
 export const pricePerToken = 0.01;
 export const imageSize = 250;
 
 // create new list of NFTs
 export const nftCount = 5;
 export const data = [...Array(nftCount).keys()].map((i) => ({
+	// url: images[i],
 	url: folderURL + (i + 1) + ".png",
 }));
 
