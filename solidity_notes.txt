@@ -639,3 +639,35 @@ Code to mine blocks
    }
 
 
+Blockchain code
+
+class Blockchain {
+    constructor() {
+        this.chain = [ new Block() ];
+    }
+    addBlock(block) {
+        const lastBlock = this.chain[this.chain.length-1]
+        block.previousHash = lastBlock.toHash()
+        this.chain.push(block)
+    }
+    isValid() {
+        for (let i = 1; i < this.chain.length; i++) {
+            const currentBlock = this.chain[i];
+            const previousBlock = this.chain[i - 1];
+            if (currentBlock.previousHash !== previousBlock.toHash()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+}
+class Block {
+    constructor(data) {
+        this.data = data;
+        this.previousHash = null
+    }
+    toHash() {
+        return SHA256(this.previousHash + this.data).toString();
+    }
+}
