@@ -671,3 +671,9 @@ class Block {
         return SHA256(this.previousHash + this.data).toString();
     }
 }
+
+
+// create private key and public using secp256k1
+const secp = require("ethereum-cryptography/secp256k1");
+const privateKey = secp.createPrivateKey();
+const publicKey = secp.getPublicKey(privateKey, true);
