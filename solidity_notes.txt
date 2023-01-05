@@ -677,3 +677,89 @@ class Block {
 const secp = require("ethereum-cryptography/secp256k1");
 const privateKey = secp.createPrivateKey();
 const publicKey = secp.getPublicKey(privateKey, true);
+
+
+Miner's Fee in UTXO model
+   class Transaction {
+      constructor(inputUTXOs, outputUTXOs) {
+         this.inputUTXOs = inputUTXOs;
+         this.outputUTXOs = outputUTXOs;
+         this.fee = 0;
+      }
+      execute() {
+         var inputValue = 0, outputValue = 0;
+         for (var utxo of this.inputUTXOs) {
+            if (utxo.spent)
+                  throw new Error()
+            inputValue += utxo.amount
+         }
+         for (var utxo of this.outputUTXOs) {
+            outputValue += utxo.amount
+         }
+         if (inputValue < outputValue) {
+            this.fee = 1
+            throw new Error()
+         } else if (inputValue == outputValue)
+            this.fee = 0
+         else
+            this.fee = inputValue - outputValue
+         for (var utxo of this.inputUTXOs) {
+            utxo.spent = true
+         }
+      }
+   }
+
+
+
+Adding node in Tree data structure
+
+class Tree {
+   constructor() {
+       this.root = null;
+   }
+
+   addNode(node) {
+       if (!this.root) {
+           this.root = node;
+       } else {
+           this._addNode(this.root, node);
+       }
+   }
+
+   _addNode(currentNode, newNode) {
+       if (newNode.data < currentNode.data) {
+           if (!currentNode.left) {
+               currentNode.left = newNode;
+           } else {
+               this._addNode(currentNode.left, newNode);
+           }
+       } else if (newNode.data > currentNode.data) {
+           if (!currentNode.right) {
+               currentNode.right = newNode;
+           } else {
+               this._addNode(currentNode.right, newNode);
+           }
+       }
+   }
+   
+   hasNode(data) {
+       return this._hasNode(this.root, data);
+   }
+
+   _hasNode(currentNode, data) {
+       if (!currentNode) {
+           return false;
+       }
+
+       if (currentNode.data === data) {
+           return true;
+       }
+
+       if (data < currentNode.data) {
+           return this._hasNode(currentNode.left, data);
+       } else {
+           return this._hasNode(currentNode.right, data);
+       }
+   }
+}
+
