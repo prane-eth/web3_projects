@@ -1,2 +1,1 @@
-cd solidity-learn
 npx hardhat run scripts/run.js
