@@ -74,26 +74,33 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 	return (
 		<nav id="navbar">
-			<h1>Invoice App</h1>
-			<div id="walletDiv">
+			<div className="emptyDiv"></div>
+			<h1>Debank App</h1>
+			<div id="walletDiv" className="flex-horizontal">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
 				</span>
 				{account ? (
 					<div className="connectedAs">
-						<div><MdOutlineAccountBalance /> {accountShort}</div>
+						<div>
+							<MdOutlineAccountBalance /> {accountShort}
+						</div>
 						{balance && (
-							<div><AiOutlineWallet /> {balance} ETH</div>
+							<div>
+								<AiOutlineWallet /> {balance} ETH
+							</div>
 						)}
 					</div>
+				) : isWalletInstalled ? (
+					<button
+						id="connectMetamask"
+						className="btn btn-primary btn-lg active"
+						onClick={connectWallet}
+					>
+						<AiOutlineWallet /> Connect Wallet
+					</button>
 				) : (
-					isWalletInstalled ? (
-						<button id="connectMetamask" className="btn btn-primary btn-lg active" onClick={connectWallet}>
-							<AiOutlineWallet /> Connect Wallet
-						</button>
-					) : (
-						<p>Install Metamask wallet</p>
-					)
+					<p>Install Metamask wallet</p>
 				)}
 			</div>
 		</nav>
