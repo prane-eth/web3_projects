@@ -485,12 +485,12 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "withdrawMoney",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
+		"inputs": [],
+		"name": "withdrawEther",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
   ],
   "contractAddress": "0xD4E4ee93DE1aebd05302C63Bf5eC8E12d1c20294"
 }

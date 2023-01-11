@@ -58,9 +58,9 @@ export async function connectWallet() {
 		});
 }
 
-export async function withdrawMoney() {
+export async function withdrawEther() {
 	try {
-		const response = await NFTContract.withdrawMoney();
+		const response = await NFTContract.withdrawEther();
 		console.log("Started txn: ", response);
 	} catch (err) {
 		alert(err);

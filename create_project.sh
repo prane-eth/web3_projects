@@ -154,6 +154,17 @@ if [ "$createClient" == "true" ]; then
     color: white;
     background: #0a58ca;
 }
+.darkModeToggle {
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px grey;
+	border-radius: 50%;
+	padding: 0.6rem;
+	cursor: pointer;
+	&:hover {
+		background: lightgrey;
+	}
+}
 
 @mixin flex-layout {
 	display: flex;
@@ -167,20 +178,6 @@ if [ "$createClient" == "true" ]; then
 .flex-vertical {
 	@include flex-layout;
 	flex-direction: column;
-}
-
-
-
-.darkModeToggle {
-	margin-right: 1rem;
-	width: fit-content;
-	box-shadow: 0 0.5px 15px grey;
-	border-radius: 50%;
-	padding: 0.6rem;
-	cursor: pointer;
-	&:hover {
-		background: lightgrey;
-	}
 }
 
 .darkmode {
@@ -494,7 +491,7 @@ const main = async () => {
 	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
 	const contract = await contractFactory.deploy();
 	await contract.deployed();
-	console.log(\"Contract deployed address: \", contract.address);
+	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
 };
 
 const runMain = async () => {

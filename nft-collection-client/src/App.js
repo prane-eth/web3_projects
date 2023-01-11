@@ -3,12 +3,12 @@ import "./App.css";
 import {
 	setStateVariables,
 	connectWallet,
-	withdrawMoney,
-    handleMint,
-    pricePerToken,
-    imageSize,
-    data,
-	bindNFTContract
+	withdrawEther,
+	handleMint,
+	pricePerToken,
+	imageSize,
+	data,
+	bindNFTContract,
 } from "./components/NftFunctions";
 
 function App() {
@@ -83,7 +83,7 @@ function App() {
 						</button>
 					</div>
 				))}
-				<button onClick={withdrawMoney}>Withdraw Money</button>
+				<button onClick={withdrawEther}>Withdraw Ether</button>
 			</div>
 		</>
 	);

@@ -64,7 +64,7 @@ enable nice loading animation when loading anything
 when only 1 task is remaining and that is completed, enable firework animation with only css
 allow them to store locally if they dont want blockchain or dont have wallet installed
 enable custom themes, animations, styles for prime members
-create pro and prime memberships, with lifetime or monthly/yearly options, free trial. money will be paid to owner by contract
+create pro and prime memberships, with lifetime or monthly/yearly options, free trial. Ether will be paid to owner by contract
 add refresh button
 rename app to metodo or meto (meta + todo)
 enable badges and free prime membership for regular users

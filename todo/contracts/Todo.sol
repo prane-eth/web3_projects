@@ -107,7 +107,7 @@ contract Todo {
             return false;
         }
 
-        // if contract has lesser money
+        // if contract has lesser Ether
         if (address(this).balance < amount) {
             amount = address(this).balance;
         }

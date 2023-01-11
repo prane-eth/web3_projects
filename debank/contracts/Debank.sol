@@ -32,6 +32,13 @@ contract Debank {
         balances[to] += amount;
     }
 
+    function transferToWallet(address to, uint256 amount) public AccountRequired {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount;
+        (bool success, ) = to.call{ value: amount }("");
+        require(success, "Failed to transfer to wallet");
+    }
+
     function payToAccount(address to) public payable {
         balances[to] += msg.value;
     }

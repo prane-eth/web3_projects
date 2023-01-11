@@ -6,6 +6,7 @@
 	top: 0;
 	width: 97vw;
 	margin-top: 1rem;
+	margin-bottom: 1.5rem;
 
 	// always display navbar on top of page
 	position: sticky;
@@ -17,6 +18,18 @@
 	margin-top: 0;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+}
+
+.create-account-btn {
+	margin-right: 1rem;
+	width: fit-content;
+	cursor: pointer;
+	border-radius: .2em .2em .2em .2em;
+	border: none;
+	padding: 0.6rem;
+	font-size: 1.1rem;
+	color: white;
+	background: green;
 }
 
 .mainContainer {

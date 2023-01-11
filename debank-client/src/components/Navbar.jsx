@@ -6,11 +6,15 @@ import { HiOutlineMoon } from "react-icons/hi";
 import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
 
+import getContract from "./Utils";
+
 const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
-	const [balance, setBalance] = useState(null);
+	const [balanceShort, setBalanceShort] = useState(null);
+	const [accountExists, setAccountExists] = useState(false);
+	const [accountBalance, setAccountBalance] = useState(null);
 	const [accountShort, setAccountShort] = useState(null);
-    
+
 	const checkIfWalletIsConnected = async () => {
 		if (account) {
 			return;
@@ -32,8 +36,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 					params: [accounts[0], "latest"],
 				});
 				const balance = ethers.utils.formatEther(walletBalance);
-				const balanceShort = balance.slice(0, 5);
-				setBalance(balanceShort);
+				setBalanceShort(balance.slice(0, 5));
 			} else {
 				console.log("No authorized account found");
 			}
@@ -46,9 +49,11 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 		await window.ethereum
 			.request({
 				method: "eth_requestAccounts",
-			}).then((accounts) => {
+			})
+			.then((accounts) => {
 				setAccount(accounts[0]);
-			}).catch((error) => {
+			})
+			.catch((error) => {
 				alert("Something went wrong");
 			});
 	};
@@ -56,6 +61,10 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	const toggleDarkMode = () => {
 		localStorage.setItem("darkMode", !darkMode);
 		setDarkMode(!darkMode);
+	};
+
+	const disconnectWallet = async () => {
+		// TODO: add option to disconnect metamask wallet
 	};
 
 	useEffect(() => {
@@ -68,13 +77,58 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
 	}, []);
 	useEffect(() => {
-		const accountShortValue = account ? account.slice(0, 6) + "..." + account.slice(-4) : null;
+		getContract().then((contract) => {
+			if (accountExists) {
+				// if Home component is not mounted
+				if (document.getElementById("homepageDiv") === null) {
+					contract.getBalance().then((bankBalance) => {
+						bankBalance = ethers.utils.formatEther(bankBalance);
+						setAccountBalance(bankBalance);
+					});
+				}
+			}
+		});
+	}, [account, accountExists]);
+	useEffect(() => {
+		const accountShortValue = account
+			? account.slice(0, 6) + "..." + account.slice(-4)
+			: null;
 		setAccountShort(accountShortValue);
+
+		if (account) {
+			setIsWalletInstalled(true);
+			ethereum
+				.request({
+					method: "eth_getBalance",
+					params: [account, "latest"],
+				})
+				.then((walletBalance) => {
+					const balance = ethers.utils.formatEther(walletBalance);
+					setBalanceShort(balance.slice(0, 5));
+				});
+
+			getContract().then((contract) => {
+				contract.userHasAccount().then((hasAccount) => {
+					setAccountExists(hasAccount);
+					contract.getBalance().then((rawBalance) => {
+						const balanceEther = ethers.utils.formatEther(rawBalance);
+						setAccountBalance(balanceEther);
+					});
+				});
+			});
+		}
 	}, [account]);
 
 	return (
 		<nav id="navbar">
-			<div className="emptyDiv"></div>
+			<div className="emptyDiv">
+				{/* Account balance: {bankBalance} ETH */}
+				{accountBalance && (
+					<div className="bankBalance">
+						<AiOutlineWallet /> {accountBalance} ETH
+					</div>
+				)}
+			</div>
 			<h1>Debank App</h1>
 			<div id="walletDiv" className="flex-horizontal">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
@@ -83,11 +137,14 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 				{account ? (
 					<div className="connectedAs">
 						<div>
-							<MdOutlineAccountBalance /> {accountShort}
+							<MdOutlineAccountBalance
+								onClick={disconnectWallet}
+							/>{" "}
+							{accountShort}
 						</div>
-						{balance && (
+						{balanceShort && (
 							<div>
-								<AiOutlineWallet /> {balance} ETH
+								<AiOutlineWallet /> {balanceShort} ETH
 							</div>
 						)}
 					</div>
