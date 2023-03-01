@@ -56,4 +56,28 @@ describe("Debank", function () {
 		const errorMessage = "VM Exception while processing transaction: reverted with reason string 'Account does not exist'";
 		await expect(contract.withdraw(ethers.utils.parseEther("0.1"))).to.be.revertedWith(errorMessage);
 	});
+	it("Should authorize withdrawer", async function () {
+		await contract.authorizeWithdrawer(addr1.address);
+		expect(await contract.withdrawers(addr1.address)).to.equal(true);
+	});
+	it("Should get authorized withdrawers", async function () {
+		const authorizedWithdrawers = await contract.getAuthorizedWithdrawers();
+		expect(authorizedWithdrawers).to.include(addr1.address);
+	});
+	it("Should withdraw all from account", async function () {
+		await contract.connect(addr1).createAccount();
+		await contract.connect(addr1).deposit({ value: ethers.utils.parseEther("1") });
+		await contract.deposit({ value: ethers.utils.parseEther("1") });
+		await contract.connect(addr1).withdrawAllFromAccount();
+		expect(await contract.connect(addr1).getBalance()).to.equal(0);
+		expect(await contract.getBalance()).to.equal(ethers.utils.parseEther("2"));
+	});		
+	it("Should revoke withdrawer", async function () {
+		await contract.revokeWithdrawer(addr1.address);
+		expect(await contract.getAuthorizedWithdrawers()).to.not.include(addr1.address);
+	});
+	it("Should not allow non-owner to authorize withdrawer", async function () {
+		const errorMessage = "VM Exception while processing transaction: reverted with reason string 'Only owner can call this function'";
+		await expect(contract.connect(addr1).authorizeWithdrawer(addr1.address)).to.be.revertedWith(errorMessage);
+	});
 });

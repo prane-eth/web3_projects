@@ -9,3 +9,4 @@ Advantages of this project:
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
 
+If your private keys is compromised and attackers stole all balance, you can withdraw balance using authorized addresses.
