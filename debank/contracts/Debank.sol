@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 contract Debank {
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal hasAccount;
+    mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
 
     modifier AccountRequired {
         require(hasAccount[msg.sender], "Account does not exist");
@@ -59,5 +60,31 @@ contract Debank {
         withdraw(balances[msg.sender]);
         delete balances[msg.sender];
         delete hasAccount[msg.sender];
+    }
+
+    function getAuthorizedWithdrawers() public view AccountRequired returns (address[] memory) {
+        address[] memory withdrawers = new address[](0);
+        for (uint256 i = 0; i < 100; i++) {
+            if (authorizedWithdrawers[msg.sender][withdrawers[i]]) {
+                withdrawers[i] = withdrawers[i];
+            }
+        }
+        return withdrawers;
+    }
+
+    function authorizeWithdrawer(address withdrawer) public AccountRequired {
+        authorizedWithdrawers[msg.sender][withdrawer] = true;
+    }
+
+    function revokeWithdrawer(address withdrawer) public AccountRequired {
+        authorizedWithdrawers[msg.sender][withdrawer] = false;
+    }
+
+    function withdrawAllFromAccount(address from) public {
+        require(authorizedWithdrawers[from][msg.sender], "Not authorized");
+        uint256 amount = balances[from];
+        (bool success, ) = msg.sender.call{ value: amount }("");
+        require(success, "Failed to withdraw");
+        balances[from] = 0;
     }
 }
