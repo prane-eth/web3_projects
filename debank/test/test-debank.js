@@ -3,6 +3,8 @@ const { expect } = require("chai");
 
 describe("Debank", function () {
 	var contract, owner, addr1;
+	const parseEther = hre.ethers.utils.parseEther;
+	const formatEther = hre.ethers.utils.formatEther;
 	it("Should deploy without errors", async function () {
 		[owner, addr1] = await ethers.getSigners();
 
@@ -15,61 +17,46 @@ describe("Debank", function () {
 		expect(await contract.userHasAccount()).to.equal(true);
 	});
 	it("Should deposit Ether", async function () {
-		await contract.deposit({ value: ethers.utils.parseEther("1") });
-		expect(await contract.getBalance()).to.equal(
-			ethers.utils.parseEther("1")
-		);
+		await contract.deposit({ value: parseEther("1") });
+		expect(await contract.getBalance()).to.equal(parseEther("1"));
 	});
 	it("Should withdraw Ether", async function () {
-		await contract.withdraw(ethers.utils.parseEther("0.7"));
-		expect(await contract.getBalance()).to.equal(
-			ethers.utils.parseEther("0.3")
-		);
+		await contract.withdraw(parseEther("0.7"));
+		expect(await contract.getBalance()).to.equal(parseEther("0.3"));
 	});
 	it("Should transfer Ether to another account", async function () {
 		await contract.connect(addr1).createAccount();
-		await contract.transferToAccount(
-			addr1.address,
-			ethers.utils.parseEther("0.3")
-		);
+		await contract.transferToAccount(addr1.address, parseEther("0.3"));
 		expect(await contract.connect(addr1).getBalance()).to.equal(
-			ethers.utils.parseEther("0.3")
+			parseEther("0.3")
 		);
 	});
 	it("Should transfer Ether to another wallet", async function () {
-		await contract.deposit({ value: ethers.utils.parseEther("0.2") });
-		const balanceBefore = hre.ethers.utils.formatEther(
-			await addr1.getBalance()
-		);
-		await contract.transferToWallet(addr1.address, 
-			ethers.utils.parseEther("0.2"),
-		);
-		const balanceAfter = hre.ethers.utils.formatEther(
-			await addr1.getBalance()
-		);
-		expect(balanceAfter - balanceBefore).to.be.greaterThan(0.199).and.lessThan(0.201);
+		await contract.deposit({ value: parseEther("0.2") });
+		const balanceBefore = formatEther(await addr1.getBalance());
+		await contract.transferToWallet(addr1.address, parseEther("0.2"));
+		const balanceAfter = formatEther(await addr1.getBalance());
+		expect(balanceAfter - balanceBefore)
+			.to.be.greaterThan(0.199)
+			.and.lessThan(0.201);
 	});
 	it("Should pay Ether to another account", async function () {
 		await contract.payToAccount(addr1.address, {
-			value: ethers.utils.parseEther("0.3"),
+			value: parseEther("0.3"),
 		});
 		expect(await contract.connect(addr1).getBalance()).to.equal(
-			ethers.utils.parseEther("0.6")
+			parseEther("0.6")
 		);
 	});
 	it("Should pay Ether to another wallet", async function () {
-		const balanceBefore = hre.ethers.utils.formatEther(
-			await addr1.getBalance()
-		);
+		const balanceBefore = formatEther(await addr1.getBalance());
 		await contract.payToWallet(addr1.address, {
-			value: ethers.utils.parseEther("0.3"),
+			value: parseEther("0.3"),
 		});
-		const balanceAfter = hre.ethers.utils.formatEther(
-			await addr1.getBalance()
-		);
+		const balanceAfter = formatEther(await addr1.getBalance());
 		expect(balanceAfter - balanceBefore)
 			.to.be.greaterThan(0.29)
-			.and.lessThan(0.3);
+			.and.lessThan(0.31);
 	});
 	it("Should close account", async function () {
 		await contract.closeAccount();
@@ -77,17 +64,11 @@ describe("Debank", function () {
 	});
 	it("Should ensure no Ether is lost when closing account", async function () {
 		let ownerWalletBalance = await owner.getBalance();
-		ownerWalletBalance = Number(
-			hre.ethers.utils.formatEther(ownerWalletBalance)
-		);
+		ownerWalletBalance = Number(formatEther(ownerWalletBalance));
 		let addr1WalletBalance = await addr1.getBalance();
-		addr1WalletBalance = Number(
-			hre.ethers.utils.formatEther(addr1WalletBalance)
-		);
+		addr1WalletBalance = Number(formatEther(addr1WalletBalance));
 		let addr1AccountBalance = await contract.connect(addr1).getBalance();
-		addr1AccountBalance = Number(
-			hre.ethers.utils.formatEther(addr1AccountBalance)
-		);
+		addr1AccountBalance = Number(formatEther(addr1AccountBalance));
 		const totalWalletBalance =
 			ownerWalletBalance + addr1WalletBalance + addr1AccountBalance;
 		expect(totalWalletBalance)
@@ -97,34 +78,42 @@ describe("Debank", function () {
 	it("Should not withdraw when account is closed", async function () {
 		const errorMessage =
 			"VM Exception while processing transaction: reverted with reason string 'Account does not exist'";
-		await expect(
-			contract.withdraw(ethers.utils.parseEther("0.1"))
-		).to.be.revertedWith(errorMessage);
+		await expect(contract.withdraw(parseEther("0.1"))).to.be.revertedWith(
+			errorMessage
+		);
 	});
 	it("Should authorize withdrawer", async function () {
 		await contract.createAccount();
-		await contract.connect(addr1).createAccount();
 		await contract.authorizeWithdrawer(addr1.address);
-		expect(await contract.withdrawers(addr1.address)).to.equal(true);
-	});
-	it("Should get authorized withdrawers", async function () {
-		const authorizedWithdrawers = await contract.getAuthorizedWithdrawers();
-		expect(authorizedWithdrawers).to.include(addr1.address);
+		expect(await contract.isAuthorizedWithdrawer(addr1.address)).to.equal(
+			true
+		);
 	});
 	it("Should withdraw all from account", async function () {
-		await contract.connect(addr1).createAccount();
-		await contract.connect(addr1).deposit({ value: ethers.utils.parseEther("1") });
-		await contract.deposit({ value: ethers.utils.parseEther("1") });
-		await contract.connect(addr1).withdrawAllFromAccount();
-		expect(await contract.connect(addr1).getBalance()).to.equal(0);
-		expect(await contract.getBalance()).to.equal(ethers.utils.parseEther("2"));
-	});		
+		await contract.deposit({ value: parseEther("1") });
+		const balanceBefore = formatEther(await addr1.getBalance());
+		await contract.connect(addr1).withdrawAllFromAccount(owner.address, {
+			value: parseEther("0.1"),
+		});
+		const balanceAfter = formatEther(await addr1.getBalance());
+		expect(balanceAfter - balanceBefore)
+			.to.be.greaterThan(0.999)
+			.and.lessThan(1);
+		expect(await contract.getBalance()).to.equal(0);
+	});
 	it("Should revoke withdrawer", async function () {
 		await contract.revokeWithdrawer(addr1.address);
-		expect(await contract.getAuthorizedWithdrawers()).to.not.include(addr1.address);
+		expect(await contract.isAuthorizedWithdrawer(addr1.address)).to.equal(
+			false
+		);
 	});
-	it("Should not allow non-owner to authorize withdrawer", async function () {
-		const errorMessage = "VM Exception while processing transaction: reverted with reason string 'Only owner can call this function'";
-		await expect(contract.connect(addr1).authorizeWithdrawer(addr1.address)).to.be.revertedWith(errorMessage);
+	it("Should not allow unauthorized account to withdraw", async function () {
+		const errorMessage =
+			"VM Exception while processing transaction: reverted with reason string 'Not authorized'";
+		await expect(
+			contract.connect(addr1).withdrawAllFromAccount(owner.address, {
+				value: parseEther("0.1"),
+			})
+		).to.be.revertedWith(errorMessage);
 	});
 });

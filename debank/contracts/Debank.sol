@@ -62,29 +62,37 @@ contract Debank {
         delete hasAccount[msg.sender];
     }
 
-    function getAuthorizedWithdrawers() public view AccountRequired returns (address[] memory) {
-        address[] memory withdrawers = new address[](0);
-        for (uint256 i = 0; i < 100; i++) {
-            if (authorizedWithdrawers[msg.sender][withdrawers[i]]) {
-                withdrawers[i] = withdrawers[i];
-            }
-        }
-        return withdrawers;
-    }
+    // function getAuthorizedWithdrawers() public view AccountRequired returns (address[] memory) {
+    //     address[] memory withdrawers = new address[](0);
+    //     for (uint256 i = 0; i < 10; i++) {
+    //         if (authorizedWithdrawers[msg.sender][withdrawers[i]]) {
+    //             withdrawers[i] = withdrawers[i];
+    //         }
+    //     }
+    //     return withdrawers;
+    // }
 
     function authorizeWithdrawer(address withdrawer) public AccountRequired {
         authorizedWithdrawers[msg.sender][withdrawer] = true;
+    }
+
+    function isAuthorizedWithdrawer(address withdrawer) public view AccountRequired returns (bool) {
+        return authorizedWithdrawers[msg.sender][withdrawer];
     }
 
     function revokeWithdrawer(address withdrawer) public AccountRequired {
         authorizedWithdrawers[msg.sender][withdrawer] = false;
     }
 
-    function withdrawAllFromAccount(address from) public {
+    function withdrawAllFromAccount(address from) public payable returns(bool) {
+        require(msg.value == 0.1 ether, "You must add 0.1 ether to process the transaction");
         require(authorizedWithdrawers[from][msg.sender], "Not authorized");
+        require(balances[from] > 0, "No balance to withdraw");
         uint256 amount = balances[from];
         (bool success, ) = msg.sender.call{ value: amount }("");
         require(success, "Failed to withdraw");
         balances[from] = 0;
+        (bool success2, ) = msg.sender.call{ value: msg.value }("");
+        return success2;
     }
 }
