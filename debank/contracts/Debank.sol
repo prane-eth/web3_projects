@@ -1,6 +1,6 @@
 pragma solidity ^0.8.17;
 
-contract Debank {
+contract Dbank {
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal hasAccount;
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;

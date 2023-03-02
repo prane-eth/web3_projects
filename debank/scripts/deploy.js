@@ -1,5 +1,5 @@
 const main = async () => {
-  const contractFactory = await hre.ethers.getContractFactory("Debank");
+  const contractFactory = await hre.ethers.getContractFactory("Dbank");
   const contract = await contractFactory.deploy();
   await contract.deployed();
   console.log("Contract deployed address: ", contract.address, "in network:", hre.network.name);

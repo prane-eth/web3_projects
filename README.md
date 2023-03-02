@@ -2,9 +2,9 @@
 
 Projects:  (latest to oldest)
 
-- Debank (Decentralized bank) - Not finished
+- Dbank (Decentralized bank) - Not finished
 	- to perform transaction with more privacy, security and less gas fee
-	- ENS sub-domain for contract address: `debank.vh-praneeth.eth`
+	- ENS sub-domain for contract address: `dbank.vh-praneeth.eth`
 
 - Invoice-app - https://savory-mahogany-lemon.glitch.me/
 	- to create and pay invoices by PAN number of a seller

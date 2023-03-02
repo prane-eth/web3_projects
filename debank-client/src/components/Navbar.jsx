@@ -129,7 +129,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 					</div>
 				)}
 			</div>
-			<h1>Debank App</h1>
+			<h1>Dbank App</h1>
 			<div id="walletDiv" className="flex-horizontal">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}

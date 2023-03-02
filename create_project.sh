@@ -285,7 +285,7 @@ import getContract from \"./Utils\";
 const Home = ({ setLoadingMessage, account }) => {
 	return (
 		<>
-			<h1 className=\"mt-5\">Hello from Debank project</h1>
+			<h1 className=\"mt-5\">Hello from Dbank project</h1>
 
 			<div className=\"content-container mt-5 flex-vertical\">
 				{!account ? \"Please connect to metamask\" : null}
@@ -393,7 +393,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	return (
 		<nav id=\"navbar\">
 			<div className=\"emptyDiv\"></div>
-			<h1>Debank App</h1>
+			<h1>Dbank App</h1>
 			<div id=\"walletDiv\" className=\"flex-horizontal\">
 				<span className=\"darkModeToggle\" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
