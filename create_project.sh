@@ -22,6 +22,17 @@ else
 	createClient="false"
 fi
 
+# ask for confirmation
+echo "Creating project with folder name $folder"
+echo "Create contract: $createContract"
+echo "Create client: $createClient"
+read -p "Are you sure? (Y/n) " -n 1 -r
+if [[ $REPLY =~ ^[Nn]$ ]]; then
+	echo
+	echo "Aborted"
+	exit 1
+fi
+
 # convert folder name to lower case
 folder=$(echo "$folder" | tr '[:upper:]' '[:lower:]')
 # replace spaces with hyphens
@@ -188,6 +199,9 @@ if [ "$createClient" == "true" ]; then
 		rgba(60, 60, 60, 1) 67%
 	);
 	color: white;
+	#navbar {
+		background-color: black;
+	}
 	.darkModeToggle {
 		color: orange;
 		box-shadow: 0 0.5px 15px orange;
@@ -285,7 +299,7 @@ import getContract from \"./Utils\";
 const Home = ({ setLoadingMessage, account }) => {
 	return (
 		<>
-			<h1 className=\"mt-5\">Hello from Dbank project</h1>
+			<h1 className=\"mt-5\">Hello from $contractName project</h1>
 
 			<div className=\"content-container mt-5 flex-vertical\">
 				{!account ? \"Please connect to metamask\" : null}
@@ -342,16 +356,20 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 			const accounts = await ethereum.request({ method: \"eth_accounts\" });
 			if (accounts) {
-				setAccount(accounts[0]);
+				setAccount(window.ethereum.selectedAddress);
 				setIsWalletInstalled(true);
 
 				const walletBalance = await ethereum.request({
 					method: \"eth_getBalance\",
-					params: [accounts[0], \"latest\"],
+					params: [window.ethereum.selectedAddress, \"latest\"],
 				});
-				const balance = ethers.utils.formatEther(walletBalance);
-				const balanceShort = balance.slice(0, 5);
-				setBalance(balanceShort);
+				if (walletBalance == 0x0 || walletBalance === \"0x187c99de7e564ce0\") {
+					setBalance('0.00');
+				} else {
+					const balance = ethers.utils.formatEther(walletBalance);
+					const balanceShort = balance.slice(0, 5);
+					setBalance(balanceShort);
+				}
 			} else {
 				console.log(\"No authorized account found\");
 			}
@@ -364,8 +382,8 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 		await window.ethereum
 			.request({
 				method: \"eth_requestAccounts\",
-			}).then((accounts) => {
-				setAccount(accounts[0]);
+			}).then(() => {
+				setAccount(window.ethereum.selectedAddress);
 			}).catch((error) => {
 				alert(\"Something went wrong\");
 			});
@@ -393,7 +411,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	return (
 		<nav id=\"navbar\">
 			<div className=\"emptyDiv\"></div>
-			<h1>Dbank App</h1>
+			<h1>$contractName App</h1>
 			<div id=\"walletDiv\" className=\"flex-horizontal\">
 				<span className=\"darkModeToggle\" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
@@ -540,5 +558,5 @@ if [ "$createClient" == "true" ]; then
 fi
 if [ "$createContract" == "true" ]; then
 	echo "Installed Hardhat in $folder"
+	echo "Please edit .env file with your RPC_URL and PRIVATE_KEY"
 fi
-echo "Please edit .env file with your RPC_URL and PRIVATE_KEY"
