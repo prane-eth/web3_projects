@@ -1,12 +1,10 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Todo {
-    address payable owner;
+contract Todo is Ownable {
     struct Task {
-        bytes32 id;
         address addedBy;
         uint256 timestamp;
         string description;
@@ -14,119 +12,75 @@ contract Todo {
         uint256 balance;
     }
 
-    constructor() payable {
-        owner = payable(msg.sender);
-        console.log("Deploying a TodoList with one task");
-        addTask("Deploy my first contract");
-    }
+    mapping(address => Task[]) public tasks;
 
-    Task[] public tasks;
-
-    function addTask(string memory _description) public {
-        bytes32 id = keccak256(abi.encodePacked(msg.sender, block.timestamp));
-        tasks.push(Task(id, msg.sender, block.timestamp, _description, false, 0));
-        console.log("%s has created a task:", msg.sender);
-    }
-
-    function getTaskCount() public view returns (uint256) {
-        return tasks.length;
+    function addTask(string memory _description) public payable {
+        tasks[msg.sender].push(Task(msg.sender, block.timestamp, _description, false, msg.value));
     }
 
     function getAllTasks() public view returns (Task[] memory) {
-        return tasks;
+        return tasks[msg.sender];
     }
 
-    function finishTask(bytes32 _id) public returns (bool) {
-        for (uint256 i = 0; i < tasks.length; i++) {
-            if (tasks[i].id == _id) {
-                // only creator can finish the task
-                require(
-                    tasks[i].addedBy == msg.sender,
-                    "Only creator can finish the task"
-                );
+    function finishTask(uint256 _index) public returns (bool) {
+        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(
+            tasks[msg.sender][_index].addedBy == msg.sender,
+            "Only creator can finish the task"
+        );
 
-                tasks[i].done = true;
-                bool status = withdrawForTask(tasks[i]);
-                if (status) {
-                    tasks[i].balance = 0;
-                }
-                return true;
-            }
-        }
-        return false;
+        // if task has balance, send it back to the creator
+        withdrawForTask(tasks[msg.sender][_index]);
+        tasks[msg.sender][_index].done = true;
+        return true;
     }
 
-    function deleteTask(bytes32 _id) public returns (bool) {
-        for (uint256 i = 0; i < tasks.length; i++) {
-            if (tasks[i].id == _id) {
-                // only creator can finish the task
-                require(
-                    tasks[i].addedBy == msg.sender,
-                    "Only creator can finish the task"
-                );
+    function deleteTask(uint256 _index) public {
+        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(
+            tasks[msg.sender][_index].addedBy == msg.sender,
+            "Only creator can finish the task"
+        );
+        withdrawForTask(tasks[msg.sender][_index]);
 
-                // if task has balance, send it back to the creator
-                withdrawForTask(tasks[i]);
-
-                // delete item from array in solidity, reordering the array
-                tasks[i] = tasks[tasks.length - 1];
-                for (uint256 j = i; j < tasks.length - 1; j++) {
-                    tasks[j] = tasks[j + 1];
-                }
-                tasks.pop();
-                return true;
-            }
+        // delete item from array in solidity, reordering the array
+        uint256 lastIndex = tasks[msg.sender].length - 1;
+        for (uint256 i = _index; i < lastIndex; i++) {
+            tasks[msg.sender][i] = tasks[msg.sender][i + 1];
         }
-        return false;
+        tasks[msg.sender].pop();
     }
 
-    // https://solidity-by-example.org/payable/, https://solidity-by-example.org/sending-ether/
-    function deposit(bytes32 _id) public payable returns (bool) {
-        uint256 amount = msg.value;
-
-        if (amount == 0) {
-            return false;
-        }
-        for (uint256 i = 0; i < tasks.length; i++) {
-            if (tasks[i].id == _id) {
-                tasks[i].balance += amount;
-                return true;
-            }
-        }
-        // if we get here, the task was not found. refund the sender
-        address payable sender = payable(msg.sender);
-        (bool success, ) = sender.call{value: amount}("");
-        require(success, "Failed to refund the deposited Ether");
-
-        return false;
+    function deposit(uint256 _index) public payable returns (bool) {
+        require(msg.value > 0, "Value must be greater than 0");
+        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(
+            tasks[msg.sender][_index].addedBy == msg.sender,
+            "Only creator can finish the task"
+        );
+        tasks[msg.sender][_index].balance += msg.value;
+        return true;
     }
 
-    function withdrawForTask(Task memory task) private returns (bool) {
-        uint256 amount = task.balance;
-        if (amount <= 0) {
-            return false;
+    function withdrawForTask(Task memory task) internal {
+        uint256 amountToRefund = task.balance;
+        if (amountToRefund <= 0) {
+            return;
         }
 
-        // if contract has lesser Ether
-        if (address(this).balance < amount) {
-            amount = address(this).balance;
+        // if contract has lesser Ether (possible only when all amount is refunded to owner)
+        if (address(this).balance < amountToRefund) {
+            amountToRefund = address(this).balance;
         }
 
         // send all Ether to owner
-        // Owner can receive Ether since the address of owner is payable
-        address payable sender = payable(msg.sender);
-        (bool success, ) = sender.call{value: amount}("");
-        require(success, "Failed to send Ether");
-        if (success) {
-            // task.balance = 0;
-            return true;
-        }
-        return false;
+        (bool success, ) = msg.sender.call{value: amountToRefund}("");
+        require(success, "Failed to refund Ether");
     }
 
-    function refundToOwner() public returns (bool) {
-        (bool success, ) = owner.call{value: address(this).balance}("");
-        require(success, "Failed to send Ether");
-        return success;
+    // to call when contract should be closed
+    function refundToOwner() public onlyOwner {
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Failed to refund Ether to owner");
     }
 }

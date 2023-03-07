@@ -7,7 +7,6 @@ describe("Dbank", function () {
 	const formatEther = hre.ethers.utils.formatEther;
 	it("Should deploy without errors", async function () {
 		[owner, addr1] = await ethers.getSigners();
-
 		const Bank = await ethers.getContractFactory("Dbank");
 		contract = await Bank.deploy();
 		await contract.deployed();

@@ -1,2 +1,4 @@
 create test cases for all projects
+make contracts upgradable
+test todo-client
 finish dbank client

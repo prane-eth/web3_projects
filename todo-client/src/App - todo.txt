@@ -1,6 +1,6 @@
 
 All thinkable new features for this project
-I recommend not to read these
+---- I recommend not to read these ----
 
 swipe task left to right to finish
 swipe task right to left to delete
