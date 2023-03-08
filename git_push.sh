@@ -6,9 +6,4 @@ message=${1:-'Updated code'}
 
 git add .
 git commit -m "$message"
-if [ "$2" == "-f" ]; then
-	git push -f
-else
-	git push
-fi
-
+git push ${@:2}  # to add more args like 'origin newBranch'

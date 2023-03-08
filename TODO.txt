@@ -1,4 +1,7 @@
 create test cases for all projects
 make contracts upgradable
+switch from goerli to mumbai matic (or a faster testnet like arbitrum, optimism, avalanche, bnb)
+	make sure it is commonly used, so people can test it
 test todo-client
+	add tests for react
 finish dbank client
