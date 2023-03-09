@@ -4,4 +4,8 @@ switch from goerli to mumbai matic (or a faster testnet like arbitrum, optimism,
 	make sure it is commonly used, so people can test it
 test todo-client
 	add tests for react
+
+in dbank, add password feature to withdraw money
+create a logo for dbank
+in todo-app, add option to pay from dbank
 finish dbank client

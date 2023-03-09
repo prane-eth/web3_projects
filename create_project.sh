@@ -484,13 +484,13 @@ contract $contractName {
 }" > contracts/$contractName.sol
 
 	# add this content to hardhat.config.js
-	echo "require(\"@nomiclabs/hardhat-waffle\");
-require(\"dotenv\").config();
+	echo "require('@nomiclabs/hardhat-waffle');
+require('dotenv').config();
 
 const { RPC_URL, PRIVATE_KEY } = process.env;
 
 module.exports = {
-solidity: \"0.8.17\",
+solidity: '0.8.17',
 networks: {
 	goerli: {
 	url: RPC_URL,
@@ -503,46 +503,123 @@ networks: {
 	echo "RPC_URL=
 PRIVATE_KEY=" > .env
 
-	# add content to scripts/deploy.js
+	# test file
 	echo "
-const main = async () => {
-	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
-	const contract = await contractFactory.deploy();
-	await contract.deployed();
-	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
-};
+const { expect } = require('chai');
+const { ethers } = require('hardhat');
+const { parseEther } = ethers.utils;
 
-const runMain = async () => {
-	try {
-		await main();
-		process.exit(0);
-	} catch (error) {
-		console.error(error);
-		process.exit(1);
-	}
-};
-
-runMain();" > scripts/deploy.js
+describe(\"$contractName\", function () {
+	let contract;
+	
+	it(\"Should deploy without errors\", async function () {
+		[owner] = await ethers.getSigners();
+		const Todo = await ethers.getContractFactory(\"$contractName\");
+		contract = await Todo.deploy();
+		await contract.deployed();
+		expect(contract.address).to.properAddress;
+		expect(await contract.deployed()).to.equal(contract);
+	});
+});" > test/$folder.test.js
 
 	# add content to scripts/run.js
-	echo "
-const main = async () => {
-	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
-	const contract = await contractFactory.deploy();
-	await contract.deployed();
+# 	echo "
+# const main = async () => {
+# 	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
+# 	const contract = await contractFactory.deploy();
+# 	await contract.deployed();
+# }
+
+# const runMain = async () => {
+# 	try {
+# 		await main();
+# 		process.exit(0);
+# 	} catch (error) {
+# 		console.error(error);
+# 		process.exit(1);
+# 	}
+# };
+
+# runMain();" > scripts/run.js
+
+# 	# add content to scripts/deploy.js
+# 	echo "
+# const main = async () => {
+# 	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
+# 	const contract = await contractFactory.deploy();
+# 	await contract.deployed();
+# 	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
+# };
+
+# const runMain = async () => {
+# 	try {
+# 		await main();
+# 		process.exit(0);
+# 	} catch (error) {
+# 		console.error(error);
+# 		process.exit(1);
+# 	}
+# };
+
+# runMain();" > scripts/deploy.js
+
+	# add content to scripts/deployProxy.js
+	echo "const { ethers, upgrades } = require('hardhat');
+
+async function main() {
+  const $contractName = await ethers.getContractFactory(\"$contractName\");
+  const proxy = await upgrades.deployProxy($contractName, [100]);
+  await proxy.deployed();
+
+  const implementationAddress = await upgrades.erc1967.getImplementationAddress(
+    proxy.address
+  );
+
+  console.log('Proxy contract address: ' + proxy.address);
+  console.log('Implementation contract address: ' + implementationAddress);
 }
 
-const runMain = async () => {
-	try {
-		await main();
-		process.exit(0);
-	} catch (error) {
-		console.error(error);
-		process.exit(1);
-	}
-};
+main();" > scripts/deployProxy.js
 
-runMain();" > scripts/run.js
+	# add content to scripts/upgradeProxy.js
+	echo "const { ethers, upgrades } = require('hardhat');
+
+const proxyAddress = \"\";
+
+async function upgrade() {
+	const New$contractName = await ethers.getContractFactory(\"New$contractName\");
+	const upgraded = await upgrades.upgradeProxy(proxyAddress, New$contractName);
+
+	const implementationAddress =
+		await upgrades.erc1967.getImplementationAddress(proxyAddress);
+
+	console.log(\"The current contract owner is: \" + (await upgraded.owner()));
+	console.log(\"Upgrade: Implementation contract address: \" + implementationAddress);
+}
+// async function downgrade() {
+// 	const $contractName = await ethers.getContractFactory(\"$contractName\");
+// 	await upgrades.forceImport(proxyAddress, $contractName);
+// 	console.log(\"V1 proxy contract registered for downgrading\");
+// }
+
+upgrade();" > scripts/upgradeProxy.js
+
+	# add content to scripts/callContract.js
+	echo "const { ethers } = require("hardhat");
+
+async function main() {
+	const contractAddr = '';
+
+	const contractFactory = await ethers.getContractFactory(\"$contractName\");
+	const contract = contractFactory.attach(contractAddr);
+
+	console.log(\"Owner:\", await contract.owner());
+
+	const value1 = await ethers.provider.getStorageAt(contractAddr, ethers.utils.hexValue(1));
+	console.log(value1);
+}
+
+main();" > scripts/callContract.js
 
 	echo "npx hardhat run scripts/run.js" > run.sh
 	# echo "npx hardhat run scripts/deploy.js --network goerli" > deploy.sh
