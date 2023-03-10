@@ -514,8 +514,7 @@ describe(\"$contractName\", function () {
 	
 	it(\"Should deploy without errors\", async function () {
 		[owner] = await ethers.getSigners();
-		const Todo = await ethers.getContractFactory(\"$contractName\");
-		contract = await Todo.deploy();
+		contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
 		await contract.deployed();
 		expect(contract.address).to.properAddress;
 		expect(await contract.deployed()).to.equal(contract);
@@ -525,8 +524,7 @@ describe(\"$contractName\", function () {
 	# add content to scripts/run.js
 # 	echo "
 # const main = async () => {
-# 	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
-# 	const contract = await contractFactory.deploy();
+# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
 # 	await contract.deployed();
 # }
 
@@ -545,8 +543,7 @@ describe(\"$contractName\", function () {
 # 	# add content to scripts/deploy.js
 # 	echo "
 # const main = async () => {
-# 	const contractFactory = await hre.ethers.getContractFactory(\"$contractName\");
-# 	const contract = await contractFactory.deploy();
+# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
 # 	await contract.deployed();
 # 	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
 # };
@@ -609,9 +606,7 @@ upgrade();" > scripts/upgradeProxy.js
 
 async function main() {
 	const contractAddr = '';
-
-	const contractFactory = await ethers.getContractFactory(\"$contractName\");
-	const contract = contractFactory.attach(contractAddr);
+	const contract = await ethers.getContractAt('$contractName', contractAddr);
 
 	console.log(\"Owner:\", await contract.owner());
 

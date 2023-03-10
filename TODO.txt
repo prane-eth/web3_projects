@@ -6,6 +6,10 @@ test todo-client
 	add tests for react
 
 in dbank, add password feature to withdraw money
+	make sure they don't claim money again and again. Dont allow contracts to call functions. Make sure tx.origin == msg.sender
+	reduce money from balance first, then try to send money. If it fails, add money back to balance
+	same for TODO-app
+
 create a logo for dbank
 in todo-app, add option to pay from dbank
 finish dbank client
