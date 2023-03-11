@@ -5,11 +5,23 @@ switch from goerli to mumbai matic (or a faster testnet like arbitrum, optimism,
 test todo-client
 	add tests for react
 
-in dbank, add password feature to withdraw money
+__________________________________________________________________
+
+in dBank, add password feature to withdraw money
 	make sure they don't claim money again and again. Dont allow contracts to call functions. Make sure tx.origin == msg.sender
 	reduce money from balance first, then try to send money. If it fails, add money back to balance
 	same for TODO-app
+	emit events when money is withdrawn
+if forgot password, give user a seed phrase, or two 16-character one-time recovery keys for emergency recovery,
+	or security questions like birth place, mother's maiden name, etc
+for withdraw by other person, decide whose password to use to withdraw
+handle case if private key is theft, no balance for gas fee, and also forgot password.
+think of 2fa or TOTP
+	if that fails, give option to reset 2fa using recovery key, or security questions
+	search for solidity totp
+think of using web3Auth.io
 
-create a logo for dbank
-in todo-app, add option to pay from dbank
-finish dbank client
+create a logo for dBank
+in todo-app, add option to pay from dBank
+finish dBank client
+

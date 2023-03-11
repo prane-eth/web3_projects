@@ -26,9 +26,9 @@ contract Invoice {
         uint256 _invoiceAmount
     ) public {
         // validations
-        require(validatePAN(_buyerPAN), "Invalid buyer PAN");
-        require(validatePAN(_sellerPAN), "Invalid seller PAN");
-        require(_invoiceAmount > 0, "Invoice amount should be greater than 0");
+        require(validatePAN(_buyerPAN), "InvoiceApp: Invalid buyer PAN");
+        require(validatePAN(_sellerPAN), "InvoiceApp: Invalid seller PAN");
+        require(_invoiceAmount > 0, "InvoiceApp: Invoice amount should be greater than 0");
 
         uint256 invoiceDate = block.timestamp;
         invoiceData[_buyerPAN].push(

@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -23,10 +23,10 @@ contract Todo is Ownable {
     }
 
     function finishTask(uint256 _index) public returns (bool) {
-        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(_index < tasks[msg.sender].length, "TodoApp: Index out of bounds");
         require(
             tasks[msg.sender][_index].addedBy == msg.sender,
-            "Only creator can finish the task"
+            "TodoApp: Only creator can finish the task"
         );
 
         // if task has balance, send it back to the creator
@@ -36,10 +36,10 @@ contract Todo is Ownable {
     }
 
     function deleteTask(uint256 _index) public {
-        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(_index < tasks[msg.sender].length, "TodoApp: Index out of bounds");
         require(
             tasks[msg.sender][_index].addedBy == msg.sender,
-            "Only creator can finish the task"
+            "TodoApp: Only creator can finish the task"
         );
         withdrawForTask(tasks[msg.sender][_index]);
 
@@ -52,11 +52,11 @@ contract Todo is Ownable {
     }
 
     function deposit(uint256 _index) public payable returns (bool) {
-        require(msg.value > 0, "Value must be greater than 0");
-        require(_index < tasks[msg.sender].length, "Index out of bounds");
+        require(msg.value > 0, "TodoApp: Value must be greater than 0");
+        require(_index < tasks[msg.sender].length, "TodoApp: Index out of bounds");
         require(
             tasks[msg.sender][_index].addedBy == msg.sender,
-            "Only creator can finish the task"
+            "TodoApp: Only creator can finish the task"
         );
         tasks[msg.sender][_index].balance += msg.value;
         return true;
@@ -75,12 +75,12 @@ contract Todo is Ownable {
 
         // send all Ether to owner
         (bool success, ) = msg.sender.call{value: amountToRefund}("");
-        require(success, "Failed to refund Ether");
+        require(success, "TodoApp: Failed to refund Ether");
     }
 
     // to call when contract should be closed
     function refundToOwner() public onlyOwner {
         (bool success, ) = msg.sender.call{value: address(this).balance}("");
-        require(success, "Failed to refund Ether to owner");
+        require(success, "TodoApp: Failed to refund Ether to owner");
     }
 }

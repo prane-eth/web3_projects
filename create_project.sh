@@ -10,13 +10,13 @@ createContractArg="$2"
 createClientArg="$3"
 
 # if empty, assume false
-# if some value and not false, assume true
-if [ "$createContractArg" != "" ] && [ "$createContractArg" != "false" ]; then
+# if some value and not false or none or null, assume true
+if [ "$createContractArg" != "" ] && [ "$createContractArg" != "false" ] && [ "$createContractArg" != "none" ] && [ "$createContractArg" != "null" ]; then
 	createContract="true"
 else
 	createContract="false"
 fi
-if [ "$createClientArg" != "" ] && [ "$createClientArg" != "false" ]; then
+if [ "$createClientArg" != "" ] && [ "$createClientArg" != "false" ] && [ "$createClientArg" != "none" ] && [ "$createClientArg" != "null" ]; then
 	createClient="true"
 else
 	createClient="false"
@@ -74,7 +74,7 @@ if [ -d "$folder" ]; then
 fi
 # ______________________________________________________________________________________
 
-# if createContract value exists but not false 
+# if client is requested
 if [ "$createClient" == "true" ]; then
     echo "Creating a React app in $folder-client"
     npm create vite@latest "$folder-client" -- --template react
@@ -447,7 +447,7 @@ export default Navbar;" > src/components/Navbar.jsx
 
     cd ..
 else
-    echo "createContract is mentioned. Skipping client creation"
+    echo "createClient is false"
 fi
 
 # ______________________________________________________________________________________
@@ -458,10 +458,9 @@ if [ "$createContract" == "true" ]; then
 	mkdir -p "$folder"
 	cd "$folder"
 	npm init -y
-	npm i
-	npm i hardhat @nomicfoundation/hardhat-toolbox \
-		@nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers \
-		ethers dotenv # @openzeppelin/contracts
+	# npm i
+	npm i hardhat @nomiclabs/hardhat-waffle chai dotenv @nomiclabs/hardhat-etherscan
+		# ethers @nomicfoundation/hardhat-toolbox ethereum-waffle @nomiclabs/hardhat-ethers @openzeppelin/contracts
 	echo "Press enter 3 times now"
 
 	npx hardhat
@@ -486,22 +485,27 @@ contract $contractName {
 	# add this content to hardhat.config.js
 	echo "require('@nomiclabs/hardhat-waffle');
 require('dotenv').config();
+require("@nomiclabs/hardhat-etherscan");
 
-const { RPC_URL, PRIVATE_KEY } = process.env;
+const { RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 module.exports = {
-solidity: '0.8.17',
-networks: {
-	goerli: {
-	url: RPC_URL,
-	accounts: [PRIVATE_KEY]
-	},
-}
+	solidity: '0.8.17',
+	networks: {
+		goerli: {
+			url: RPC_URL,
+			accounts: [PRIVATE_KEY]
+		},
+		etherscan: {
+			apiKey: ETHERSCAN_API_KEY
+		}
+	}
 };" > hardhat.config.js
 
 	# create .env file
 	echo "RPC_URL=
-PRIVATE_KEY=" > .env
+PRIVATE_KEY=
+ETHERSCAN_API_KEY=" > .env
 
 	# test file
 	echo "
@@ -522,43 +526,43 @@ describe(\"$contractName\", function () {
 });" > test/$folder.test.js
 
 	# add content to scripts/run.js
-# 	echo "
-# const main = async () => {
-# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
-# 	await contract.deployed();
-# }
+	# 	echo "
+	# const main = async () => {
+	# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
+	# 	await contract.deployed();
+	# }
 
-# const runMain = async () => {
-# 	try {
-# 		await main();
-# 		process.exit(0);
-# 	} catch (error) {
-# 		console.error(error);
-# 		process.exit(1);
-# 	}
-# };
+	# const runMain = async () => {
+	# 	try {
+	# 		await main();
+	# 		process.exit(0);
+	# 	} catch (error) {
+	# 		console.error(error);
+	# 		process.exit(1);
+	# 	}
+	# };
 
-# runMain();" > scripts/run.js
+	# runMain();" > scripts/run.js
 
-# 	# add content to scripts/deploy.js
-# 	echo "
-# const main = async () => {
-# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
-# 	await contract.deployed();
-# 	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
-# };
+	# 	# add content to scripts/deploy.js
+	# 	echo "
+	# const main = async () => {
+	# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
+	# 	await contract.deployed();
+	# 	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
+	# };
 
-# const runMain = async () => {
-# 	try {
-# 		await main();
-# 		process.exit(0);
-# 	} catch (error) {
-# 		console.error(error);
-# 		process.exit(1);
-# 	}
-# };
+	# const runMain = async () => {
+	# 	try {
+	# 		await main();
+	# 		process.exit(0);
+	# 	} catch (error) {
+	# 		console.error(error);
+	# 		process.exit(1);
+	# 	}
+	# };
 
-# runMain();" > scripts/deploy.js
+	# runMain();" > scripts/deploy.js
 
 	# add content to scripts/deployProxy.js
 	echo "const { ethers, upgrades } = require('hardhat');
@@ -593,7 +597,7 @@ async function upgrade() {
 	console.log(\"The current contract owner is: \" + (await upgraded.owner()));
 	console.log(\"Upgrade: Implementation contract address: \" + implementationAddress);
 }
-// async function downgrade() {
+// async function downgrade() {  // downgrade if any security flaw or bugs in new version
 // 	const $contractName = await ethers.getContractFactory(\"$contractName\");
 // 	await upgrades.forceImport(proxyAddress, $contractName);
 // 	console.log(\"V1 proxy contract registered for downgrading\");
@@ -622,7 +626,7 @@ main();" > scripts/callContract.js
 
 	echo "Created Hardhat project in $folder"
 else
-	echo "createClient is mentioned. Skipping contract creation"
+	echo "createContract is false"
 fi
 
 if [ "$createClient" == "true" ]; then

@@ -2,15 +2,15 @@
 
 Projects:  (latest to oldest)
 
-- Dbank (Decentralized bank) - Not finished
+- DBank (Decentralized bank) - Not finished
 	- to perform transaction with more privacy, security and less gas fee
 	- ENS sub-domain for contract address: `dbank.vh-praneeth.eth`
 
 - Invoice-app - https://savory-mahogany-lemon.glitch.me/
-	- to create and pay invoices by PAN number of a seller
+	- to create and pay invoices by PAN ID number of a seller
 	- ENS: `invoice-app.vh-praneeth.eth`
 
-- NFT-client - Not finished
+- NFT-collection-client - Not finished
 	- NFT platform that mints NFTs to the account of the buyer
 
 - TODO-app - https://river-fork-persimmon.glitch.me/
