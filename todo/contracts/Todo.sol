@@ -58,14 +58,20 @@ contract Todo is Ownable {
             tasks[msg.sender][_index].addedBy == msg.sender,
             "TodoApp: Only creator can finish the task"
         );
+        // make sure uint256 can hold the value
+        require(
+            tasks[msg.sender][_index].balance + msg.value >= tasks[msg.sender][_index].balance,
+            "TodoApp: Value too large"
+        );
         tasks[msg.sender][_index].balance += msg.value;
         return true;
     }
 
     function withdrawForTask(Task memory task) internal {
         uint256 amountToRefund = task.balance;
+        // using require() instead will make finishTask function fail to run if balance for task is 0
         if (amountToRefund <= 0) {
-            return;
+            return; 
         }
 
         // if contract has lesser Ether (possible only when all amount is refunded to owner)
@@ -73,8 +79,14 @@ contract Todo is Ownable {
             amountToRefund = address(this).balance;
         }
 
+        task.balance -= amountToRefund;
+
         // send all Ether to owner
         (bool success, ) = msg.sender.call{value: amountToRefund}("");
+        if (!success) {
+            // if failed, refund the amount to task balance
+            task.balance += amountToRefund;
+        }
         require(success, "TodoApp: Failed to refund Ether");
     }
 

@@ -1,9 +1,15 @@
+update create_project.sh:
+	add RPC options of all networks
+	update solidity version
+
+use new create_project.sh to re-create existing projects
 create test cases for all projects
 make contracts upgradable
-switch from goerli to mumbai matic (or a faster testnet like arbitrum, optimism, avalanche, bnb)
+switch from goerli to polygon mumbai (or a faster testnet like arbitrum, optimism, avalanche, bnb)
 	make sure it is commonly used, so people can test it
 test todo-client
 	add tests for react
+scan security with Slither - https://github.com/crytic/slither
 
 __________________________________________________________________
 
@@ -21,7 +27,13 @@ think of 2fa or TOTP
 	search for solidity totp
 think of using web3Auth.io
 
+add ReentrancyGuard, Ownable, Pausable, and other security features to contracts
+allow only 1 backup withdrawer to withdraw money
+add daily limit to withdraw. can be changed instantly, just like in real net banking
+if no wallet installed, they can login with private key. store it in localstorage
+
 create a logo for dBank
 in todo-app, add option to pay from dBank
 finish dBank client
+rename dBank to Bank3 or dBank3
 

@@ -1,26 +1,51 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Please provide a folder name in the command line argument"
-    exit 1
-fi
-
 folder="$1"
 createContractArg="$2"
 createClientArg="$3"
+emptyValues=("false" "none" "null" "skip" "no" "n" "0" "-")
 
-# if empty, assume false
-# if some value and not false or none or null, assume true
-if [ "$createContractArg" != "" ] && [ "$createContractArg" != "false" ] && [ "$createContractArg" != "none" ] && [ "$createContractArg" != "null" ]; then
-	createContract="true"
-else
-	createContract="false"
+# if empty, ask for input
+# $folder
+if [ "$folder" == "" ]; then
+	read -p "Folder name: " folder
 fi
-if [ "$createClientArg" != "" ] && [ "$createClientArg" != "false" ] && [ "$createClientArg" != "none" ] && [ "$createClientArg" != "null" ]; then
-	createClient="true"
+if [ "$createContractArg" == "" ]; then
+	read -p "Create contract? (y/N) " -n 1 -r
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		createContract="true"
+	else
+		createContract="false"
+	fi
 else
-	createClient="false"
+	# if some value and not false or none or null, assume true
+	if [[ ! " ${emptyValues[@]} " =~ " ${createContractArg} " ]]; then
+		createContract="true"
+	else
+		createContract="false"
+	fi
 fi
+
+# if REPLY is not enter key, print extra line
+if [[ $REPLY != "" ]]; then
+	echo
+fi
+
+if [ "$createClientArg" == "" ]; then
+	read -p "Create client? (y/N) " -n 1 -r
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		createClient="true"
+	else
+		createClient="false"
+	fi
+else
+	if [[ ! " ${emptyValues[@]} " =~ " ${createClientArg} " ]]; then
+		createClient="true"
+	else
+		createClient="false"
+	fi
+fi
+
 
 # ask for confirmation
 echo "Creating project with folder name $folder"
@@ -67,11 +92,11 @@ if [ -d "$folder-client" ]; then
 	echo "Failed to create project"
 	exit 1
 fi
-if [ -d "$folder" ]; then
-	echo "Contract folder already exists"
-	echo "Failed to create project"
-	exit 1
-fi
+# if [ -d "$folder" ]; then
+# 	echo "Contract folder already exists"
+# 	echo "Failed to create project"
+# 	exit 1
+# fi
 # ______________________________________________________________________________________
 
 # if client is requested
@@ -457,20 +482,31 @@ if [ "$createContract" == "true" ]; then
 	echo "Creating a Solidity project in $folder"
 	mkdir -p "$folder"
 	cd "$folder"
-	npm init -y
+	if [ ! -f "package.json" ]; then
+		npm init -y
+	fi
 	# npm i
 	npm i hardhat @nomiclabs/hardhat-waffle chai dotenv @nomiclabs/hardhat-etherscan
 		# ethers @nomicfoundation/hardhat-toolbox ethereum-waffle @nomiclabs/hardhat-ethers @openzeppelin/contracts
-	echo "Press enter 3 times now"
 
-	npx hardhat
-	npx hardhat compile
-	npx hardhat test
+	# while running npx hardhat init, run yes '' for 4 times
+	# to skip the questions
+	yes '' | head -n 4 | awk '{print; system("sleep 1");}' | npx hardhat init
+	# npx hardhat compile
+	# npx hardhat test
+
+	# if contracts folder does not exist, assume an interruption
+	if [ ! -d "contracts" ]; then
+		echo "interrupted"
+		rm hardhat.config.js 2> /dev/null
+		exit
+	fi
 
 	rm contracts/*
 	rm scripts/*
 	rm test/*
 
+	echo "Creating files..."
 	# add content to contracts/$contractName.sol
 	echo "pragma solidity ^0.8.17;
 
@@ -485,20 +521,23 @@ contract $contractName {
 	# add this content to hardhat.config.js
 	echo "require('@nomiclabs/hardhat-waffle');
 require('dotenv').config();
-require("@nomiclabs/hardhat-etherscan");
+require('@nomiclabs/hardhat-etherscan');
 
 const { RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 module.exports = {
 	solidity: '0.8.17',
 	networks: {
+		// localhost: {
+		// 	url: 'http://localhost:8545',
+		// },
 		goerli: {
 			url: RPC_URL,
 			accounts: [PRIVATE_KEY]
 		},
-		etherscan: {
-			apiKey: ETHERSCAN_API_KEY
-		}
+	},
+	etherscan: {
+		apiKey: ETHERSCAN_API_KEY,
 	}
 };" > hardhat.config.js
 
@@ -512,14 +551,22 @@ ETHERSCAN_API_KEY=" > .env
 const { expect } = require('chai');
 const { ethers } = require('hardhat');
 const { parseEther } = ethers.utils;
+const { getBalance } = ethers.provider;
+
+const deployContract = async (contractName, ...args) => {
+	const contract = await ethers
+		.getContractFactory(contractName)
+		.then((contractFactory) => contractFactory.deploy(...args));
+	await contract.deployed();
+	return contract;
+};
 
 describe(\"$contractName\", function () {
 	let contract;
 	
 	it(\"Should deploy without errors\", async function () {
 		[owner] = await ethers.getSigners();
-		contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
-		await contract.deployed();
+		contract = await deployContract(\"$contractName\");
 		expect(contract.address).to.properAddress;
 		expect(await contract.deployed()).to.equal(contract);
 	});

@@ -99,4 +99,11 @@ contract DBank {
         (bool success2, ) = msg.sender.call{ value: msg.value }("");
         return success2;
     }
+
+    receive() external payable {
+        if (!userHasAccount()) {
+            createAccount();
+        }
+        deposit();
+    }
 }
