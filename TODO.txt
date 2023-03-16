@@ -1,6 +1,8 @@
-update create_project.sh:
-	add RPC options of all networks
-	update solidity version
+
+finish NFT project
+make projects multi-network
+enable option to select network, on wallet button of navbar
+add material-ui with mui package. update create_project.sh
 
 use new create_project.sh to re-create existing projects
 create test cases for all projects
@@ -10,6 +12,8 @@ switch from goerli to polygon mumbai (or a faster testnet like arbitrum, optimis
 test todo-client
 	add tests for react
 scan security with Slither - https://github.com/crytic/slither
+
+start using use-dark-mode for dark mode in create_project.sh
 
 __________________________________________________________________
 
@@ -27,7 +31,7 @@ think of 2fa or TOTP
 	search for solidity totp
 think of using web3Auth.io
 
-add ReentrancyGuard, Ownable, Pausable, and other security features to contracts
+add ReentrancyGuardUpgradeable, Ownable, Pausable, and other security features to contracts
 allow only 1 backup withdrawer to withdraw money
 add daily limit to withdraw. can be changed instantly, just like in real net banking
 if no wallet installed, they can login with private key. store it in localstorage

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-//Contract based on https://docs.openzeppelin.com/contracts/3.x/erc721
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-contract Collection is ERC721URIStorage, Ownable {
+contract Collection is ERC721URIStorage, Ownable, ReentrancyGuardUpgradeable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     Counters.Counter private _totalMinted;
@@ -19,7 +19,9 @@ contract Collection is ERC721URIStorage, Ownable {
     uint256 public LIMIT_PER_ADDRESS = 5;
     uint256 public MAX_SUPPLY = 5;
 
-    constructor() ERC721("Collection", "ColNFT") {}
+    constructor() ERC721("Collection", "CollNFT") {
+        __ReentrancyGuard_init();
+    }
 
     function setPrice(uint256 price) external onlyOwner {
         PRICE_PER_TOKEN = price;
@@ -35,10 +37,10 @@ contract Collection is ERC721URIStorage, Ownable {
 
     function mintNFT(
         string memory tokenURI
-    ) external payable returns (uint256) {
+    ) external payable nonReentrant returns (uint256) {
         require(
             PRICE_PER_TOKEN <= msg.value,
-            "CollectionApp: Ether paid is incorrect"
+            "CollectionApp: Ether paid is less than " + PRICE_PER_TOKEN
         );
         require(
             mintedForAddress[msg.sender] < LIMIT_PER_ADDRESS,

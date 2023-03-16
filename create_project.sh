@@ -506,9 +506,11 @@ if [ "$createContract" == "true" ]; then
 	rm scripts/*
 	rm test/*
 
+	solidityVersion="0.8.19"
+
 	echo "Creating files..."
 	# add content to contracts/$contractName.sol
-	echo "pragma solidity ^0.8.17;
+	echo "pragma solidity ^$solidityVersion;
 
 contract $contractName {
 	address public owner;
@@ -523,16 +525,24 @@ contract $contractName {
 require('dotenv').config();
 require('@nomiclabs/hardhat-etherscan');
 
-const { RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
+const { GOERLI_RPC_URL, SEPOLIA_RPC_URL, MUMBAI_RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 module.exports = {
-	solidity: '0.8.17',
+	solidity: '$solidityVersion',
 	networks: {
-		// localhost: {
-		// 	url: 'http://localhost:8545',
-		// },
+		localhost: {
+			url: 'http://localhost:8545',
+		},
 		goerli: {
-			url: RPC_URL,
+			url: GOERLI_RPC_URL,
+			accounts: [PRIVATE_KEY]
+		},
+		sepolia: {
+			url: SEPOLIA_RPC_URL,
+			accounts: [PRIVATE_KEY]
+		},
+		mumbai: {
+			url: MUMBAI_RPC_URL,
 			accounts: [PRIVATE_KEY]
 		},
 	},
@@ -542,9 +552,12 @@ module.exports = {
 };" > hardhat.config.js
 
 	# create .env file
-	echo "RPC_URL=
+	echo "GOERLI_RPC_URL=
+SEPOLIA_RPC_URL=
+MUMBAI_RPC_URL=
 PRIVATE_KEY=
-ETHERSCAN_API_KEY=" > .env
+ETHERSCAN_API_KEY=
+" > .env
 
 	# test file
 	echo "
