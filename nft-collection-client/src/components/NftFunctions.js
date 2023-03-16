@@ -1,15 +1,16 @@
 import { ethers, Contract } from "ethers";
-import contractABI from "../assets/contractABI.json";
-import Image1 from "../assets/images/1.png";
-import Image2 from "../assets/images/2.png";
-import Image3 from "../assets/images/3.png";
-import Image4 from "../assets/images/4.png";
-import Image5 from "../assets/images/5.png";
+import ContractABI from "../assets/ContractABI.json";
+// import Image1 from "../assets/images/1.png";
+// import Image2 from "../assets/images/2.png";
+// import Image3 from "../assets/images/3.png";
+// import Image4 from "../assets/images/4.png";
+// import Image5 from "../assets/images/5.png";
 
-const images = [Image1, Image2, Image3, Image4, Image5];
+// const images = [Image1, Image2, Image3, Image4, Image5];
 
 const folderURL =
-	"https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
+	"https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
+	// "https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
 export const pricePerToken = 0.01;
 export const imageSize = 250;
 
@@ -27,7 +28,7 @@ export const bindNFTContract = () => {
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
 	setNFTContract(
-		new Contract(contractABI.contractAddress, contractABI.abi, signer)
+		new Contract(ContractABI.contractAddress, ContractABI.abi, signer)
 	);
 };
 

@@ -1,42 +1,14 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import { useState, useEffect } from "react";
+import "./App.scss";
 import {
-	setStateVariables,
-	connectWallet,
-	withdrawEther,
 	handleMint,
-	pricePerToken,
-	imageSize,
-	data,
-	bindNFTContract,
 } from "./components/NftFunctions";
 
-function App() {
-	const [account, setAccount] = useState(null);
+
+const Home = ({ setLoadingMessage, account }) => {
 	const [walletInstalled, setWalletInstalled] = useState(false);
 	const [NFTContract, setNFTContract] = useState(null);
 	const [mintingTxn, setMintingTxn] = useState("");
-	setStateVariables(
-		account,
-		setAccount,
-		walletInstalled,
-		setWalletInstalled,
-		NFTContract,
-		setNFTContract,
-		mintingTxn,
-		setMintingTxn
-	);
-
-	useEffect(() => {
-		if (window.ethereum) {
-			setWalletInstalled(true);
-		}
-	}, []);
-	useEffect(() => {
-		if (account) {
-			bindNFTContract();
-		}
-	}, [account]);
 
 	if (account === null) {
 		return (
@@ -57,6 +29,12 @@ function App() {
 
 	return (
 		<>
+			<h1 className="mt-5">Hello from NftCollection project</h1>
+
+			<div className="content-container mt-5 flex-vertical">
+				{!account ? "Please connect to metamask" : null}
+			</div>
+			
 			<div className="container">
 				<br />
 				<h2> 🔮 NFT Marketplace </h2>
@@ -89,4 +67,4 @@ function App() {
 	);
 }
 
-export default App;
+export default Home;

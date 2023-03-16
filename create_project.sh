@@ -46,16 +46,8 @@ else
 	fi
 fi
 
-
-# ask for confirmation
-echo "Creating project with folder name $folder"
-echo "Create contract: $createContract"
-echo "Create client: $createClient"
-read -p "Are you sure? (Y/n) " -n 1 -r
-if [[ $REPLY =~ ^[Nn]$ ]]; then
+if [[ $REPLY != "" ]]; then
 	echo
-	echo "Aborted"
-	exit 1
 fi
 
 # convert folder name to lower case
@@ -73,6 +65,8 @@ folder=${folder%-}
 contractName=$(echo "$folder" | sed 's/\(.\)/\u\1/')
 # convert kebab-case to CamelCase
 contractName=$(echo "$contractName" | sed -r 's/(^|-)(.)/\U\2/g')
+# # add V1 to contract name
+# contractName="$contractName""V1"
 
 # ________________________________ Validations ________________________________
 
@@ -92,11 +86,29 @@ if [ -d "$folder-client" ]; then
 	echo "Failed to create project"
 	exit 1
 fi
-# if [ -d "$folder" ]; then
-# 	echo "Contract folder already exists"
-# 	echo "Failed to create project"
-# 	exit 1
-# fi
+if [ -d "$folder" ]; then
+	echo "Contract folder already exists"
+	echo "Failed to create project"
+	exit 1
+fi
+
+solidityVersion="0.8.19"
+
+# ask for confirmation
+echo "Creating project with folder name $folder"
+echo "Create contract: $createContract"
+echo "Create client: $createClient"
+echo "Folder name: $folder"
+echo "Contract name: $contractName"
+echo "Solidity version: $solidityVersion"
+read -p "Are you sure? (Y/n) " -n 1 -r
+if [[ $REPLY =~ ^[Nn]$ ]]; then
+	echo
+	echo "Aborted"
+	exit 1
+fi
+
+
 # ______________________________________________________________________________________
 
 # if client is requested
@@ -486,8 +498,9 @@ if [ "$createContract" == "true" ]; then
 		npm init -y
 	fi
 	# npm i
-	npm i hardhat @nomiclabs/hardhat-waffle chai dotenv @nomiclabs/hardhat-etherscan
-		# ethers @nomicfoundation/hardhat-toolbox ethereum-waffle @nomiclabs/hardhat-ethers @openzeppelin/contracts
+	npm i hardhat @nomiclabs/hardhat-waffle chai dotenv @nomiclabs/hardhat-etherscan \
+		@openzeppelin/contracts @openzeppelin/contracts-upgradeable
+		# ethers @nomicfoundation/hardhat-toolbox ethereum-waffle @nomiclabs/hardhat-ethers
 
 	# while running npx hardhat init, run yes '' for 4 times
 	# to skip the questions
@@ -506,17 +519,16 @@ if [ "$createContract" == "true" ]; then
 	rm scripts/*
 	rm test/*
 
-	solidityVersion="0.8.19"
-
 	echo "Creating files..."
 	# add content to contracts/$contractName.sol
-	echo "pragma solidity ^$solidityVersion;
+	echo "// SPDX-License-Identifier: MIT
+pragma solidity ^$solidityVersion;
 
-contract $contractName {
-	address public owner;
+import "@openzeppelin/contracts/access/Ownable.sol";
 
+contract $contractName is Ownable {
 	constructor() {
-		owner = msg.sender;
+		
 	}
 }" > contracts/$contractName.sol
 
@@ -629,7 +641,8 @@ describe(\"$contractName\", function () {
 
 async function main() {
   const $contractName = await ethers.getContractFactory(\"$contractName\");
-  const proxy = await upgrades.deployProxy($contractName, [100]);
+  const proxy = await upgrades.deployProxy($contractName);
+  // if args are needed - (contractName, [arg1, arg2])
   await proxy.deployed();
 
   const implementationAddress = await upgrades.erc1967.getImplementationAddress(
@@ -641,6 +654,10 @@ async function main() {
 }
 
 main();" > scripts/deployProxy.js
+
+	# # if contractName has 1 at last, remove it. add 2
+	# newContractName=${contractName%1}
+	# newContractName=$newContractName"2"
 
 	# add content to scripts/upgradeProxy.js
 	echo "const { ethers, upgrades } = require('hardhat');
@@ -673,16 +690,14 @@ async function main() {
 	const contract = await ethers.getContractAt('$contractName', contractAddr);
 
 	console.log(\"Owner:\", await contract.owner());
-
-	const value1 = await ethers.provider.getStorageAt(contractAddr, ethers.utils.hexValue(1));
-	console.log(value1);
 }
 
 main();" > scripts/callContract.js
 
 	echo "npx hardhat run scripts/run.js" > run.sh
-	# echo "npx hardhat run scripts/deploy.js --network goerli" > deploy.sh
-	chmod +x run.sh # deploy.sh
+	chmod +x run.sh
+	echo "npx hardhat test" > test.sh
+	chmod +x test.sh
 
 	echo "Created Hardhat project in $folder"
 else

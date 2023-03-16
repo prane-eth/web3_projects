@@ -31,7 +31,7 @@ think of 2fa or TOTP
 	search for solidity totp
 think of using web3Auth.io
 
-add ReentrancyGuardUpgradeable, Ownable, Pausable, and other security features to contracts
+add ReentrancyGuardUpgradeable, SafeMath, Ownable, Pausable, and other security features to contracts
 allow only 1 backup withdrawer to withdraw money
 add daily limit to withdraw. can be changed instantly, just like in real net banking
 if no wallet installed, they can login with private key. store it in localstorage

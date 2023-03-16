@@ -2,11 +2,11 @@
 
 Projects:  (latest to oldest)
 
-Status | Project name | Description | ENS (goerli) | Link
+Status | Project name | Description | ENS (goerli) | Frontend Link
 --- | --- | --- | --- | ---
-:heavy_plus_sign: | DBank | Decentralized bank | `dbank.vh-praneeth.eth` | -
+:wrench: | DBank | Decentralized bank | `dbank.vh-praneeth.eth` | Not started
 :heavy_check_mark: | Invoice-app | to create and pay invoices by PAN ID number of a seller | `invoice-app.vh-praneeth.eth` | https://savory-mahogany-lemon.glitch.me/
-:x: | NFT-collection-client | NFT platform that mints NFTs to the account of the buyer | - | -
+:white_check_mark: | NFT-collection-client | NFT platform that mints NFTs to the account of the buyer | - | In progress
 :heavy_check_mark: | TODO-app | to create a task and deposit ETH for commitment towards it, and to get refund only after finishing the task | `todo.vh-praneeth.eth` | https://river-fork-persimmon.glitch.me/
 
 <!-- - DBank (Decentralized bank) - Not finished
