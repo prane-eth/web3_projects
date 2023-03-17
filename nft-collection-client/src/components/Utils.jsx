@@ -4,8 +4,8 @@ import config from "../assets/ContractABI.json";
 import contractAddressJson from "../assets/ContractAddress.json";
 
 export const supportedNetworks = {
-	"0xaa36a7": {name: "Sepolia", currency: "ETH"},
 	"0x13881": {name: "Mumbai", currency: "MATIC"},
+	"0xaa36a7": {name: "Sepolia", currency: "ETH"},
 }
 
 export const getConnectedNetwork = async () => {
@@ -32,14 +32,15 @@ export const getContract = async () => {
 	}
 
 	// get connected network name
-	const network = getConnectedNetwork();
-	var contractAddress;
-	if (network === "Mumbai")
-		contractAddress = contractAddressJson.mumbaiAddress;
-	else if (network === "Sepolia")
-		contractAddress = contractAddressJson.sepoliaAddress;
-	else
-		return false;
+	// const { name: networkName} = await getConnectedNetwork();
+	// var contractAddress;
+	// if (networkName === "Mumbai")
+	// 	contractAddress = contractAddressJson.mumbaiAddress;
+	// else if (networkName === "Sepolia")
+	// 	contractAddress = contractAddressJson.sepoliaAddress;
+	// else
+	// 	return false;
+	const contractAddress = contractAddressJson.mumbaiAddress;
 
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
@@ -67,4 +68,3 @@ export const getEtherscanLink = (mintingTxn, hash, type = "transaction") => {
 	}
 };
 
-export default getContract;

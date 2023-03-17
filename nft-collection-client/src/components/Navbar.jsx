@@ -8,7 +8,7 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
 import { SiBlockchaindotcom } from "react-icons/si";
 
-import { getConnectedNetwork, supportedNetworks } from "./Utils";
+import { getConnectedNetwork } from "./Utils";
 
 
 const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
@@ -87,7 +87,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
 				</span>
-				{account ? (
+				{wallet.status === 'connected' ? (
 					<div className="connectedAs" onClick={() => wallet.reset()} style={{ cursor: "pointer" }}>
 						<div>
 							<MdOutlineAccountBalance /> {accountShort}

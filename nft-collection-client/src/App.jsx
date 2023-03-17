@@ -4,15 +4,17 @@ import { UseWalletProvider } from 'use-wallet'
 
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
+import { supportedNetworks } from "./components/Utils";
 import "./App.scss";
 
 const App = () => {
 	const [account, setAccount] = useState(null);
 	const [darkMode, setDarkMode] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState(null);
+	const allSupportedNetworks = Object.keys(supportedNetworks);
 
 	return (
-		<UseWalletProvider chains={[0x539, 0x13881]}>
+		<UseWalletProvider chainId={allSupportedNetworks[0]}>
 			<div className={darkMode ? "mainContainer darkmode" : "mainContainer"}>
 				<div className="container text-center flex-vertical">
 					<Navbar

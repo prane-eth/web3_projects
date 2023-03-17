@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useWallet } from "use-wallet";
+
 import { data, handleMint, pricePerToken, imageSize } from "./NftFunctions";
-import { getContract, getEtherscanLink } from "./Utils";
+import { getEtherscanLink } from "./Utils";
 
 
 const Home = () => {
 	const [mintingTxn, setMintingTxn] = useState("");
-	var contract = getContract();
 	const wallet = useWallet();
 
 	if (wallet.status !== 'connected') {
@@ -47,13 +47,13 @@ const Home = () => {
 							disabled={mintingTxn}
 							onClick={async (e) => {
 								e.target.style.backgroundColor = "blue";
-								await handleMint(contract, item.url);
+								await handleMint(item.url, mintingTxn, setMintingTxn);
 								e.target.style.removeProperty(
 									"background-color"
 								);
 							}}
 						>
-							Mint - {pricePerToken} eth
+							Mint - {pricePerToken} ETH
 						</button>
 					</div>
 				))}

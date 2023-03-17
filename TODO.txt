@@ -1,5 +1,4 @@
 
-implement useWallet in Navbar.jsx
 finish nft project to make it work, then leave it
 create new glitch account and host them
 
