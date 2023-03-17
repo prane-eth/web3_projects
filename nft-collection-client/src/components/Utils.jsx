@@ -1,17 +1,70 @@
 import { ethers } from "ethers";
 
 import config from "../assets/ContractABI.json";
-import { contractAddress } from "../assets/ContractAddress.json";
+import contractAddressJson from "../assets/ContractAddress.json";
 
-const getContract = async () => {
+export const supportedNetworks = {
+	"0xaa36a7": {name: "Sepolia", currency: "ETH"},
+	"0x13881": {name: "Mumbai", currency: "MATIC"},
+}
+
+export const getConnectedNetwork = async () => {
 	if (!window.ethereum) {
 		console.log("Make sure you have metamask!");
 		return false;
 	}
+
+	// get connected network name
+	const network = await window.ethereum.request({ method: "net_version" });
+	if (!supportedNetworks[network]) {
+		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
+		alert("Please switch to supported network: " + networksList.join(", "));
+		return false;
+	}
+
+	return supportedNetworks[network];
+};
+
+export const getContract = async () => {
+	if (!window.ethereum) {
+		console.log("Make sure you have metamask!");
+		return false;
+	}
+
+	// get connected network name
+	const network = getConnectedNetwork();
+	var contractAddress;
+	if (network === "Mumbai")
+		contractAddress = contractAddressJson.mumbaiAddress;
+	else if (network === "Sepolia")
+		contractAddress = contractAddressJson.sepoliaAddress;
+	else
+		return false;
+
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
 	return contract;
+};
+
+export const getEtherscanLink = (mintingTxn, hash, type = "transaction") => {
+	const networkId = mintingTxn?.networkId;
+	const networkName = mintingTxn?.networkName;
+	if (!networkId) {
+		return "";
+	}
+
+	console.log("networkId", mintingTxn);
+
+	if (type === "transaction") {
+		return `https://${
+			networkId === "1" ? "" : networkId + "."
+			}etherscan.io/tx/${hash}`;
+	} else if (type === "address") {
+		return `https://${
+			networkId === "1" ? "" : networkId + "."
+			}etherscan.io/address/${hash}`;
+	}
 };
 
 export default getContract;

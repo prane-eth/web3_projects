@@ -336,7 +336,7 @@ import getContract from \"./Utils\";
 const Home = ({ setLoadingMessage, account }) => {
 	return (
 		<>
-			<h1 className=\"mt-5\">Hello from $contractName project</h1>
+			<h1 className=\"mt-5\">Hello from $folder project</h1>
 
 			<div className=\"content-container mt-5 flex-vertical\">
 				{!account ? \"Please connect to metamask\" : null}
@@ -403,7 +403,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 				if (walletBalance == 0x0 || walletBalance === \"0x187c99de7e564ce0\") {
 					setBalance('0.00');
 				} else {
-					const balance = ethers.utils.formatEther(walletBalance);
+					const balance = ethers.formatEther(walletBalance);
 					const balanceShort = balance.slice(0, 5);
 					setBalance(balanceShort);
 				}
@@ -482,6 +482,8 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 export default Navbar;" > src/components/Navbar.jsx
 
+	
+
     cd ..
 else
     echo "createClient is false"
@@ -536,6 +538,7 @@ contract $contractName is Ownable {
 	echo "require('@nomiclabs/hardhat-waffle');
 require('dotenv').config();
 require('@nomiclabs/hardhat-etherscan');
+require('@openzeppelin/hardhat-upgrades');
 
 const { GOERLI_RPC_URL, SEPOLIA_RPC_URL, MUMBAI_RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
@@ -544,6 +547,7 @@ module.exports = {
 	networks: {
 		localhost: {
 			url: 'http://localhost:8545',
+			accounts: [PRIVATE_KEY]
 		},
 		goerli: {
 			url: GOERLI_RPC_URL,
@@ -581,7 +585,7 @@ const { getBalance } = ethers.provider;
 const deployContract = async (contractName, ...args) => {
 	const contract = await ethers
 		.getContractFactory(contractName)
-		.then((contractFactory) => contractFactory.deploy(...args));
+		.then((contractFactory) => upgrades.deployProxy(contractFactory, [...args]));
 	await contract.deployed();
 	return contract;
 };
@@ -640,8 +644,8 @@ describe(\"$contractName\", function () {
 	echo "const { ethers, upgrades } = require('hardhat');
 
 async function main() {
-  const $contractName = await ethers.getContractFactory(\"$contractName\");
-  const proxy = await upgrades.deployProxy($contractName);
+  const contractFactory = await ethers.getContractFactory(\"$contractName\");
+  const proxy = await upgrades.deployProxy(contractFactory);
   // if args are needed - (contractName, [arg1, arg2])
   await proxy.deployed();
 

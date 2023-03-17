@@ -1,6 +1,9 @@
 
-finish NFT project
-make projects multi-network
+implement useWallet in Navbar.jsx
+finish nft project to make it work, then leave it
+create new glitch account and host them
+
+make projects multi-network successfully
 enable option to select network, on wallet button of navbar
 add material-ui with mui package. update create_project.sh
 
@@ -40,4 +43,8 @@ create a logo for dBank
 in todo-app, add option to pay from dBank
 finish dBank client
 rename dBank to Bank3 or dBank3
+
+_____________________________________________________
+
+make NftCollection upgradable
 

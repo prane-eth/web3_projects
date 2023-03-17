@@ -1,6 +1,10 @@
 .imgDiv {
 	display: inline-grid;
 	margin: 10px;
+	
+	img {
+		border-radius: 15px;
+	}
 }
 
 .imgDiv button {
@@ -83,17 +87,41 @@ button:hover {
 	border-top-right-radius: 0;
 }
 
+.mt-5 {
+	color: white;
+}
+
+.homeContainer {
+	color: white;
+}
+
 .mainContainer {
-	transition: 1s;
-	background: radial-gradient(circle,
-			rgba(253, 255, 162, 1) 0%,
-			rgba(229, 255, 204, 1) 67%);
+	// background: radial-gradient(circle,
+	// 		rgba(253, 255, 162, 1) 0%,
+	// 		rgba(229, 255, 204, 1) 67%);
+	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+
 	height: 100%;
 	min-height: 100vh;
+	transition: 1s;
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 
 .icon-large {

@@ -1,25 +1,23 @@
-import { useState, useEffect } from "react";
-import "./App.scss";
-import {
-	handleMint,
-} from "./components/NftFunctions";
+import { useState } from "react";
+import { useWallet } from "use-wallet";
+import { data, handleMint, pricePerToken, imageSize } from "./NftFunctions";
+import { getContract, getEtherscanLink } from "./Utils";
 
 
-const Home = ({ setLoadingMessage, account }) => {
-	const [walletInstalled, setWalletInstalled] = useState(false);
-	const [NFTContract, setNFTContract] = useState(null);
+const Home = () => {
 	const [mintingTxn, setMintingTxn] = useState("");
+	var contract = getContract();
+	const wallet = useWallet();
 
-	if (account === null) {
+	if (wallet.status !== 'connected') {
 		return (
-			<div className="container">
+			<div className="container homeContainer">
 				<br />
-				<h1> 🔮 metaschool</h1>
-				<h2>NFT Marketplace</h2>
+				<h2>🖼️ NFT Marketplace</h2>
 				<p>Buy an NFT from our marketplace.</p>
 
-				{walletInstalled ? (
-					<button onClick={connectWallet}>Connect Wallet</button>
+				{window.ethereum ? (
+					<button onClick={() => wallet.connect()}>Connect Wallet</button>
 				) : (
 					<p>Install Metamask wallet</p>
 				)}
@@ -28,16 +26,14 @@ const Home = ({ setLoadingMessage, account }) => {
 	}
 
 	return (
-		<>
-			<h1 className="mt-5">Hello from NftCollection project</h1>
+		<div className="homeContainer">
+			<h1 className="mt-5">🖼️ NFT Marketplace</h1>
 
 			<div className="content-container mt-5 flex-vertical">
-				{!account ? "Please connect to metamask" : null}
+				{wallet.status !== 'connected' ? "Please connect to metamask" : null}
 			</div>
 			
 			<div className="container">
-				<br />
-				<h2> 🔮 NFT Marketplace </h2>
 				{data.map((item, index) => (
 					<div className="imgDiv" key={index}>
 						<img
@@ -49,9 +45,9 @@ const Home = ({ setLoadingMessage, account }) => {
 						/>
 						<button
 							disabled={mintingTxn}
-							onClick={(e) => {
+							onClick={async (e) => {
 								e.target.style.backgroundColor = "blue";
-								handleMint(item.url);
+								await handleMint(contract, item.url);
 								e.target.style.removeProperty(
 									"background-color"
 								);
@@ -61,9 +57,20 @@ const Home = ({ setLoadingMessage, account }) => {
 						</button>
 					</div>
 				))}
-				<button onClick={withdrawEther}>Withdraw Ether</button>
+				{/* <button onClick={withdrawEther}>Withdraw Ether</button> */}
 			</div>
-		</>
+
+			{mintingTxn && (
+				<div className="container">
+					<h3>Minting Transaction</h3>
+					<p>
+						<a href={getEtherscanLink(mintingTxn)}>
+							View on Etherscan
+						</a>
+					</p>
+				</div>
+			)}
+		</div>
 	);
 }
 
