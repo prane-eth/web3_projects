@@ -60,14 +60,15 @@ const Home = () => {
 							width={imageSize}
 							height={imageSize}
 						/>
-						{item.name}
 						<button
 							disabled={mintingTxn || !item.isAvailable}
+							className={mintingTxn || !item.isAvailable ? "button-sold-out" : ""}
 							onClick={async (e) => {
-								console.log(item.isAvailable)
+								console.log("item.isAvailable", item.isAvailable);
 								e.target.style.backgroundColor = "blue";
-								await handleMint(item.url, setMintingTxn, setLoadingMessage);
+								await handleMint(item.id, setMintingTxn, setLoadingMessage);
 								e.target.style.removeProperty("background-color");
+								item.isAvailable = false;
 							}}
 						>
 							{item.isAvailable ?

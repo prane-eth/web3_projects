@@ -73,6 +73,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 		const localDarkMode = localStorage.getItem("darkMode");
 		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
+		wallet.connect();
 	}, []);
 	useEffect(() => {
 		const accountShortValue = account ? account.slice(0, 6) + "..." + account.slice(-2) : null;
