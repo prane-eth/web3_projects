@@ -1,6 +1,5 @@
-
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
 const { parseEther } = ethers.utils;
 const { getBalance } = ethers.provider;
 
@@ -12,14 +11,15 @@ const deployContract = async (contractName, ...args) => {
 	return contract;
 };
 
-describe("NftCollection", function () {
+describe("CryptoGallery", function () {
 	let contract, owner, customer, attacker;
-	const folderURL = "https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
-	const pricePerToken = parseEther("0.01")
-	
+	const folderURL =
+		"https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
+	const pricePerToken = parseEther("0.01");
+
 	it("Should deploy without errors", async function () {
 		[owner, customer, attacker] = await ethers.getSigners();
-		contract = await deployContract("NftCollection");
+		contract = await deployContract("CryptoGallery");
 		expect(contract.address).to.properAddress;
 		expect(await contract.deployed()).to.equal(contract);
 	});
@@ -33,9 +33,10 @@ describe("NftCollection", function () {
 	it("Should mint NFT", async function () {
 		const initialOwnerBalance = await getBalance(owner.address);
 		// mint from folder QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL of ipfs
-		const tx = await contract.connect(customer)
+		const tx = await contract
+			.connect(customer)
 			.mintNFT(folderURL + "1.png", {
-				value: pricePerToken
+				value: pricePerToken,
 			});
 		const receipt = await tx.wait();
 		const finalOwnerBalance = await getBalance(owner.address);
@@ -46,14 +47,17 @@ describe("NftCollection", function () {
 		expect(event.args[2]).to.equal(1);
 		expect(await contract.ownerOf(1)).to.equal(customer.address);
 		expect(await contract.tokenURI(1)).to.equal(folderURL + "1.png");
-		expect(finalOwnerBalance.sub(initialOwnerBalance)).to.equal(pricePerToken);
+		expect(finalOwnerBalance.sub(initialOwnerBalance)).to.equal(
+			pricePerToken
+		);
 	});
 
 	it("Should mint 1 more NFT", async function () {
 		const initialOwnerBalance = await getBalance(owner.address);
-		const tx = await contract.connect(customer)
+		const tx = await contract
+			.connect(customer)
 			.mintNFT(folderURL + "2.png", {
-				value: pricePerToken
+				value: pricePerToken,
 			});
 		const receipt = await tx.wait();
 		const finalOwnerBalance = await getBalance(owner.address);
@@ -64,15 +68,19 @@ describe("NftCollection", function () {
 		expect(event.args[2]).to.equal(2);
 		expect(await contract.ownerOf(2)).to.equal(customer.address);
 		expect(await contract.tokenURI(2)).to.equal(folderURL + "2.png");
-		expect(finalOwnerBalance.sub(initialOwnerBalance)).to.equal(pricePerToken);
+		expect(finalOwnerBalance.sub(initialOwnerBalance)).to.equal(
+			pricePerToken
+		);
 	});
 
 	it("Should not mint 3rd NFT beyond limit per user", async function () {
-		await expect(contract.connect(customer)
-			.mintNFT(folderURL + "3.png", {
-				value: pricePerToken
+		await expect(
+			contract.connect(customer).mintNFT(folderURL + "3.png", {
+				value: pricePerToken,
 			})
-		).to.be.revertedWith("CollectionApp: You have exceeded minting limit per address");
+		).to.be.revertedWith(
+			"CollectionApp: You have exceeded minting limit per address"
+		);
 	});
 
 	it("Should check if token is available", async function () {
@@ -82,5 +90,4 @@ describe("NftCollection", function () {
 		expect(await contract.isAvailable(folderURL + "4.png")).to.equal(true);
 		expect(await contract.isAvailable(folderURL + "5.png")).to.equal(true);
 	});
-
 });

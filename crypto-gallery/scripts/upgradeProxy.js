@@ -3,8 +3,8 @@
 // const proxyAddress = "";
 
 // async function upgrade() {
-// 	const NewNftCollection = await ethers.getContractFactory("NewNftCollection");
-// 	const upgraded = await upgrades.upgradeProxy(proxyAddress, NewNftCollection);
+// 	const NewCryptoGallery = await ethers.getContractFactory("NewCryptoGallery");
+// 	const upgraded = await upgrades.upgradeProxy(proxyAddress, NewCryptoGallery);
 
 // 	const implementationAddress =
 // 		await upgrades.erc1967.getImplementationAddress(proxyAddress);
@@ -13,8 +13,8 @@
 // 	console.log("Upgrade: Implementation contract address: " + implementationAddress);
 // }
 // // async function downgrade() {  // downgrade if any security flaw or bugs in new version
-// // 	const NftCollection = await ethers.getContractFactory("NftCollection");
-// // 	await upgrades.forceImport(proxyAddress, NftCollection);
+// // 	const CryptoGallery = await ethers.getContractFactory("CryptoGallery");
+// // 	await upgrades.forceImport(proxyAddress, CryptoGallery);
 // // 	console.log("V1 proxy contract registered for downgrading");
 // // }
 

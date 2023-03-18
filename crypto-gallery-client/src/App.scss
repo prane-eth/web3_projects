@@ -14,6 +14,10 @@
 
 .button-sold-out {
 	background-color: orange;
+	&:hover {
+		background-color: orange;
+		cursor: not-allowed;
+	}
 }
 
 button {

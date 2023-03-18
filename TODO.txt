@@ -1,9 +1,11 @@
 
 finish nft project to make it work, then leave it
-	use metadata. go through course how to use
-	follow course to ensure code is correct
+	etherscan link is not working
 	verify contract on etherscan using hardhat package
+
+
 create new glitch account and host them
+find way to host all react apps on one glitch project
 update create-project.sh according to new react & solidity codes
 
 make projects multi-network successfully
@@ -49,13 +51,13 @@ rename dBank to Bank3 or dBank3
 
 _____________________________________________________
 
-make NftCollection upgradable
+make CryptoGallery upgradable
 
 in todo app, add reward token for accomplishing tasks
 	add subheading - "Become a chain-goaler"
 
 for nft app, give new name
-	NFTropolis, ArtChain, EtherGallery, CryptoCanvas, Artverse, ArtChain
+	CryptoGallery, ArtChain, Artverse, EtherGallery, CryptoCanvas, NFTropolis
 for bank app,
 	EtherGuard (best name), EtherLocker, EtherBank, EtherVault, EtherShield, CryptoShield, CryptoBank
 	BlockBank, ChainBank, Web3Vault, CryptoVault, Web3Safe,

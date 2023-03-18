@@ -64,11 +64,16 @@ const Home = () => {
 							disabled={mintingTxn || !item.isAvailable}
 							className={mintingTxn || !item.isAvailable ? "button-sold-out" : ""}
 							onClick={async (e) => {
-								console.log("item.isAvailable", item.isAvailable);
-								e.target.style.backgroundColor = "blue";
-								await handleMint(item.id, setMintingTxn, setLoadingMessage);
-								e.target.style.removeProperty("background-color");
-								item.isAvailable = false;
+								try {
+									e.target.style.backgroundColor = "blue";
+									await handleMint(item, setMintingTxn, setLoadingMessage);
+									e.target.style.removeProperty("background-color");
+								} catch (error) {
+									console.error(error);
+									item.isAvailable = true;
+									setMintingTxn("");
+									setLoadingMessage("Failed to mint. Please try again.");
+								}
 							}}
 						>
 							{item.isAvailable ?
@@ -79,16 +84,18 @@ const Home = () => {
 				))}
 			</div>
 
-			{txnLink && (
+			{loadingMessage ? (
 				<div className="container">
 					<h3>{loadingMessage}</h3>
-					<p>
-						<a href={txnLink}>
-							View on block explorer
-						</a>
-					</p>
+					{txnLink ? (
+						<p>
+							<a href={txnLink}>
+								View on block explorer
+							</a>
+						</p>
+					) : null}
 				</div>
-			)}
+			) : null}
 		</div>
 	);
 }

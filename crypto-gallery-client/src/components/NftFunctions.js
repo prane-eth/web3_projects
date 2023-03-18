@@ -31,9 +31,9 @@ for (let i = 1; i <= nftCount; i++) {
 	});
 }
 
-export async function handleMint(tokenID, setMintingTxn, setLoadingMessage) {
+export async function handleMint(item, setMintingTxn, setLoadingMessage) {
 	setMintingTxn(true);
-	const tokenURI = metadataURL + tokenID + ".json";
+	const tokenURI = metadataURL + item.id + ".json";
 	console.log("tokenURI", tokenURI);
 
 	const available = await isAvailable(tokenURI);
@@ -41,11 +41,15 @@ export async function handleMint(tokenID, setMintingTxn, setLoadingMessage) {
 		alert("Token URI not available");
 		return;
 	}
-	const response = await fetch(tokenURI);
-	if (!response.ok) {
-		alert("Token URI not reachable");
-		return;
-	}
+
+	// // fetch with timeout
+	// const response = await fetch(tokenURI, { timeout: 5000 });
+	// if (!response.ok) {
+	// 	const confirmed = window.confirm("Token URI not reachable. Continue?");
+	// 	if (!confirmed) {
+	// 		return;
+	// 	}
+	// }
 
 	try {
 		const contract = await getContract();
@@ -54,8 +58,11 @@ export async function handleMint(tokenID, setMintingTxn, setLoadingMessage) {
 		setMintingTxn(txn);
 		await txn.wait();
 		setLoadingMessage("Minted NFT!");
-	} catch (err) {
-		alert(err);
+		item.isAvailable = false;
+	} catch (error) {
+		if (error.code != "ACTION_REJECTED") {  // 4001 if transaction rejected
+			alert(error);
+		}
 	} finally {
 		setMintingTxn(null);
 	}

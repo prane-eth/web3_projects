@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract NftCollection is ERC721URIStorage, Ownable, Initializable {
+contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
     
@@ -20,7 +20,7 @@ contract NftCollection is ERC721URIStorage, Ownable, Initializable {
     // string public IPFS_FOLDER = "";
     event Minted(address indexed to, uint256 indexed tokenId);
 
-    constructor() ERC721("Collection", "CollNFT") {}
+    constructor() ERC721("CryptoGallery", "CGNFT") {}
 
     function setPrice(uint256 price) external onlyOwner {
         PRICE_PER_TOKEN = price;
