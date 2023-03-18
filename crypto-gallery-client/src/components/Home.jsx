@@ -6,15 +6,15 @@ import { getEtherscanLink, getConnectedNetwork } from "./Utils";
 
 
 const Home = () => {
-	const [mintingTxn, setMintingTxn] = useState("");
-	const [txnLink, setTxnLink] = useState("");
-	const [loadingMessage, setLoadingMessage] = useState("");
-	const [currency, setCurrency] = useState("");
+	const [mintingTxn, setMintingTxn] = useState(null);
+	const [txnLink, setTxnLink] = useState(null);
+	const [loadingMessage, setLoadingMessage] = useState(null);
+	const [currency, setCurrency] = useState(null);
 	const wallet = useWallet();
 
-	useEffect(() => {
+	useEffect(async () => {
 		if (mintingTxn) {
-			setTxnLink(getEtherscanLink(mintingTxn));
+			setTxnLink(await getEtherscanLink(mintingTxn));
 		} else {
 			setTxnLink(null);
 		}
@@ -62,7 +62,7 @@ const Home = () => {
 						/>
 						<button
 							disabled={mintingTxn || !item.isAvailable}
-							className={mintingTxn || !item.isAvailable ? "button-sold-out" : ""}
+							className={!item.isAvailable ? "button-sold-out" : ""}
 							onClick={async (e) => {
 								try {
 									e.target.style.backgroundColor = "blue";
@@ -78,7 +78,7 @@ const Home = () => {
 						>
 							{item.isAvailable ?
 								<> Mint - {pricePerToken} {currency} </>
-							: "Sold Out"}
+							: "Sold"}
 						</button>
 					</div>
 				))}
@@ -89,7 +89,7 @@ const Home = () => {
 					<h3>{loadingMessage}</h3>
 					{txnLink ? (
 						<p>
-							<a href={txnLink}>
+							<a href={txnLink} target="_blank">
 								View on block explorer
 							</a>
 						</p>

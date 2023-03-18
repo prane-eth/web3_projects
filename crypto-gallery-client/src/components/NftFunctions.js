@@ -63,7 +63,5 @@ export async function handleMint(item, setMintingTxn, setLoadingMessage) {
 		if (error.code != "ACTION_REJECTED") {  // 4001 if transaction rejected
 			alert(error);
 		}
-	} finally {
-		setMintingTxn(null);
 	}
 }

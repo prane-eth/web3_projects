@@ -4,9 +4,28 @@ import config from "../assets/ContractABI.json";
 import contractAddressJson from "../assets/ContractAddress.json";
 
 export const supportedNetworks = {
-	"0x13881": {name: "Mumbai", currency: "MATIC"},
-	"0xaa36a7": {name: "Sepolia", currency: "ETH"},
+	// please enter in lower case only
+	"0x13881": {
+		name: "Mumbai", currency: "MATIC",
+		url: "https://mumbai.polygonscan.com"
+	},
+	"0xaa36a7": {
+		name: "Sepolia", currency: "ETH",
+		url: "https://sepolia.etherscan.io"
+	},
+	"0x7a69": {
+		name: "Localhost", currency: "ETH",
+		url: "http://localhost:8545"
+	},
 }
+
+// on network/account change, reload page
+window.ethereum.on("chainChanged", () => {
+	window.location.reload();
+});
+window.ethereum.on("accountsChanged", () => {
+	window.location.reload();
+});
 
 export const getConnectedNetwork = async () => {
 	if (!window.ethereum) {
@@ -15,10 +34,16 @@ export const getConnectedNetwork = async () => {
 	}
 
 	// get connected network name
-	const network = await window.ethereum.request({ method: "net_version" });
+	const networkCode = await window.ethereum.request({ method: "net_version" });
+	const network = networkCode.toLowerCase();
 	if (!supportedNetworks[network]) {
 		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
 		alert("Please switch to supported network: " + networksList.join(", "));
+		// request user to switch to Mumbai
+		await window.ethereum.request({
+			method: "wallet_switchEthereumChain",
+			params: [{ chainId: Object.keys(supportedNetworks)[0] }],
+		});
 		return false;
 	}
 
@@ -38,6 +63,9 @@ export const getContract = async () => {
 		contractAddress = contractAddressJson.mumbaiAddress;
 	else if (networkName === "Sepolia")
 		contractAddress = contractAddressJson.sepoliaAddress;
+	else if (networkName === "Localhost")
+		contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+		// always the same first contract after starting a node
 	else
 		return false;
 
@@ -47,22 +75,9 @@ export const getContract = async () => {
 	return contract;
 };
 
-export const getEtherscanLink = (mintingTxn, type = "transaction") => {
-	const network = getConnectedNetwork();
-	var domain;
-	if (network === "Mumbai")
-		domain = "https://mumbai.polygonscan.com";
-	else if (network === "Sepolia")
-		domain = "https://sepolia.etherscan.io";
-	else
-		return null;
-
-	const hash = mintingTxn.hash;
-	if (type === "transaction") {
-		console.log(`${domain}/tx/${hash}`);
-		return `${domain}/tx/${hash}`;
-	} else if (type === "address") {
-		return `${domain}/address/${hash}`;
-	}
+export const getEtherscanLink = async (mintingTxn) => {
+	const { url: domain } = await getConnectedNetwork();
+	const hash = await mintingTxn.hash;
+	return `${domain}/tx/${hash}`;
 };
 

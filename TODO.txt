@@ -1,8 +1,7 @@
 
 finish nft project to make it work, then leave it
-	etherscan link is not working
 	verify contract on etherscan using hardhat package
-
+	note down procedure
 
 create new glitch account and host them
 find way to host all react apps on one glitch project

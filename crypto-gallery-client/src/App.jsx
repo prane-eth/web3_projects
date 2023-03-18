@@ -14,7 +14,7 @@ const App = () => {
 	const allSupportedNetworks = Object.keys(supportedNetworks);
 
 	return (
-		<UseWalletProvider chainId={allSupportedNetworks[0]}>
+		<UseWalletProvider chainId={allSupportedNetworks[2]}>
 			<div className={darkMode ? "mainContainer darkmode" : "mainContainer"}>
 				<div className="container text-center flex-vertical">
 					<Navbar
