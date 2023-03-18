@@ -1,11 +1,8 @@
 
-finish nft project to make it work, then leave it
-	verify contract on etherscan using hardhat package
-	note down procedure
+update create-project.sh according to new react & solidity codes
 
 create new glitch account and host them
 find way to host all react apps on one glitch project
-update create-project.sh according to new react & solidity codes
 
 make projects multi-network successfully
 enable option to select network, on wallet button of navbar
