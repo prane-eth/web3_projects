@@ -133,19 +133,6 @@
 		},
 		{
 			"inputs": [],
-			"name": "IPFS_FOLDER",
-			"outputs": [
-				{
-					"internalType": "string",
-					"name": "",
-					"type": "string"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [],
 			"name": "LIMIT_PER_ADDRESS",
 			"outputs": [
 				{
