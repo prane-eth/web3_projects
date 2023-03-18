@@ -1,45 +1,44 @@
 import { ethers } from "ethers";
 import { getContract } from "./Utils";
 
-const { parseEther } = ethers;
-const folderURL =
-	"https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
-// "https://gateway.pinata.cloud/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
-export const pricePerToken = 0.01;
+
+const { parseEther, formatEther } = ethers;
+
+const contract = await getContract();
+
 export const imageSize = "280em";
+const imagesURL = `https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/`;
+const metadataURL = `https://ipfs.io/ipfs/QmWZdF6MjqXk3mZHFiWgZ5rkR4GPnc38MCpUYcCbyhZs4L/`;
+// `https://gateway.pinata.cloud/ipfs/${ipfsFolder}/`;
+
 
 // create new list of NFTs
-export const nftCount = 5;
 export const data = [];
+const nftCount = await contract.MAX_SUPPLY();
 for (let i = 0; i < nftCount; i++) {
+	const available = await contract.isAvailable(imagesURL + (i + 1) + ".png");
 	data.push({
-		url: folderURL + (i + 1) + ".png",  // images[i],
+		id: i,
+		imageURL: imagesURL + (i + 1) + ".png",
+		name: "NFT #" + (i + 1),
+		metadataURL: metadataURL + (i + 1) + ".json",
+		isAvailable: available
 	});
 }
 
-export async function withdrawEther(contract) {
-	try {
-		const response = await contract.withdrawEther();
-		console.log("Started txn: ", response);
-	} catch (err) {
-		alert(err);
-	}
-}
+const price = await contract.PRICE_PER_TOKEN();
+export const pricePerToken = formatEther("" + price).toString();
 
-export async function handleMint(tokenURI, mintingTxn, setMintingTxn) {
-	if (mintingTxn) {
-		return;
-	}
+export async function handleMint(tokenID, setMintingTxn, setLoadingMessage) {
 	setMintingTxn(true);
+	const tokenURI = metadataURL + tokenID + ".json";
 	try {
 		const contract = await getContract();
-		const options = { value: parseEther("" + pricePerToken) };
-		const txn = await contract.mintNFT(tokenURI, options);
-		console.log("Processing: ", txn);
-		txn.tokenURI = tokenURI;
+		const txn = await contract.mintNFT(tokenURI, { value: parseEther("" + pricePerToken) });
+		setLoadingMessage("Minting NFT...");
 		setMintingTxn(txn);
 		await txn.wait();
-		console.log("Minted");
+		setLoadingMessage("Minted NFT!");
 	} catch (err) {
 		alert(err);
 	} finally {

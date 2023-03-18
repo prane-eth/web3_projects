@@ -1,5 +1,8 @@
 
 finish nft project to make it work, then leave it
+	use metadata. go through course how to use
+	follow course to ensure code is correct
+	verify contract on etherscan using hardhat package
 create new glitch account and host them
 update create-project.sh according to new react & solidity codes
 

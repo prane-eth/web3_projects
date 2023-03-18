@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "use-wallet";
 
-import { data, handleMint, pricePerToken, imageSize } from "./NftFunctions";
-import { getEtherscanLink } from "./Utils";
+import { data, handleMint, imageSize, pricePerToken } from "./NftFunctions";
+import { getEtherscanLink, getConnectedNetwork } from "./Utils";
 
 
 const Home = () => {
 	const [mintingTxn, setMintingTxn] = useState("");
 	const [txnLink, setTxnLink] = useState("");
+	const [loadingMessage, setLoadingMessage] = useState("");
+	const [currency, setCurrency] = useState("");
 	const wallet = useWallet();
 
 	useEffect(() => {
@@ -17,6 +19,12 @@ const Home = () => {
 			setTxnLink(null);
 		}
 	}, [mintingTxn]);
+	useEffect(async () => {
+		const connectedNetwork = await getConnectedNetwork();
+		if (connectedNetwork) {
+			setCurrency(connectedNetwork.currency);
+		}
+	}, []);
 
 	if (wallet.status !== 'connected') {
 		return (
@@ -43,38 +51,39 @@ const Home = () => {
 			</div>
 			
 			<div className="container">
-				{data.map((item, index) => (
-					<div className="imgDiv" key={index}>
+				{data.map(item => (
+					<div className="imgDiv" key={item.id}>
 						<img
-							src={item.url}
-							key={index}
+							src={item.imageURL}
+							key={item.id}
 							alt="images"
 							width={imageSize}
 							height={imageSize}
 						/>
+						{item.name}
 						<button
-							disabled={mintingTxn}
+							disabled={mintingTxn || !item.isAvailable}
 							onClick={async (e) => {
+								console.log(item.isAvailable)
 								e.target.style.backgroundColor = "blue";
-								await handleMint(item.url, mintingTxn, setMintingTxn);
-								e.target.style.removeProperty(
-									"background-color"
-								);
+								await handleMint(item.url, setMintingTxn, setLoadingMessage);
+								e.target.style.removeProperty("background-color");
 							}}
 						>
-							Mint - {pricePerToken} ETH
+							{item.isAvailable ?
+								<> Mint - {pricePerToken} {currency} </>
+							: "Sold Out"}
 						</button>
 					</div>
 				))}
-				{/* <button onClick={withdrawEther}>Withdraw Ether</button> */}
 			</div>
 
 			{txnLink && (
 				<div className="container">
-					<h3>Minting Transaction</h3>
+					<h3>{loadingMessage}</h3>
 					<p>
 						<a href={txnLink}>
-							View on Etherscan
+							View on block explorer
 						</a>
 					</p>
 				</div>

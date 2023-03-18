@@ -75,4 +75,12 @@ describe("NftCollection", function () {
 		).to.be.revertedWith("CollectionApp: You have exceeded minting limit per address");
 	});
 
+	it("Should check if token is available", async function () {
+		expect(await contract.isAvailable(folderURL + "1.png")).to.equal(false);
+		expect(await contract.isAvailable(folderURL + "2.png")).to.equal(false);
+		expect(await contract.isAvailable(folderURL + "3.png")).to.equal(true);
+		expect(await contract.isAvailable(folderURL + "4.png")).to.equal(true);
+		expect(await contract.isAvailable(folderURL + "5.png")).to.equal(true);
+	});
+
 });

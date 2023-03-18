@@ -17,6 +17,7 @@ contract NftCollection is ERC721URIStorage, Ownable, Initializable {
     uint256 public PRICE_PER_TOKEN = 0.01 ether;
     uint256 public LIMIT_PER_ADDRESS = 2;
     uint256 public MAX_SUPPLY = 5;
+    // string public IPFS_FOLDER = "";
     event Minted(address indexed to, uint256 indexed tokenId);
 
     constructor() ERC721("Collection", "CollNFT") {}
@@ -35,6 +36,10 @@ contract NftCollection is ERC721URIStorage, Ownable, Initializable {
 
     function setMaxSupply(uint256 max_supply) external onlyOwner {
         MAX_SUPPLY = max_supply;
+    }
+
+    function isAvailable(string memory tokenURI) external view returns (bool) {
+        return !isTokenMinted[tokenURI];
     }
 
     function mintNFT(
@@ -57,6 +62,8 @@ contract NftCollection is ERC721URIStorage, Ownable, Initializable {
             mintedForAddress[msg.sender] < LIMIT_PER_ADDRESS,
             "CollectionApp: You have exceeded minting limit per address"
         );
+
+        // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png"
 
         // for security reasons, minting is after payment and increments
         // due to this, we do not need a ReentrancyGuard
