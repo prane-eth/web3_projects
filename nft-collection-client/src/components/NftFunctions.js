@@ -39,7 +39,7 @@ export async function handleMint(tokenURI, mintingTxn, setMintingTxn) {
 		txn.tokenURI = tokenURI;
 		setMintingTxn(txn);
 		await txn.wait();
-		console.log("Minted: ", txn);
+		console.log("Minted");
 	} catch (err) {
 		alert(err);
 	} finally {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWallet } from "use-wallet";
 
 import { data, handleMint, pricePerToken, imageSize } from "./NftFunctions";
@@ -7,7 +7,16 @@ import { getEtherscanLink } from "./Utils";
 
 const Home = () => {
 	const [mintingTxn, setMintingTxn] = useState("");
+	const [txnLink, setTxnLink] = useState("");
 	const wallet = useWallet();
+
+	useEffect(() => {
+		if (mintingTxn) {
+			setTxnLink(getEtherscanLink(mintingTxn));
+		} else {
+			setTxnLink(null);
+		}
+	}, [mintingTxn]);
 
 	if (wallet.status !== 'connected') {
 		return (
@@ -60,11 +69,11 @@ const Home = () => {
 				{/* <button onClick={withdrawEther}>Withdraw Ether</button> */}
 			</div>
 
-			{mintingTxn && (
+			{txnLink && (
 				<div className="container">
 					<h3>Minting Transaction</h3>
 					<p>
-						<a href={getEtherscanLink(mintingTxn)}>
+						<a href={txnLink}>
 							View on Etherscan
 						</a>
 					</p>

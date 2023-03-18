@@ -117,8 +117,8 @@ if [ "$createClient" == "true" ]; then
     npm create vite@latest "$folder-client" -- --template react
     # npx create-react-app "$folder-client"
     cd "$folder-client"
-    npm i
-    npm i ethers react-router-dom sass react-icons
+    # npm i
+    npm i ethers react-router-dom sass react-icons @mui/material @emotion/react @emotion/styled @mui/icons-material use-wallet
     mkdir -p src/components src/assets
     rm src/assets/*
     rm src/App.css

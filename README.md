@@ -4,22 +4,8 @@ Projects:  (latest to oldest)
 
 Status | Project name | Description | Frontend Link
 --- | --- | --- | ---
-:wrench: | DBank | Decentralized bank | Not started
-:heavy_check_mark: | Invoice-app | to create and pay invoices by PAN ID number of a seller | https://savory-mahogany-lemon.glitch.me/
-:white_check_mark: | NFT-collection-client | NFT platform that mints NFTs to the account of the buyer | In progress
-:heavy_check_mark: | TODO-app | to create a task and deposit ETH for commitment towards it, and to get refund only after finishing the task | https://river-fork-persimmon.glitch.me/
+:wrench: | DBank | EtherGuard | Not started
+:heavy_check_mark: | EtherInvoice (formerly Invoice payment app) | to create and pay invoices by ID number of a seller | https://savory-mahogany-lemon.glitch.me/
+:white_check_mark: | NFT Collection | NFT platform that mints NFTs to the account of the buyer | In progress
+:heavy_check_mark: | BlockGoaler app (formerly TODO) | to create a task and deposit ETH for commitment towards it, and to get refund only after finishing the task | https://river-fork-persimmon.glitch.me/
 
-<!-- - DBank (Decentralized bank) - Not finished
-	- to perform transaction with more privacy, security and less gas fee
-	- ENS sub-domain for contract address: `dbank.vh-praneeth.eth`
-
-- Invoice-app - https://savory-mahogany-lemon.glitch.me/
-	- to create and pay invoices by PAN ID number of a seller
-	- ENS: `invoice-app.vh-praneeth.eth`
-
-- NFT-collection-client - Not finished
-	- NFT platform that mints NFTs to the account of the buyer
-
-- TODO-app - https://river-fork-persimmon.glitch.me/
-	- to create a task and deposit ETH for commitment towards it, and to get refund only after finishing the task
-	- ENS: `todo.vh-praneeth.eth` -->

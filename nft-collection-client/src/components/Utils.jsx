@@ -32,39 +32,37 @@ export const getContract = async () => {
 	}
 
 	// get connected network name
-	// const { name: networkName} = await getConnectedNetwork();
-	// var contractAddress;
-	// if (networkName === "Mumbai")
-	// 	contractAddress = contractAddressJson.mumbaiAddress;
-	// else if (networkName === "Sepolia")
-	// 	contractAddress = contractAddressJson.sepoliaAddress;
-	// else
-	// 	return false;
-	const contractAddress = contractAddressJson.mumbaiAddress;
+	const { name: networkName} = await getConnectedNetwork();
+	var contractAddress;
+	if (networkName === "Mumbai")
+		contractAddress = contractAddressJson.mumbaiAddress;
+	else if (networkName === "Sepolia")
+		contractAddress = contractAddressJson.sepoliaAddress;
+	else
+		return false;
 
-	const provider = new ethers.providers.Web3Provider(window.ethereum);
-	const signer = provider.getSigner();
+	const provider = new ethers.BrowserProvider(window.ethereum);
+	const signer = await provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
 	return contract;
 };
 
-export const getEtherscanLink = (mintingTxn, hash, type = "transaction") => {
-	const networkId = mintingTxn?.networkId;
-	const networkName = mintingTxn?.networkName;
-	if (!networkId) {
-		return "";
-	}
+export const getEtherscanLink = (mintingTxn, type = "transaction") => {
+	const network = getConnectedNetwork();
+	var domain;
+	if (network === "Mumbai")
+		domain = "https://mumbai.polygonscan.com";
+	else if (network === "Sepolia")
+		domain = "https://sepolia.etherscan.io";
+	else
+		return null;
 
-	console.log("networkId", mintingTxn);
-
+	const hash = mintingTxn.hash;
 	if (type === "transaction") {
-		return `https://${
-			networkId === "1" ? "" : networkId + "."
-			}etherscan.io/tx/${hash}`;
+		console.log(`${domain}/tx/${hash}`);
+		return `${domain}/tx/${hash}`;
 	} else if (type === "address") {
-		return `https://${
-			networkId === "1" ? "" : networkId + "."
-			}etherscan.io/address/${hash}`;
+		return `${domain}/address/${hash}`;
 	}
 };
 
