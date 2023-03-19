@@ -1,20 +1,65 @@
 import { ethers } from "ethers";
-import { getContract } from "./Utils";
+import { getEtherscanLink, getContract } from "./Utils";
 
-const { parseEther, formatEther } = ethers;
+const { parseEther } = ethers;
 
-// wait for wallet to get unlocked
-await window.ethereum.enable();
-await window.ethereum.request({ method: 'eth_requestAccounts' });
+var allTasks, newTask, loadingMessage, isOwner, miningTxn, txnLink;
+var setAllTasks, setNewTask, setLoadingMessage, setIsOwner, setMiningTxn, setTxnLink;
 
-// show wallet popup to unlock wallet
-const provider = new ethers.BrowserProvider(window.ethereum);
-const hasWalletPermissions = await provider.send('wallet_getPermissions');
-console.log('hasWalletPermissions', hasWalletPermissions);
+export const setHooks = (hooks) => {
+	allTasks = hooks.allTasks;
+	newTask = hooks.newTask;
+	loadingMessage = hooks.loadingMessage;
+	isOwner = hooks.isOwner;
+	miningTxn = hooks.miningTxn;
+	txnLink = hooks.txnLink;
 
+	setAllTasks = hooks.setAllTasks;
+	setNewTask = hooks.setNewTask;
+	setLoadingMessage = hooks.setLoadingMessage;
+	setIsOwner = hooks.setIsOwner;
+	setMiningTxn = hooks.setMiningTxn;
+	setTxnLink = hooks.setTxnLink;
+};
 
+export const setNewTxnLink = async () => {
+	if (miningTxn) {
+		const txnLink = await getEtherscanLink(miningTxn);
+		setTxnLink(txnLink);
+	} else {
+		setTxnLink(null);
+	}
+};
 
-const addTask = async () => {
+export const getAllTasks = async () => {
+	setLoadingMessage("Loading tasks");
+	const contract = getContract();
+
+	let tasks = await contract.getAllTasks();
+	// console.log("Got all tasks...", tasks);
+
+	// copy tasks to itself, to enable modification
+	tasks = tasks.map((task) => {
+		return { ...task };
+	});
+
+	// array to store finished tasks
+	let finishedTasks = [];
+	for (var task of tasks) {
+		if (task.done) {
+			finishedTasks.push(task);
+			// remove task from tasks
+			tasks.splice(tasks.indexOf(task), 1);
+		}
+	}
+	// add finished tasks to the end of tasks
+	tasks.push(...finishedTasks);
+
+	setAllTasks(tasks);
+	setLoadingMessage(null);
+};
+
+export const addTask = async () => {
 	if (!newTask) {
 		setLoadingMessage("Task is empty!");
 		return;
@@ -22,230 +67,79 @@ const addTask = async () => {
 	setLoadingMessage("Adding task");
 	console.log("adding a newTask: ", newTask);
 
-	try {
-		const { ethereum } = window;
+	const contract = getContract();
 
-		if (ethereum) {
-			const provider = new ethers.providers.Web3Provider(ethereum);
-			const signer = provider.getSigner();
-			const myContract = new ethers.Contract(
-				contractAddress,
-				contractABI,
-				signer
-			);
-
-			let count = await myContract.getTaskCount();
-			console.log("Tasks count...", count.toNumber());
-
-			const txn = await myContract.addTask(newTask);
-			console.log("Mining...", txn.hash);
-
-			await txn.wait();
-			console.log("Mined");
-
-			count = await myContract.getTaskCount();
-			console.log("Tasks count...", count.toNumber());
-
-			setNewTask("");
-			getAllTasks();
-		} else {
-			console.log("Ethereum object doesn't exist!");
-		}
-	} catch (error) {
-		console.error(error);
-	}
+	const txn = await contract.addTask(newTask);
+	await txn.wait();
+	setNewTask("");
+	getAllTasks();
 	setLoadingMessage(null);
 };
 
-const getAllTasks = async () => {
-	setLoadingMessage("Loading tasks");
-	try {
-		const { ethereum } = window;
-		if (ethereum) {
-			const provider = new ethers.providers.Web3Provider(ethereum);
-			const signer = provider.getSigner();
-			const myContract = new ethers.Contract(
-				contractAddress,
-				contractABI,
-				signer
-			);
+export const finishTask = async (taskId) => {
+	// event.preventDefault();
+	setLoadingMessage("Finishing task...");
 
-			let tasks = await myContract.getAllTasks();
-			// console.log("Got all tasks...", tasks);
+	const contract = getContract();
 
-			// copy tasks to itself
-			tasks = tasks.map((task) => {
-				return { ...task };
-			});
+	const txn = await contract.finishTask(taskId);
+	setMiningTxn(txn);
+	await txn.wait();
+	setLoadingMessage("Done");
 
-			// array to store finished tasks
-			let finishedTasks = [];
-			for (var task of tasks) {
-				if (task.done) {
-					finishedTasks.push(task);
-					// remove task from tasks
-					tasks.splice(tasks.indexOf(task), 1);
-				}
-			}
-			// add finished tasks to the end of tasks
-			tasks.push(...finishedTasks);
-
-			setAllTasks(tasks);
-		} else {
-			console.log("Ethereum object doesn't exist!");
-		}
-	} catch (error) {
-		console.error(error);
-	}
-	setLoadingMessage(null);
+	getAllTasks();
 };
 
-const finishTask = async (event, taskId) => {
-	setLoadingMessage("Finishing task");
-	event.preventDefault();
+export const deleteTask = async (taskPos) => {
+	// event.preventDefault();
+	setLoadingMessage("Deleting task..,");
 
-	try {
-		const { ethereum } = window;
-		if (ethereum) {
-			const provider = new ethers.providers.Web3Provider(ethereum);
-			const signer = provider.getSigner();
-			const myContract = new ethers.Contract(
-				contractAddress,
-				contractABI,
-				signer
-			);
+	const contract = getContract();
 
-			const txn = await myContract.finishTask(taskId);
-			console.log("Mining...", txn.hash);
+	const txn = await contract.deleteTask(taskPos);
+	setMiningTxn(txn);
+	await txn.wait();
+	setLoadingMessage("Done");
 
-			await txn.wait();
-			console.log("Mined");
-
-			getAllTasks();
-		} else {
-			console.log("Ethereum object doesn't exist!");
-		}
-	} catch (error) {
-		console.error(error);
-	}
-	setLoadingMessage(null);
+	getAllTasks();
 };
 
-const deleteTask = async (event, taskId) => {
-	setLoadingMessage("Deleting task");
-	event.preventDefault();
+export const depositEth = async (taskPos) => {
+	// event.preventDefault();
+	setLoadingMessage("Depositing ETH to task...");
 
-	try {
-		const { ethereum } = window;
-		if (ethereum) {
-			const provider = new ethers.providers.Web3Provider(ethereum);
-			const signer = provider.getSigner();
-			const myContract = new ethers.Contract(
-				contractAddress,
-				contractABI,
-				signer
-			);
+	const contract = getContract();
+	const txn = await contract.deposit(taskPos, {
+		value: parseEther("0.01"),
+	});
+	setMiningTxn(txn);
+	await txn.wait();
+	setLoadingMessage("Done");
 
-			const txn = await myContract.deleteTask(taskId);
-			console.log("Mining...", txn.hash);
-
-			await txn.wait();
-			console.log("Mined");
-
-			getAllTasks();
-		} else {
-			console.log("Ethereum object doesn't exist!");
-		}
-	} catch (error) {
-		console.error(error);
-	}
-	setLoadingMessage(null);
+	getAllTasks();
 };
 
-const depositEth = async (event, taskId) => {
-	setLoadingMessage("Depositing ETH to task");
-	event.preventDefault();
+export const refundToOwner = async () => {
+	setLoadingMessage("Refunding to owner...");
 
-	try {
-		const { ethereum } = window;
-		if (ethereum) {
-			const provider = new ethers.providers.Web3Provider(ethereum);
-			const signer = provider.getSigner();
-			const myContract = new ethers.Contract(
-				contractAddress,
-				contractABI,
-				signer
-			);
+	const contract = getContract();
+	const txn = await contract.refundToOwner();
+	setMiningTxn(txn);
+	await txn.wait();
+	setLoadingMessage("Done");
 
-			const txn = await myContract.deposit(taskId, {
-				value: ethers.utils.parseEther("0.01"),
-			});
-			console.log("Mining...", txn.hash);
-
-			await txn.wait();
-			console.log("Mined");
-
-			getAllTasks();
-		} else {
-			console.log("Ethereum object doesn't exist!");
-		}
-	} catch (error) {
-		console.error(error);
-	}
-	setLoadingMessage(null);
+	getAllTasks();
 };
 
-/*
-// const refundToOwner = async () => {
-//     try {
-//         const { ethereum } = window;
-//         if (ethereum) {
-//             const provider = new ethers.providers.Web3Provider(ethereum);
-//             const signer = provider.getSigner();
-//             const myContract = new ethers.Contract(
-//                 contractAddress,
-//                 contractABI,
-//                 signer
-//             );
-
-//             const txn = await myContract.refundToOwner();
-//             console.log("Mining...", txn.hash);
-
-//             await txn.wait();
-//             console.log("Mined");
-
-//             getAllTasks();
-//         } else {
-//             console.log("Ethereum object doesn't exist!");
-//         }
-//     } catch (error) {
-//         console.error(error);
-//     }
-// };
-// <button onClick={refundToOwner}>
-//     Refund to owner
-// </button>
-*/
+export const verifyOwner = async () => {
+	const contract = getContract();
+	const owns = await contract.isOwner();
+	setIsOwner(owns);
+};
 
 // press enter to add task
-const submitOnEnter = (event) => {
+export const submitOnEnter = (event) => {
 	if (event.key === "Enter") {
 		addTask(event);
 	}
 };
-
-const Instructions = () => (
-	<>
-		<div className="instructions">
-			Instructions:
-			<br />
-			Add a task using the input box
-			<br />
-			Deposit your valuable ETH to a task to increase your commitment
-			to the goals
-			<br />
-			Finish a task by clicking on the checkbox and get your ETH back
-			(if any)
-		</div>
-	</>
-);

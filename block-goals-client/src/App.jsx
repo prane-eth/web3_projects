@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { UseWalletProvider } from 'use-wallet'
 
 import Home from "./components/Home";
@@ -24,19 +23,10 @@ const App = () => {
 						darkMode={darkMode}
 						setDarkMode={setDarkMode}
 					/>
-					<Router>
-						<Routes>
-							<Route
-								path="/"
-								element={
-									<Home
-										setLoadingMessage={setLoadingMessage}
-										account={account}
-									/>
-								}
-							/>
-						</Routes>
-					</Router>
+					<Home
+						setLoadingMessage={setLoadingMessage}
+						account={account}
+					/>
 					{loadingMessage && (
 						<div className="loading mt-5">{loadingMessage}...</div>
 					)}

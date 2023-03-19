@@ -14,7 +14,7 @@ const main = async () => {
 	console.log(
 		"Contract source code could be verified on Etherscan/Polygonscan using the following command:"
 	);
-	console.log();
+	console.log(`npx hardhat verify ${contract.address} --network ${network.name}`);
 };
 
 const runMain = async () => {

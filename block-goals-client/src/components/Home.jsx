@@ -1,39 +1,62 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "use-wallet";
 
-import { getOwner } from "./ContractFunctions";
-import { getEtherscanLink } from "./Utils";
-
-import { FaEthereum, FaMoon, FaSun } from "react-icons/fa";
+import { FaEthereum } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { TbCurrencyEthereum } from "react-icons/tb";
 import { FaRegPlusSquare } from "react-icons/fa";
 
-const Home = () => {
-	const [mintingTxn, setMintingTxn] = useState(null);
-	const [txnLink, setTxnLink] = useState(null);
-	const [loadingMessage, setLoadingMessage] = useState(null);
-	const [currency, setCurrency] = useState(null);
-	const wallet = useWallet();
+import {
+	setHooks,
+	setNewTxnLink,
+	getAllTasks,
+	addTask,
+	finishTask,
+	deleteTask,
+	depositEth,
+	refundToOwner,
+	verifyOwner,
+	submitOnEnter
+} from "./ContractFunctions";
 
-	const [newTask, setNewTask] = useState("");
+
+const Home = () => {
+	const wallet = useWallet();
 	const [allTasks, setAllTasks] = useState([]);
+	const [newTask, setNewTask] = useState("");
+	const [loadingMessage, setLoadingMessage] = useState(null);
+	const [isOwner, setIsOwner] = useState(false);
+	const [miningTxn, setMiningTxn] = useState(null);
+	const [txnLink, setTxnLink] = useState(null);
+	setHooks({
+		allTasks, setAllTasks, newTask, setNewTask, loadingMessage, setLoadingMessage, isOwner, setIsOwner, miningTxn, setMiningTxn, txnLink, setTxnLink
+	});
+	
+	const Instructions = () => (
+		<>
+			<div className="instructions">
+				Instructions:
+				<br />
+				Add a task using the input box
+				<br />
+				Deposit your valuable ETH to a task to increase your commitment
+				to the goals
+				<br />
+				Finish a task by clicking on the checkbox and get your ETH back
+				(if any)
+			</div>
+		</>
+	);
+
+	useEffect(setNewTxnLink, [miningTxn]);
 
 	useEffect(async () => {
-		if (mintingTxn) {
-			setTxnLink(await getEtherscanLink(mintingTxn));
-		} else {
-			setTxnLink(null);
-		}
-	}, [mintingTxn]);
-
-	useEffect(() => {
+		await verifyOwner();
 		window.addEventListener("keydown", submitOnEnter);
 		return () => {
 			window.removeEventListener("keydown", submitOnEnter);
 		};
 	}, []);
-	useEffect(() => getAllTasks(), [account]);
 
 	if (wallet.status !== 'connected') {
 		return (
@@ -41,7 +64,7 @@ const Home = () => {
 				<br />
 				<h2> BlockGoals </h2>
 				<p>
-					{/* add contract description here */}
+					Become a chain-goaler
 				</p>
 
 				{window.ethereum ? (
@@ -59,6 +82,7 @@ const Home = () => {
 				<span className="waving-item">👋</span>
 				Hello from block-goals project
 			</h1>
+			<p> Become a chain-goaler </p>
 
 			<div className="content-container mt-5 flex-vertical">
 				{wallet.status !== 'connected' ? 'Please connect to metamask' : null}
@@ -143,6 +167,8 @@ const Home = () => {
 				)}
 
 			</div>
+
+			<button onClick={refundToOwner}> Refund to owner </button>
 
 			{loadingMessage ? (
 				<div className="container">

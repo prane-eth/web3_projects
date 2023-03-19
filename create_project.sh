@@ -372,19 +372,19 @@ import { getOwner } from \"./ContractFunctions\";
 import { getEtherscanLink, getConnectedNetwork } from \"./Utils\";
 
 const Home = () => {
-	const [mintingTxn, setMintingTxn] = useState(null);
+	const [miningTxn, setMiningTxn] = useState(null);
 	const [txnLink, setTxnLink] = useState(null);
 	const [loadingMessage, setLoadingMessage] = useState(null);
 	const [currency, setCurrency] = useState(null);
 	const wallet = useWallet();
 
 	useEffect(async () => {
-		if (mintingTxn) {
-			setTxnLink(await getEtherscanLink(mintingTxn));
+		if (miningTxn) {
+			setTxnLink(await getEtherscanLink(miningTxn));
 		} else {
 			setTxnLink(null);
 		}
-	}, [mintingTxn]);
+	}, [miningTxn]);
 	// useEffect(async () => {  // if we need to display currency somewhere
 	// 	const connectedNetwork = await getConnectedNetwork();
 	// 	if (connectedNetwork) {
@@ -507,7 +507,7 @@ export const getConnectedNetwork = async () => {
 	const network = networkCode.toLowerCase();
 	if (!supportedNetworks[network]) {
 		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
-		alert('Please switch to supported network: ' + networksList.join(', '));
+		alert('Network not supported. Please switch to supported network: ' + networksList.join(', '));
 		// request user to switch to Mumbai
 		await window.ethereum.request({
 			method: 'wallet_switchEthereumChain',
@@ -520,18 +520,38 @@ export const getConnectedNetwork = async () => {
 };
 
 
-const getContract = async () => {
+export const getContract = async () => {
 	if (!window.ethereum) {
 		console.log(\"Make sure you have metamask!\");
 		return false;
 	}
+
+	// get connected network name
+	const { name: networkName } = await getConnectedNetwork();
+	const networkNameInJson = networkName.toLowerCase() + 'Address';
+	var contractAddress;
+	if (networkNameInJson in contractAddressJson)
+		contractAddress = contractAddressJson[networkNameInJson];
+	else if (networkName === 'Localhost')
+		contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+		// always the same first contract after starting a node
+	else {
+		alert("Network not supported for this contract");
+		return false;
+	}
+	
 	const provider = new ethers.providers.Web3Provider(window.ethereum);
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
 	return contract;
 };
 
-export default getContract;" > src/components/Utils.js
+export const getEtherscanLink = async (miningTxn) => {
+	const { url: domain } = await getConnectedNetwork();
+	const hash = await miningTxn.hash;
+	return `${domain}/tx/${hash}`;
+};
+" > src/components/Utils.js
 
     # components/Navbar.jsx
     echo "import { useState, useEffect } from \"react\";
@@ -541,6 +561,7 @@ import { FaSun } from \"react-icons/fa\";
 import { HiOutlineMoon } from \"react-icons/hi\";
 import { MdOutlineAccountBalance } from \"react-icons/md\";
 import { AiOutlineWallet } from \"react-icons/ai\";
+import { SiBlockchaindotcom } from \"react-icons/si\";
 
 import { getConnectedNetwork } from \"./Utils\";
 
@@ -639,7 +660,12 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 						</div>
 						{balance && (
 							<div>
-								<AiOutlineWallet /> {balance} ETH
+								<AiOutlineWallet /> {balance} {currency}
+							</div>
+						)}
+						{network && (
+							<div>
+								<SiBlockchaindotcom /> {network}
 							</div>
 						)}
 					</div>
@@ -797,7 +823,7 @@ const { getBalance } = ethers.provider;
 const deployContract = async (contractName, ...args) => {
 	const contract = await ethers
 		.getContractFactory(contractName)
-		.then((contractFactory) => upgrades.deployProxy(contractFactory, [...args]));
+		.then(contractFactory => contractFactory.deploy(...args));
 	await contract.deployed();
 	return contract;
 };
@@ -805,9 +831,7 @@ const deployContract = async (contractName, ...args) => {
 // const deployProxy = async (contractName, ...args) => {
 // 	const contract = await ethers
 // 		.getContractFactory(contractName)
-// 		.then((contractFactory) =>
-// 			upgrades.deployProxy(contractFactory, [...args])
-// 		);
+// 		.then(contractFactory => upgrades.deployProxy(contractFactory, [...args]));
 // 	await contract.deployed();
 // 	return contract;
 // };

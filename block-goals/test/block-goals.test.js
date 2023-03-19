@@ -1,14 +1,12 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { parseEther, formatEther } = ethers.utils;
-const { getBalance } = ethers.provider;
+// const { getBalance } = ethers.provider;
 
 const deployContract = async (contractName, ...args) => {
 	const contract = await ethers
 		.getContractFactory(contractName)
-		.then((contractFactory) =>
-			contractFactory.deploy(...args)
-		);
+		.then(contractFactory => contractFactory.deploy(...args));
 	await contract.deployed();
 	return contract;
 };
@@ -16,9 +14,7 @@ const deployContract = async (contractName, ...args) => {
 // const deployProxy = async (contractName, ...args) => {
 // 	const contract = await ethers
 // 		.getContractFactory(contractName)
-// 		.then((contractFactory) =>
-// 			upgrades.deployProxy(contractFactory, [...args])
-// 		);
+// 		.then(contractFactory => upgrades.deployProxy(contractFactory, [...args]));
 // 	await contract.deployed();
 // 	return contract;
 // };
@@ -53,31 +49,25 @@ describe("BlockGoals", function () {
 		const balanceBefore = await owner.getBalance();
 		await contract.finishTask(targetIndex);
 		const balanceAfter = await owner.getBalance();
+		const difference = formatEther(balanceAfter - balanceBefore + '');
 
 		const allTasks = await contract.getAllTasks();
 		var task = allTasks[targetIndex];
 		expect(task.done).to.equal(true);
-		console.log(task);
-		console.log(formatEther(task.balance));
 		expect(task.balance).to.equal(0);
-		expect(balanceAfter - balanceBefore).to.be.within(
-			smallAmount * 0.9,
-			smallAmount
-		);
+		expect(Number(difference)).to.be.within(0.09, 0.1);
 	});
-	// it("Should delete a task", async function () {
-	// 	await contract.deleteTask(targetIndex);
-	// 	expect(await contract.getAllTasks()).to.have.lengthOf(1);
-	// });
-	// it("Should refund ether to owner", async function () {
-	// 	await contract.addTask("Test this contract");
-	// 	await contract.deposit(taskId, { value: smallAmount });
-	// 	const balanceBefore = await owner.getBalance();
-	// 	await contract.refundToOwner();
-	// 	const balanceAfter = await owner.getBalance();
-	// 	expect(balanceAfter - balanceBefore).to.be.within(
-	// 		parseEther("0.99"),
-	// 		parseEther("1")
-	// 	);
-	// });
+	it("Should delete a task", async function () {
+		await contract.deleteTask(targetIndex);
+		expect(await contract.getAllTasks()).to.have.lengthOf(1);
+	});
+	it("Should refund ether to owner", async function () {
+		await contract.addTask("Test this contract");
+		await contract.deposit(targetIndex, { value: parseEther("1") });
+		const balanceBefore = await owner.getBalance();
+		await contract.refundToOwner();
+		const balanceAfter = await owner.getBalance();
+		const difference = formatEther(balanceAfter - balanceBefore + '');
+		expect(Number(difference)).to.be.within(0.99, 1);
+	});
 });

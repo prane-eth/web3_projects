@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 
+import { useWallet } from "use-wallet";
 import { ethers } from "ethers";
+
 import { FaSun } from "react-icons/fa";
 import { HiOutlineMoon } from "react-icons/hi";
 import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
+import { SiBlockchaindotcom } from "react-icons/si";
 
 import { getConnectedNetwork } from "./Utils";
+
 
 const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -57,17 +61,6 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 		}
 	};
 
-	// const connectWallet = async () => {
-	// 	await window.ethereum
-	// 		.request({
-	// 			method: "eth_requestAccounts",
-	// 		}).then(() => {
-	// 			setAccount(window.ethereum.selectedAddress);
-	// 		}).catch((error) => {
-	// 			alert("Something went wrong");
-	// 		});
-	// };
-
 	const toggleDarkMode = () => {
 		localStorage.setItem("darkMode", !darkMode);
 		setDarkMode(!darkMode);
@@ -103,7 +96,12 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 						</div>
 						{balance && (
 							<div>
-								<AiOutlineWallet /> {balance} ETH
+								<AiOutlineWallet /> {balance} {currency}
+							</div>
+						)}
+						{network && (
+							<div>
+								<SiBlockchaindotcom /> {network}
 							</div>
 						)}
 					</div>

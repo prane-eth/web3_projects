@@ -47,7 +47,7 @@ export const getConnectedNetwork = async () => {
 	const network = networkCode.toLowerCase();
 	if (!supportedNetworks[network]) {
 		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
-		alert('Please switch to supported network: ' + networksList.join(', '));
+		alert('Network not supported. Please switch to supported network: ' + networksList.join(', '));
 		// request user to switch to Mumbai
 		await window.ethereum.request({
 			method: 'wallet_switchEthereumChain',
@@ -60,15 +60,45 @@ export const getConnectedNetwork = async () => {
 };
 
 
-const getContract = async () => {
+export const getContract = async () => {
 	if (!window.ethereum) {
 		console.log("Make sure you have metamask!");
 		return false;
 	}
-	const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+	// get connected network name
+	const { name: networkName } = await getConnectedNetwork();
+	const networkNameInJson = networkName.toLowerCase() + 'Address';
+	var contractAddress;
+	if (networkNameInJson in contractAddressJson)
+		contractAddress = contractAddressJson[networkNameInJson];
+	else if (networkName === 'Localhost')
+		contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+		// always the same first contract after starting a node
+	else {
+		alert("Network not supported for this contract");
+		return false;
+	}
+
+	console.log('contractAddress', contractAddress);
+
+	const provider = new ethers.BrowserProvider(window.ethereum);
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
 	return contract;
 };
 
-export default getContract;
+export const getEtherscanLink = async (miningTxn) => {
+	const { url: domain } = await getConnectedNetwork();
+	const hash = await miningTxn.hash;
+	return `${domain}/tx/${hash}`;
+};
+
+// // wait for wallet to get unlocked
+// await window.ethereum.enable();
+// await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+// // show wallet popup to unlock wallet
+// const provider = new ethers.BrowserProvider(window.ethereum);
+// const hasWalletPermissions = await provider.send('wallet_getPermissions');
+// console.log('hasWalletPermissions', hasWalletPermissions);
