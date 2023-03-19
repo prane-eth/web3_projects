@@ -11,7 +11,7 @@ contract BlockGoals is Ownable {
         uint256 balance;
     }
 
-    mapping(address => Task[]) public tasks;
+    mapping(address => Task[]) private tasks;
     mapping(address => bool) private isWithdrawing; // to prevent reentrancy attack
 
     modifier nonReentrant() {
@@ -100,10 +100,6 @@ contract BlockGoals is Ownable {
     function refundToOwner() public onlyOwner nonReentrant {
         (bool success, ) = msg.sender.call{value: address(this).balance}("");
         require(success, "BlockGoals: Failed to refund Ether to owner");
-    }
-
-    function isOwner() public view returns (bool) {
-        return msg.sender == owner();
     }
 
     receive() external payable {

@@ -33,6 +33,19 @@ export const supportedNetworks = {
 	},
 }
 
+const getProviderAndSigner = async () => {
+	if (!window.ethereum) {
+		console.log("MetaMask not installed; using read-only defaults");
+		const provider = ethers.getDefaultProvider();
+		const signer = undefined;
+		return { provider, signer };
+	} else {
+		const provider = new ethers.BrowserProvider(window.ethereum);
+		const signer = await provider.getSigner();
+		return { provider, signer };
+	}
+};
+
 export const getConnectedNetwork = async () => {
 	if (!window.ethereum) {
 		console.log('Make sure you have metamask!');
@@ -40,11 +53,10 @@ export const getConnectedNetwork = async () => {
 	}
 
 	// get connected network name
-	const networkCode = await window.ethereum.request({ method: 'net_version' });
-	// use ethers
-	// const provider = new ethers.BrowserProvider(window.ethereum);
-	// const networkCode = await provider.getNetwork().chainId;
-	const network = networkCode.toLowerCase();
+	let network = await window.ethereum.request({ method: "net_version" });
+	// if networkCode is not in hex format, convert it to hex
+	if (!network.startsWith("0x"))
+		network = "0x" + parseInt(network).toString(16);
 	if (!supportedNetworks[network]) {
 		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
 		alert('Network not supported. Please switch to supported network: ' + networksList.join(', '));
@@ -61,30 +73,34 @@ export const getConnectedNetwork = async () => {
 
 
 export const getContract = async () => {
-	if (!window.ethereum) {
-		console.log("Make sure you have metamask!");
-		return false;
-	}
+	// if (!window.ethereum) {
+	// 	console.log("Make sure you have metamask!");
+	// 	return false;
+	// }
 
 	// get connected network name
 	const { name: networkName } = await getConnectedNetwork();
-	const networkNameInJson = networkName.toLowerCase() + 'Address';
+	const networkNameInJson = networkName.toLowerCase() + "Address";
 	var contractAddress;
 	if (networkNameInJson in contractAddressJson)
 		contractAddress = contractAddressJson[networkNameInJson];
-	else if (networkName === 'Localhost')
-		contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
-		// always the same first contract after starting a node
+	else if (networkName === "Localhost")
+		contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+	// always the same first contract after starting a node
 	else {
 		alert("Network not supported for this contract");
 		return false;
 	}
 
-	console.log('contractAddress', contractAddress);
+	console.log("contractAddress", contractAddress);
 
-	const provider = new ethers.BrowserProvider(window.ethereum);
-	const signer = provider.getSigner();
+	const { provider, signer } = await getProviderAndSigner();
+	console.log("provider", provider);
+	// const signer = await provider.getSigner();
+	console.log("signer", signer);
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
+	console.log("contract", contract);
+
 	return contract;
 };
 

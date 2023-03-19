@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import config from "../assets/ContractABI.json";
 import contractAddressJson from "../assets/ContractAddress.json";
 
+
 export const supportedNetworks = {
 	// please enter in lower case only
 	"0x13881": {
@@ -31,7 +32,6 @@ if (!window.ethereum) {
 		window.location.reload();
 	});
 }
-
 
 export const getConnectedNetwork = async () => {
 	if (!window.ethereum) {
@@ -79,8 +79,12 @@ export const getContract = async () => {
 		return false;
 
 	const provider = new ethers.BrowserProvider(window.ethereum);
+	console.log('provider', provider);
 	const signer = await provider.getSigner();
+	console.log('signer', signer);
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
+	console.log('contract', contract);
+
 	return contract;
 };
 

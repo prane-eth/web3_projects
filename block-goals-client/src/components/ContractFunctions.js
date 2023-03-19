@@ -4,9 +4,10 @@ import { getEtherscanLink, getContract } from "./Utils";
 const { parseEther } = ethers;
 
 var allTasks, newTask, loadingMessage, isOwner, miningTxn, txnLink;
-var setAllTasks, setNewTask, setLoadingMessage, setIsOwner, setMiningTxn, setTxnLink;
+var setAllTasks, setNewTask, setLoadingMessage, setIsOwner;
+var setMiningTxn, setTxnLink;
 
-export const setHooks = (hooks) => {
+export async function setHooks(hooks) {
 	allTasks = hooks.allTasks;
 	newTask = hooks.newTask;
 	loadingMessage = hooks.loadingMessage;
@@ -20,46 +21,45 @@ export const setHooks = (hooks) => {
 	setIsOwner = hooks.setIsOwner;
 	setMiningTxn = hooks.setMiningTxn;
 	setTxnLink = hooks.setTxnLink;
-};
+}
 
-export const setNewTxnLink = async () => {
+// function to set a new transaction link
+export async function setNewTxnLink() {
 	if (miningTxn) {
 		const txnLink = await getEtherscanLink(miningTxn);
 		setTxnLink(txnLink);
 	} else {
 		setTxnLink(null);
 	}
-};
+}
 
-export const getAllTasks = async () => {
+// function to get all tasks
+export async function getAllTasks() {
 	setLoadingMessage("Loading tasks");
-	const contract = getContract();
+	const contract = await getContract();
 
 	let tasks = await contract.getAllTasks();
-	// console.log("Got all tasks...", tasks);
 
-	// copy tasks to itself, to enable modification
 	tasks = tasks.map((task) => {
 		return { ...task };
 	});
 
-	// array to store finished tasks
 	let finishedTasks = [];
 	for (var task of tasks) {
 		if (task.done) {
 			finishedTasks.push(task);
-			// remove task from tasks
 			tasks.splice(tasks.indexOf(task), 1);
 		}
 	}
-	// add finished tasks to the end of tasks
+
 	tasks.push(...finishedTasks);
 
 	setAllTasks(tasks);
 	setLoadingMessage(null);
-};
+}
 
-export const addTask = async () => {
+// function to add a new task
+export async function addTask() {
 	if (!newTask) {
 		setLoadingMessage("Task is empty!");
 		return;
@@ -67,20 +67,20 @@ export const addTask = async () => {
 	setLoadingMessage("Adding task");
 	console.log("adding a newTask: ", newTask);
 
-	const contract = getContract();
+	const contract = await getContract();
 
 	const txn = await contract.addTask(newTask);
 	await txn.wait();
 	setNewTask("");
 	getAllTasks();
 	setLoadingMessage(null);
-};
+}
 
-export const finishTask = async (taskId) => {
-	// event.preventDefault();
+// function to finish a task
+export async function finishTask(taskId) {
 	setLoadingMessage("Finishing task...");
 
-	const contract = getContract();
+	const contract = await getContract();
 
 	const txn = await contract.finishTask(taskId);
 	setMiningTxn(txn);
@@ -88,13 +88,13 @@ export const finishTask = async (taskId) => {
 	setLoadingMessage("Done");
 
 	getAllTasks();
-};
+}
 
-export const deleteTask = async (taskPos) => {
-	// event.preventDefault();
+// function to delete a task
+export async function deleteTask(taskPos) {
 	setLoadingMessage("Deleting task..,");
 
-	const contract = getContract();
+	const contract = await getContract();
 
 	const txn = await contract.deleteTask(taskPos);
 	setMiningTxn(txn);
@@ -102,13 +102,13 @@ export const deleteTask = async (taskPos) => {
 	setLoadingMessage("Done");
 
 	getAllTasks();
-};
+}
 
-export const depositEth = async (taskPos) => {
-	// event.preventDefault();
+// function to deposit ETH to a task
+export async function depositEth(taskPos) {
 	setLoadingMessage("Depositing ETH to task...");
 
-	const contract = getContract();
+	const contract = await getContract();
 	const txn = await contract.deposit(taskPos, {
 		value: parseEther("0.01"),
 	});
@@ -117,29 +117,31 @@ export const depositEth = async (taskPos) => {
 	setLoadingMessage("Done");
 
 	getAllTasks();
-};
+}
 
-export const refundToOwner = async () => {
+// function to refund to owner
+export async function refundToOwner() {
 	setLoadingMessage("Refunding to owner...");
 
-	const contract = getContract();
+	const contract = await getContract();
 	const txn = await contract.refundToOwner();
 	setMiningTxn(txn);
 	await txn.wait();
 	setLoadingMessage("Done");
 
 	getAllTasks();
-};
+}
 
-export const verifyOwner = async () => {
-	const contract = getContract();
-	const owns = await contract.isOwner();
-	setIsOwner(owns);
-};
+// function to verify owner
+export async function verifyOwner() {
+	const contract = await getContract();
+	const owner = await contract.owner();
+	setIsOwner(owner === window.ethereum.selectedAddress);
+}
 
-// press enter to add task
-export const submitOnEnter = (event) => {
+// function to add task on pressing enter key
+export function submitOnEnter(event) {
 	if (event.key === "Enter") {
 		addTask(event);
 	}
-};
+}

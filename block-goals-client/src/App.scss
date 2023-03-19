@@ -147,6 +147,7 @@ input {
 	width: 40vw;
 	min-width: 300px;
 	position: relative;
+	color: black;
 
 	&:nth-child(odd) {
 		background-color: #f0f0f0;
@@ -306,7 +307,8 @@ input {
 	margin-top: 1rem;
 
 	// always display navbar on top of page
-	position: sticky;
+	// position: sticky;
+    position: fixed;
 	z-index: 1;
 	background: #f9f9f9;
 	box-shadow: 0 0.5px 15px orange;
@@ -323,14 +325,15 @@ input {
 
 .mainContainer {
 	transition: 1s;
-	background: radial-gradient(
-		circle,
-		rgba(253, 255, 162, 1) 0%,
-		rgba(229, 255, 204, 1) 67%
-	);
+	// background: radial-gradient(
+	// 	circle,
+	// 	rgba(253, 255, 162, 1) 0%,
+	// 	rgba(229, 255, 204, 1) 67%
+	// );
 	height: 100%;
     min-height: 100vh;
 
+	// display: unset;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -416,6 +419,12 @@ body {
 		a {
 			color: violet;
 		}
+	}
+	.instructions {
+		color: white;
+	}
+	.homeContainer {
+		color: white;
 	}
 	.sectionDiv {
 		background: #333;

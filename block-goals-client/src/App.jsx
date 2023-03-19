@@ -9,7 +9,6 @@ import "./App.scss";
 const App = () => {
 	const [account, setAccount] = useState(null);
 	const [darkMode, setDarkMode] = useState(false);
-	const [loadingMessage, setLoadingMessage] = useState(null);
 	const allSupportedNetworks = Object.keys(supportedNetworks);
 	const supportedArray = allSupportedNetworks.map(network => ({chainId: network}))
 
@@ -23,13 +22,7 @@ const App = () => {
 						darkMode={darkMode}
 						setDarkMode={setDarkMode}
 					/>
-					<Home
-						setLoadingMessage={setLoadingMessage}
-						account={account}
-					/>
-					{loadingMessage && (
-						<div className="loading mt-5">{loadingMessage}...</div>
-					)}
+					<Home/>
 				</div>
 			</div>
 		</UseWalletProvider>
