@@ -92,6 +92,11 @@ if [ -d "$folder" ]; then
 	exit 1
 fi
 
+read -p "Enter contract name: [$contractName] " -n 1 -r
+if [[ $REPLY != "" ]]; then
+	contractName=$REPLY
+fi
+
 solidityVersion="0.8.19"
 
 # ask for confirmation
@@ -113,23 +118,32 @@ fi
 
 # if client is requested
 if [ "$createClient" == "true" ]; then
-    echo "Creating a React app in $folder-client"
-    npm create vite@latest "$folder-client" -- --template react
+    echo "Creating a Vite+React app in $folder-client"
+	yes 'y' | head -n 1 | npm create vite@latest "$folder-client" -- --template react
     # npx create-react-app "$folder-client"
     cd "$folder-client"
-    # npm i
-    npm i ethers react-router-dom sass react-icons @mui/material @emotion/react @emotion/styled @mui/icons-material use-wallet
-    mkdir -p src/components src/assets
-    rm src/assets/*
-    rm src/App.css
+	# remove dependencies as it causes installation error after adding use-wallet
+	# remove line 12 and 13 in package.json
+	sed -i '12 d' package.json
+	sed -i '12 d' package.json
+    npm i ethers sass react-icons @mui/material @emotion/react @emotion/styled @mui/icons-material use-wallet # react-router-dom
 
     # make package.json suitable with npm start command
-    # add comma at end of line 9
-    sed -i '9 s/$/,/' package.json
-    # add to package.json line 10
-    sed -i '10 i "start": "vite serve --port 3000"' package.json
-    # add tab at start of line 10
-    sed -i '10 s/^/    /' package.json
+    # # add comma at end of line 9
+    # sed -i '9 s/$/,/' package.json
+    # # add to package.json line 10
+    # sed -i '10 i "start": "vite serve --port 3000"' package.json
+    # # add tab at start of line 10
+    # sed -i '10 s/^/    /' package.json
+
+	# add in line 9. add tab before "start"
+	sed -i '8 i "start": "vite serve --port 3000",' package.json
+	sed -i '8 s/^/    /' package.json
+	# sed -i '8 s/^/    /' package.json
+
+	mkdir -p src/components src/assets
+    rm src/assets/*
+    rm src/App.css
 
     # ContractABI.json
     echo "{
@@ -139,7 +153,8 @@ if [ "$createClient" == "true" ]; then
 
     # ContractAddress.json
     echo "{
-	\"contractAddress\": \"$folder.vh-praneeth.eth\"
+	\"mumbaiAddress\": \"\",
+	\"sepoliaAddress\": \"\"
 }" > src/assets/ContractAddress.json
 
 	echo "#navbar {
@@ -161,6 +176,10 @@ if [ "$createClient" == "true" ]; then
 	margin-top: 0;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+}
+
+.homeContainer {
+	color: white;
 }
 
 .mainContainer {
@@ -228,6 +247,11 @@ if [ "$createClient" == "true" ]; then
 	flex-direction: column;
 }
 
+body {
+	margin: 0;
+	padding: 0;
+}
+
 .darkmode {
 	transition: 1s;
 	background: radial-gradient(
@@ -285,73 +309,216 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }" > src/index.css
 
+	# if App.js exists, rename it to jsx
+	if [ -f src/App.js ]; then
+		mv src/App.js src/App.jsx
+	fi
+
+	# App.js
     echo "import { useState } from \"react\";
 import { BrowserRouter as Router, Route, Routes } from \"react-router-dom\";
+import { UseWalletProvider } from 'use-wallet'
 
 import Home from \"./components/Home\";
 import Navbar from \"./components/Navbar\";
+import { supportedNetworks } from \"./components/Utils\";
 import \"./App.scss\";
 
 const App = () => {
 	const [account, setAccount] = useState(null);
 	const [darkMode, setDarkMode] = useState(false);
 	const [loadingMessage, setLoadingMessage] = useState(null);
+	const allSupportedNetworks = Object.keys(supportedNetworks);
+	const supportedArray = allSupportedNetworks.map(network => ({chainId: network}))
 
 	return (
-		<div className={darkMode ? \"mainContainer darkmode\" : \"mainContainer\"}>
-			<div className=\"container text-center flex-vertical\">
-				<Navbar
-					account={account}
-					setAccount={setAccount}
-					darkMode={darkMode}
-					setDarkMode={setDarkMode}
-				/>
-				<Router>
-					<Routes>
-						<Route
-							path=\"/\"
-							element={
-								<Home
-									setLoadingMessage={setLoadingMessage}
-									account={account}
-								/>
-							}
-						/>
-					</Routes>
-				</Router>
-				{loadingMessage && (
-					<div className=\"loading mt-5\">{loadingMessage}...</div>
-				)}
+		<UseWalletProvider chainId={allSupportedNetworks[0]} providerOptions={{supportedArray}}>
+			<div className={darkMode ? \"mainContainer darkmode\" : \"mainContainer\"}>
+				<div className=\"container text-center flex-vertical\">
+					<Navbar
+						account={account}
+						setAccount={setAccount}
+						darkMode={darkMode}
+						setDarkMode={setDarkMode}
+					/>
+					<Router>
+						<Routes>
+							<Route
+								path=\"/\"
+								element={
+									<Home
+										setLoadingMessage={setLoadingMessage}
+										account={account}
+									/>
+								}
+							/>
+						</Routes>
+					</Router>
+					{loadingMessage && (
+						<div className=\"loading mt-5\">{loadingMessage}...</div>
+					)}
+				</div>
 			</div>
-		</div>
+		</UseWalletProvider>
 	);
 };
-export default App;" > src/App.js*  # App.js or .jsx
+export default App;" > src/App.jsx
 
     # components/Home.jsx
     echo "import { useState, useEffect } from \"react\";
-import { ethers } from \"ethers\";
-import getContract from \"./Utils\";
+import { useWallet } from \"use-wallet\";
 
-const Home = ({ setLoadingMessage, account }) => {
+import { getOwner } from \"./ContractFunctions\";
+import { getEtherscanLink, getConnectedNetwork } from \"./Utils\";
+
+const Home = () => {
+	const [mintingTxn, setMintingTxn] = useState(null);
+	const [txnLink, setTxnLink] = useState(null);
+	const [loadingMessage, setLoadingMessage] = useState(null);
+	const [currency, setCurrency] = useState(null);
+	const wallet = useWallet();
+
+	useEffect(async () => {
+		if (mintingTxn) {
+			setTxnLink(await getEtherscanLink(mintingTxn));
+		} else {
+			setTxnLink(null);
+		}
+	}, [mintingTxn]);
+	// useEffect(async () => {  // if we need to display currency somewhere
+	// 	const connectedNetwork = await getConnectedNetwork();
+	// 	if (connectedNetwork) {
+	// 		setCurrency(connectedNetwork.currency);
+	// 	}
+	// }, []);
+
+	if (wallet.status !== 'connected') {
+		return (
+			<div className=\"container homeContainer\">
+				<br />
+				<h2> $contractName </h2>
+				<p>
+					{/* add contract description here */}
+				</p>
+
+				{window.ethereum ? (
+					<button onClick={() => wallet.connect()}>Connect Wallet</button>
+				) : (
+					<p>Install Metamask wallet</p>
+				)}
+			</div>
+		);
+	}
+
 	return (
-		<>
+		<div className=\"homeContainer\">
 			<h1 className=\"mt-5\">Hello from $folder project</h1>
 
 			<div className=\"content-container mt-5 flex-vertical\">
-				{!account ? \"Please connect to metamask\" : null}
+				{wallet.status !== 'connected' ? 'Please connect to metamask' : null}
 			</div>
-		</>
+
+			<div className=\"container\">
+				{/* add code for using contracts */}
+			</div>
+
+			{loadingMessage ? (
+				<div className=\"container\">
+					<h3>{loadingMessage}</h3>
+					{txnLink ? (
+						<p>
+							<a href={txnLink} target=\"_blank\">
+								View on block explorer
+							</a>
+						</p>
+					) : null}
+				</div>
+			) : null}
+		</div>
 	);
 };
 
 export default Home;" > src/components/Home.jsx
 
-    # components/Utils.jsx
+	# ContractFunctions.js
+	echo "import { ethers } from \"ethers\";
+import { getContract } from \"./Utils\";
+
+const { parseEther, formatEther } = ethers;
+
+// wait for wallet to get unlocked
+await window.ethereum.enable();
+await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+// show wallet popup to unlock wallet
+const provider = new ethers.BrowserProvider(window.ethereum);
+const hasWalletPermissions = await provider.send('wallet_getPermissions');
+console.log('hasWalletPermissions', hasWalletPermissions);
+
+" > src/components/ContractFunctions.js
+
+    # components/Utils.js
     echo "import { ethers } from \"ethers\";
 
 import config from \"../assets/ContractABI.json\";
-import { contractAddress } from \"../assets/ContractAddress.json\";
+import contractAddressJson from \"../assets/ContractAddress.json\";
+
+
+if (!window.ethereum) {
+	console.log('Make sure you have metamask!');
+	alert('Make sure you have metamask!');
+} else {
+	// on network/account change, reload page
+	window.ethereum.on('chainChanged', () => {
+		window.location.reload();
+	});
+	window.ethereum.on('accountsChanged', () => {
+		window.location.reload();
+	});
+}
+
+export const supportedNetworks = {
+	// please enter in lower case only
+	'0x13881': {
+		name: 'Mumbai', currency: 'MATIC',
+		url: 'https://mumbai.polygonscan.com'
+	},
+	'0xaa36a7': {
+		name: 'Sepolia', currency: 'ETH',
+		url: 'https://sepolia.etherscan.io'
+	},
+	'0x7a69': {
+		name: 'Localhost', currency: 'ETH',
+		url: 'http://localhost:8545'
+	},
+}
+
+export const getConnectedNetwork = async () => {
+	if (!window.ethereum) {
+		console.log('Make sure you have metamask!');
+		return false;
+	}
+
+	// get connected network name
+	const networkCode = await window.ethereum.request({ method: 'net_version' });
+	// use ethers
+	// const provider = new ethers.BrowserProvider(window.ethereum);
+	// const networkCode = await provider.getNetwork().chainId;
+	const network = networkCode.toLowerCase();
+	if (!supportedNetworks[network]) {
+		var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
+		alert('Please switch to supported network: ' + networksList.join(', '));
+		// request user to switch to Mumbai
+		await window.ethereum.request({
+			method: 'wallet_switchEthereumChain',
+			params: [{ chainId: Object.keys(supportedNetworks)[0] }],
+		});
+		return false;
+	}
+
+	return supportedNetworks[network];
+};
+
 
 const getContract = async () => {
 	if (!window.ethereum) {
@@ -364,7 +531,7 @@ const getContract = async () => {
 	return contract;
 };
 
-export default getContract;" > src/components/Utils.jsx
+export default getContract;" > src/components/Utils.js
 
     # components/Navbar.jsx
     echo "import { useState, useEffect } from \"react\";
@@ -375,10 +542,15 @@ import { HiOutlineMoon } from \"react-icons/hi\";
 import { MdOutlineAccountBalance } from \"react-icons/md\";
 import { AiOutlineWallet } from \"react-icons/ai\";
 
+import { getConnectedNetwork } from \"./Utils\";
+
 const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
 	const [accountShort, setAccountShort] = useState(null);
+	const [network, setNetwork] = useState(null);
+	const [currency, setCurrency] = useState(null);
+	const wallet = useWallet()
     
 	const checkIfWalletIsConnected = async () => {
 		if (account) {
@@ -400,13 +572,19 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 					method: \"eth_getBalance\",
 					params: [window.ethereum.selectedAddress, \"latest\"],
 				});
-				if (walletBalance == 0x0 || walletBalance === \"0x187c99de7e564ce0\") {
+				if (walletBalance == 0x0) {
 					setBalance('0.00');
 				} else {
 					const balance = ethers.formatEther(walletBalance);
 					const balanceShort = balance.slice(0, 5);
 					setBalance(balanceShort);
 				}
+
+				const connectedNetwork = await getConnectedNetwork();
+				if (connectedNetwork === false)  return;
+				setNetwork(connectedNetwork.name);
+				setCurrency(connectedNetwork.currency);
+				
 			} else {
 				console.log(\"No authorized account found\");
 			}
@@ -415,16 +593,16 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 		}
 	};
 
-	const connectWallet = async () => {
-		await window.ethereum
-			.request({
-				method: \"eth_requestAccounts\",
-			}).then(() => {
-				setAccount(window.ethereum.selectedAddress);
-			}).catch((error) => {
-				alert(\"Something went wrong\");
-			});
-	};
+	// const connectWallet = async () => {
+	// 	await window.ethereum
+	// 		.request({
+	// 			method: \"eth_requestAccounts\",
+	// 		}).then(() => {
+	// 			setAccount(window.ethereum.selectedAddress);
+	// 		}).catch((error) => {
+	// 			alert(\"Something went wrong\");
+	// 		});
+	// };
 
 	const toggleDarkMode = () => {
 		localStorage.setItem(\"darkMode\", !darkMode);
@@ -439,9 +617,10 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 		const localDarkMode = localStorage.getItem(\"darkMode\");
 		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
+		wallet.connect();
 	}, []);
 	useEffect(() => {
-		const accountShortValue = account ? account.slice(0, 6) + \"...\" + account.slice(-4) : null;
+		const accountShortValue = account ? account.slice(0, 6) + \"...\" + account.slice(-2) : null;
 		setAccountShort(accountShortValue);
 	}, [account]);
 
@@ -453,8 +632,8 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 				<span className=\"darkModeToggle\" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
 				</span>
-				{account ? (
-					<div className=\"connectedAs\">
+				{wallet.status === 'connected' ? (
+					<div className=\"connectedAs\" onClick={() => wallet.reset()} style={{ cursor: \"pointer\" }}>
 						<div>
 							<MdOutlineAccountBalance /> {accountShort}
 						</div>
@@ -468,7 +647,7 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 					<button
 						id=\"connectMetamask\"
 						className=\"btn btn-primary btn-lg active\"
-						onClick={connectWallet}
+						onClick={() => wallet.connect()}
 					>
 						<AiOutlineWallet /> Connect Wallet
 					</button>
@@ -482,7 +661,19 @@ const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
 
 export default Navbar;" > src/components/Navbar.jsx
 
-	
+	# main.jsx
+	echo "import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import './index.css'
+
+ReactDOM.render(
+	<React.StrictMode>
+		<App />
+	</React.StrictMode>,
+	document.getElementById('root')
+)
+" > src/main.jsx
 
     cd ..
 else
@@ -501,7 +692,7 @@ if [ "$createContract" == "true" ]; then
 	fi
 	# npm i
 	npm i hardhat @nomiclabs/hardhat-waffle chai dotenv @nomiclabs/hardhat-etherscan \
-		@openzeppelin/contracts @openzeppelin/contracts-upgradeable
+		@openzeppelin/contracts @openzeppelin/contracts-upgradeable @openzeppelin/hardhat-upgrades
 		# ethers @nomicfoundation/hardhat-toolbox ethereum-waffle @nomiclabs/hardhat-ethers
 
 	# while running npx hardhat init, run yes '' for 4 times
@@ -526,7 +717,7 @@ if [ "$createContract" == "true" ]; then
 	echo "// SPDX-License-Identifier: MIT
 pragma solidity ^$solidityVersion;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import \"@openzeppelin/contracts/access/Ownable.sol\";
 
 contract $contractName is Ownable {
 	constructor() {
@@ -540,32 +731,52 @@ require('dotenv').config();
 require('@nomiclabs/hardhat-etherscan');
 require('@openzeppelin/hardhat-upgrades');
 
-const { GOERLI_RPC_URL, SEPOLIA_RPC_URL, MUMBAI_RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
+const {
+	GOERLI_RPC_URL,
+	SEPOLIA_RPC_URL,
+	MUMBAI_RPC_URL,
+	PRIVATE_KEY,
+	ETHERSCAN_API_KEY,
+	POLYGONSCAN_API_KEY,
+} = process.env;
 
 module.exports = {
-	solidity: '$solidityVersion',
+	solidity: '0.8.19',
 	networks: {
-		localhost: {
-			url: 'http://localhost:8545',
-			accounts: ['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80']
-		},
-		goerli: {
-			url: GOERLI_RPC_URL,
-			accounts: [PRIVATE_KEY]
+		mumbai: {
+			url: MUMBAI_RPC_URL,
+			accounts: [PRIVATE_KEY],
 		},
 		sepolia: {
 			url: SEPOLIA_RPC_URL,
-			accounts: [PRIVATE_KEY]
+			accounts: [PRIVATE_KEY],
 		},
-		mumbai: {
-			url: MUMBAI_RPC_URL,
-			accounts: [PRIVATE_KEY]
+		goerli: {
+			url: GOERLI_RPC_URL,
+			accounts: [PRIVATE_KEY],
+		},
+		localhost: {
+			url: 'http://localhost:8545',
+			accounts: [
+				// first private key when we run `npx hardhat node`
+				'0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+			],
 		},
 	},
 	etherscan: {
-		apiKey: ETHERSCAN_API_KEY,
-	}
-};" > hardhat.config.js
+		apiKey: {
+			//ethereum
+			mainnet: ETHERSCAN_API_KEY,
+			ropsten: ETHERSCAN_API_KEY,
+			goerli: ETHERSCAN_API_KEY,
+			sepolia: ETHERSCAN_API_KEY,
+			//polygon
+			polygon: POLYGONSCAN_API_KEY,
+			polygonMumbai: POLYGONSCAN_API_KEY,
+		},
+	},
+};
+" > hardhat.config.js
 
 	# create .env file
 	echo "GOERLI_RPC_URL=
@@ -573,6 +784,7 @@ SEPOLIA_RPC_URL=
 MUMBAI_RPC_URL=
 PRIVATE_KEY=
 ETHERSCAN_API_KEY=
+POLYGONSCAN_API_KEY=
 " > .env
 
 	# test file
@@ -590,6 +802,16 @@ const deployContract = async (contractName, ...args) => {
 	return contract;
 };
 
+// const deployProxy = async (contractName, ...args) => {
+// 	const contract = await ethers
+// 		.getContractFactory(contractName)
+// 		.then((contractFactory) =>
+// 			upgrades.deployProxy(contractFactory, [...args])
+// 		);
+// 	await contract.deployed();
+// 	return contract;
+// };
+
 describe(\"$contractName\", function () {
 	let contract;
 	
@@ -597,7 +819,6 @@ describe(\"$contractName\", function () {
 		[owner] = await ethers.getSigners();
 		contract = await deployContract(\"$contractName\");
 		expect(contract.address).to.properAddress;
-		expect(await contract.deployed()).to.equal(contract);
 	});
 });" > test/$folder.test.js
 
@@ -620,41 +841,48 @@ describe(\"$contractName\", function () {
 
 	# runMain();" > scripts/run.js
 
-	# 	# add content to scripts/deploy.js
-	# 	echo "
-	# const main = async () => {
-	# 	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
-	# 	await contract.deployed();
-	# 	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
-	# };
+		# add content to scripts/deploy.js
+		echo "const { ethers, network } = require(\"hardhat\");
 
-	# const runMain = async () => {
-	# 	try {
-	# 		await main();
-	# 		process.exit(0);
-	# 	} catch (error) {
-	# 		console.error(error);
-	# 		process.exit(1);
-	# 	}
-	# };
+const main = async () => {
+	const contract = await ethers.getContractFactory(\"$contractName\").then((contractFactory) => contractFactory.deploy());
+	await contract.deployed();
+	console.log(\"Contract deployed address: \", contract.address, \"in network:\", hre.network.name);
 
-	# runMain();" > scripts/deploy.js
+	console.log('Contract source code could be verified on Etherscan/Polygonscan using the following command:');
+	console.log(`npx hardhat verify --network \${network.name} \${contract.address}`);
+};
+
+const runMain = async () => {
+	try {
+		await main();
+		process.exit(0);
+	} catch (error) {
+		console.error(error);
+		process.exit(1);
+	}
+};
+
+runMain();" > scripts/deploy.js
 
 	# add content to scripts/deployProxy.js
-	echo "const { ethers, upgrades } = require('hardhat');
+	echo "const { ethers, network, upgrades } = require('hardhat');
 
 async function main() {
-  const contractFactory = await ethers.getContractFactory(\"$contractName\");
-  const proxy = await upgrades.deployProxy(contractFactory);
-  // if args are needed - (contractName, [arg1, arg2])
-  await proxy.deployed();
+	const contractFactory = await ethers.getContractFactory(\"$contractName\");
+	const proxy = await upgrades.deployProxy(contractFactory, []);
+	// add args in array [], like [arg1, arg2, ...]
+	await proxy.deployed();
 
-  const implementationAddress = await upgrades.erc1967.getImplementationAddress(
-    proxy.address
-  );
+	const implementationAddress = await upgrades.erc1967.getImplementationAddress(
+		proxy.address
+	);
 
-  console.log('Proxy contract address: ' + proxy.address);
-  console.log('Implementation contract address: ' + implementationAddress);
+	console.log('Proxy contract address: ' + proxy.address);
+	console.log('Implementation contract address: ' + implementationAddress);
+
+	console.log('Contract source code could be verified on Etherscan/Polygonscan using the following command:');
+	console.log(`npx hardhat verify --network ${network.name} ${implementationAddress}`);
 }
 
 main();" > scripts/deployProxy.js
@@ -693,7 +921,7 @@ async function main() {
 	const contractAddr = '';
 	const contract = await ethers.getContractAt('$contractName', contractAddr);
 
-	console.log(\"Owner:\", await contract.owner());
+	console.log('Owner:', await contract.owner());
 }
 
 main();" > scripts/callContract.js

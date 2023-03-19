@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "use-wallet";
 
-import { data, handleMint, imageSize, pricePerToken } from "./NftFunctions";
+import { data, handleMint, imageSize, pricePerToken } from "./ContractFunctions";
 import { getEtherscanLink, getConnectedNetwork } from "./Utils";
 
 
@@ -47,7 +47,7 @@ const Home = () => {
 			<h1 className="mt-5">🖼️ NFT Marketplace</h1>
 
 			<div className="content-container mt-5 flex-vertical">
-				{wallet.status !== 'connected' ? "Please connect to metamask" : null}
+				{wallet.status !== 'connected' ? 'Please connect to metamask' : null}
 			</div>
 			
 			<div className="container">

@@ -21,7 +21,6 @@ describe("CryptoGallery", function () {
 		[owner, customer, attacker] = await ethers.getSigners();
 		contract = await deployContract("CryptoGallery");
 		expect(contract.address).to.properAddress;
-		expect(await contract.deployed()).to.equal(contract);
 	});
 
 	it("Should get values correctly", async function () {

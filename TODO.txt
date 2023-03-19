@@ -1,5 +1,10 @@
 
-update create-project.sh according to new react & solidity codes
+in -app
+try to use MUI
+it is not the best if app does not load when wallet is locked
+	other projects are loading
+handle case if wallet is not installed
+give option to enter private key, or create a new wallet & private key to just let users use the app
 
 create new glitch account and host them
 find way to host all react apps on one glitch project
@@ -13,7 +18,7 @@ create test cases for all projects
 make contracts upgradable
 switch from goerli to polygon mumbai (or a faster testnet like arbitrum, optimism, avalanche, bnb)
 	make sure it is commonly used, so people can test it
-test todo-client
+test blockgoaler-client
 	add tests for react
 scan security with Slither - https://github.com/crytic/slither
 
@@ -24,7 +29,7 @@ __________________________________________________________________
 in dBank, add password feature to withdraw money
 	make sure they don't claim money again and again. Dont allow contracts to call functions. Make sure tx.origin == msg.sender
 	reduce money from balance first, then try to send money. If it fails, add money back to balance
-	same for TODO-app
+	same for -app
 	emit events when money is withdrawn
 if forgot password, give user a seed phrase, or two 16-character one-time recovery keys for emergency recovery,
 	or security questions like birth place, mother's maiden name, etc
@@ -41,22 +46,12 @@ add daily limit to withdraw. can be changed instantly, just like in real net ban
 if no wallet installed, they can login with private key. store it in localstorage
 
 create a logo for dBank
-in todo-app, add option to pay from dBank
+in -app, add option to pay from dBank
 finish dBank client
 rename dBank to Bank3 or dBank3
 
 _____________________________________________________
 
+improve NFT app
 make CryptoGallery upgradable
 
-in todo app, add reward token for accomplishing tasks
-	add subheading - "Become a chain-goaler"
-
-for nft app, give new name
-	CryptoGallery, ArtChain, Artverse, EtherGallery, CryptoCanvas, NFTropolis
-for bank app,
-	EtherGuard (best name), EtherLocker, EtherBank, EtherVault, EtherShield, CryptoShield, CryptoBank
-	BlockBank, ChainBank, Web3Vault, CryptoVault, Web3Safe,
-	BlockSafe, ChainSafe, EtherSafe, EtherSafeBank
-for invoice payment app,
-	EtherPay, EtherInvoice

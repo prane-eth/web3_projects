@@ -1,4 +1,4 @@
-const { ethers, upgrades, run } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 async function main() {
 	const contractFactory = await ethers.getContractFactory("CryptoGallery");
@@ -11,6 +11,9 @@ async function main() {
 	// 	address: contract.address,
 	// 	constructorArguments: [],
 	// });
+
+	console.log('Contract source code could be verified on Etherscan/Polygonscan using the following command:');
+	console.log(`npx hardhat verify --network ${network.name} ${contract.address}`);
 }
 
 main();

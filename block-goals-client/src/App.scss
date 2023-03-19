@@ -1,0 +1,427 @@
+/* @import "https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"; */
+
+.mainContainer {
+	background: linear-gradient(180deg, #7a0bf1 0%, #8196d3 100%);
+	height: 100%;
+	width: 100vw;
+	min-height: 100vh;
+
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.instructions {
+	text-align: center;
+	color: white;
+	font-size: 14px;
+	margin-top: 16px;
+}
+
+.dataContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	max-width: 600px;
+}
+
+.header {
+	text-align: center;
+	font-size: 32px;
+	font-weight: 600;
+	color: white;
+}
+
+.bio {
+	text-align: center;
+	color: gray;
+	margin-top: 16px;
+}
+
+button,
+input {
+	cursor: pointer;
+	margin: 2%;
+	padding: 2%;
+	border: 0;
+	border-radius: 5px;
+
+	&[type="text"] {
+		cursor: unset;
+		font-size: 24px;
+		border: 3px solid transparent;
+
+		&:focus {
+			outline: none;
+			border-color: green;
+		}
+
+		&::placeholder {
+			color: gray;
+		}
+	}
+
+	&[type="submit"] {
+		background: #00c853;
+		margin-left: 0;
+	}
+}
+
+#newTaskDiv {
+	display: flex;
+
+	#newTaskInput {
+		margin-right: 0;
+		flex-grow: 1;
+	}
+
+	button[type="submit"] {
+		background: #00c853;
+		margin-left: 0;
+	}
+}
+
+.connectedAs {
+	text-align: center;
+	color: rgb(125, 246, 125);
+}
+
+.darkModeToggle {
+	height: 20px;
+	width: 20px;
+	border-radius: 50%;
+	background: white;
+	padding: 5px;
+
+	&:hover {
+		cursor: pointer;
+		background-color: antiquewhite;
+	}
+}
+
+/* hand waving animation */
+/* https://codepen.io/jakejarvis/pen/pBZWZw */
+.waving-item,
+.wave-on-hover:hover {
+	animation-name: wave-animation;
+	animation-duration: 2.5s;
+	animation-iteration-count: 5;
+	transform-origin: 70% 70%;
+	display: inline-block;
+}
+
+@keyframes wave-animation {
+	0% {
+		transform: rotate(0deg);
+	}
+	10% {
+		transform: rotate(14deg);
+	}
+	20% {
+		transform: rotate(-8deg);
+	}
+	30% {
+		transform: rotate(14deg);
+	}
+	40% {
+		transform: rotate(-4deg);
+	}
+	50% {
+		transform: rotate(10deg);
+	}
+	60% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+.taskDiv {
+	background-color: oldlace;
+	margin-top: 16px;
+	margin-bottom: 0px;
+	padding: 16px;
+	border: 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 10% / 50%;
+	width: 40vw;
+	min-width: 300px;
+	position: relative;
+
+	&:nth-child(odd) {
+		background-color: #f0f0f0;
+	}
+
+	&:nth-child(even) {
+		background-color: #e0e0e0;
+	}
+
+	&.taskDivLarge {
+		margin-bottom: 16px;
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+	}
+
+	&.taskDoneDiv {
+		background-color: grey;
+		border-color: grey;
+	}
+
+	& > .taskDoneDiv {
+		background-color: grey;
+		border-color: grey;
+	}
+}
+
+.right {
+	cursor: pointer;
+	font-size: 24px;
+	float: right;
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	right: 1%;
+}
+
+.ethDisplay {
+	text-align: center;
+	font-size: 15px;
+	font-weight: 600;
+	border: 3px solid transparent;
+	padding: 0px 10px;
+	width: fit-content;
+	height: fit-content;
+	background-color: #f0f0f0;
+	border-radius: 0 0 50% 50%;
+	border-top: none;
+}
+
+.deposit {
+	color: green;
+
+	&:hover {
+		color: blue;
+	}
+}
+
+.delete:hover {
+	color: red;
+}
+
+.mainApp {
+	background: transparent;
+
+	// &.darkmode {
+	// 	background: linear-gradient(180deg, #7a0bf1 0%, #804600 100%);
+
+	// 	button[type="submit"] {
+	// 		background: green;
+	// 		margin-left: 0;
+	// 	}
+
+	// 	.darkModeToggle {
+	// 		background: black;
+	// 		color: white;
+
+	// 		&:hover {
+	// 			background: slategrey;
+	// 		}
+	// 	}
+
+	// 	.loading {
+	// 		color: white;
+	// 	}
+
+	// 	.connectedAs {
+	// 		color: rgb(125, 246, 125);
+	// 	}
+
+	// 	input {
+	// 		background: #1d2230;
+	// 		color: white;
+	// 	}
+
+	// 	button {
+	// 		background: #1d2230;
+	// 		color: white;
+
+	// 		&:hover {
+	// 			cursor: pointer;
+	// 			border: 1px solid white;
+	// 		}
+
+	// 		&[type="submit"] {
+	// 			background: #008b00;
+	// 		}
+	// 	}
+
+	// 	.bio {
+	// 		color: #a0a0a0;
+	// 	}
+
+	// 	.toggle {
+	// 		background: #1d2230;
+	// 		color: white;
+
+	// 		&:hover {
+	// 			cursor: pointer;
+	// 			border: 1px solid white;
+	// 		}
+	// 	}
+
+	// 	.taskDiv {
+	// 		border: none;
+	// 		background: #1d2230;
+	// 		color: white;
+
+	// 		&:nth-child(odd) {
+	// 			background-color: #1d2230;
+	// 		}
+
+	// 		&:nth-child(even) {
+	// 			background-color: #2d2d2d;
+	// 		}
+	// 	}
+
+	// 	.ethDisplay {
+	// 		background: #1d2230;
+	// 		color: white;
+	// 	}
+	// }
+}
+
+// _______________________________________________________________________________________________
+
+#navbar {
+	/* align items to left, middle and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	top: 0;
+	width: 97vw;
+	margin-top: 1rem;
+
+	// always display navbar on top of page
+	position: sticky;
+	z-index: 1;
+	background: #f9f9f9;
+	box-shadow: 0 0.5px 15px orange;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	margin-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.homeContainer {
+	color: white;
+}
+
+.mainContainer {
+	transition: 1s;
+	background: radial-gradient(
+		circle,
+		rgba(253, 255, 162, 1) 0%,
+		rgba(229, 255, 204, 1) 67%
+	);
+	height: 100%;
+    min-height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.icon-large {
+	font-size: 2rem;
+	margin-right: 0.5rem;
+}
+
+#walletDiv {
+	/* align items to left and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#connectMetamask {
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px blue;
+	cursor: pointer;
+	border-radius: 2em 2em 2em 2em;
+	padding: 0.6rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+    color: white;
+    background: #0a58ca;
+}
+.darkModeToggle {
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px grey;
+	border-radius: 50%;
+	padding: 0.6rem;
+	cursor: pointer;
+	&:hover {
+		background: lightgrey;
+	}
+}
+
+@mixin flex-layout {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.flex-horizontal {
+	@include flex-layout;
+	flex-direction: row;
+}
+.flex-vertical {
+	@include flex-layout;
+	flex-direction: column;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.darkmode {
+	transition: 1s;
+	background: radial-gradient(
+		circle,
+		rgba(30, 30, 30, 1) 0%,
+		rgba(60, 60, 60, 1) 67%
+	);
+	color: white;
+	#navbar {
+		background-color: black;
+	}
+	.darkModeToggle {
+		color: orange;
+		box-shadow: 0 0.5px 15px orange;
+		&:hover {
+			background: slategrey;
+		}
+	}
+	.darkModeToggleText, .i-am-text {
+		color: black;
+	}
+	.navbar-links {
+		a {
+			color: violet;
+		}
+	}
+	.sectionDiv {
+		background: #333;
+		color: white;
+	}
+	.sectionName {
+		color: white;
+	}
+}

@@ -30,7 +30,7 @@ module.exports = {
 		localhost: {
 			url: 'http://localhost:8545',
 			accounts: [
-				// first private key when we run `npx hardhat node`
+				// first private key when we run 
 				'0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
 			],
 		},
@@ -48,3 +48,4 @@ module.exports = {
 		},
 	},
 };
+
