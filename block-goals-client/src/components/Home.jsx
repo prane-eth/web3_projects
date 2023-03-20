@@ -1,14 +1,13 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ethers } from "ethers";
-import { useWallet } from "use-wallet";
 
 import { FaEthereum } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { TbCurrencyEthereum } from "react-icons/tb";
 import { FaRegPlusSquare } from "react-icons/fa";
+import { useWallet } from "use-wallet";
 
 import {
-	setHooks,
 	setNewTxnLink,
 	getAllTasks,
 	addTask,
@@ -22,14 +21,19 @@ import {
 
 
 const Home = () => {
-	const wallet = useWallet();
 	const [allTasks, setAllTasks] = useState([]);
 	const [newTask, setNewTask] = useState("");
 	const [loadingMessage, setLoadingMessage] = useState(null);
 	const [isOwner, setIsOwner] = useState(false);
 	const [miningTxn, setMiningTxn] = useState(null);
 	const [txnLink, setTxnLink] = useState(null);
-	
+	const wallet = useWallet();
+
+	// print newTask on change
+	useEffect(() => {
+		console.log(newTask);
+	}, [newTask]);
+
 	const Instructions = () => (
 		<div className="instructions">
 			Instructions:
@@ -47,11 +51,8 @@ const Home = () => {
 	useEffect(setNewTxnLink, [miningTxn]);
 
 	useEffect(() => {
-		setHooks({
-			allTasks, setAllTasks, newTask, setNewTask, loadingMessage, setLoadingMessage, isOwner, setIsOwner, miningTxn, setMiningTxn, txnLink, setTxnLink
-		});
 		// wallet.connect();
-		verifyOwner().then((isOwner) => setIsOwner(isOwner));
+		verifyOwner();
 		window.addEventListener("keydown", submitOnEnter);
 		// every 30 seconds, run getAllTasks
 		const interval = setInterval(() => getAllTasks, 30000);

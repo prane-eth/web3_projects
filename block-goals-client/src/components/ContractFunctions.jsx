@@ -1,40 +1,25 @@
 import { ethers } from "ethers";
 import { getEtherscanLink, getContract } from "./Utils";
 
+import { useHooksContext } from "./HooksContext";
+
+
 const { parseEther } = ethers;
 
-var allTasks, newTask, loadingMessage, isOwner, miningTxn, txnLink;
-var setAllTasks, setNewTask, setLoadingMessage, setIsOwner;
-var setMiningTxn, setTxnLink;
-
-export async function setHooks(hooks) {
-	allTasks = hooks.allTasks;
-	newTask = hooks.newTask;
-	loadingMessage = hooks.loadingMessage;
-	isOwner = hooks.isOwner;
-	miningTxn = hooks.miningTxn;
-	txnLink = hooks.txnLink;
-
-	setAllTasks = hooks.setAllTasks;
-	setNewTask = hooks.setNewTask;
-	setLoadingMessage = hooks.setLoadingMessage;
-	setIsOwner = hooks.setIsOwner;
-	setMiningTxn = hooks.setMiningTxn;
-	setTxnLink = hooks.setTxnLink;
-}
 
 // function to set a new transaction link
-export async function setNewTxnLink() {
+export const setNewTxnLink = async (miningTxn, setTxnLink) => {
 	if (miningTxn) {
 		const txnLink = await getEtherscanLink(miningTxn);
 		setTxnLink(txnLink);
 	} else {
 		setTxnLink(null);
 	}
-}
+};
 
 // function to get all tasks
 export async function getAllTasks() {
+	const { setLoadingMessage, setAllTasks } = useHooksContext();
 	setLoadingMessage("Loading tasks");
 	const contract = await getContract();
 
@@ -60,6 +45,7 @@ export async function getAllTasks() {
 
 // function to add a new task
 export async function addTask() {
+	const { setLoadingMessage, newTask, setNewTask, getAllTasks } = useHooksContext();
 	if (!newTask) {
 		setLoadingMessage("Task is empty!");
 		return;
@@ -78,6 +64,7 @@ export async function addTask() {
 
 // function to finish a task
 export async function finishTask(taskId) {
+	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
 	setLoadingMessage("Finishing task...");
 
 	const contract = await getContract();
@@ -92,6 +79,7 @@ export async function finishTask(taskId) {
 
 // function to delete a task
 export async function deleteTask(taskPos) {
+	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
 	setLoadingMessage("Deleting task..,");
 
 	const contract = await getContract();
@@ -106,6 +94,7 @@ export async function deleteTask(taskPos) {
 
 // function to deposit ETH to a task
 export async function depositEth(taskPos) {
+	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
 	setLoadingMessage("Depositing ETH to task...");
 
 	const contract = await getContract();
@@ -121,6 +110,7 @@ export async function depositEth(taskPos) {
 
 // function to refund to owner
 export async function refundToOwner() {
+	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
 	setLoadingMessage("Refunding to owner...");
 
 	const contract = await getContract();
@@ -134,6 +124,7 @@ export async function refundToOwner() {
 
 // function to verify owner
 export async function verifyOwner() {
+	const { setIsOwner } = useHooksContext();
 	const contract = await getContract();
 	const owner = await contract.owner();
 	setIsOwner(owner === window.ethereum.selectedAddress);
@@ -141,6 +132,7 @@ export async function verifyOwner() {
 
 // function to add task on pressing enter key
 export function submitOnEnter(event) {
+	const { addTask } = useHooksContext();
 	if (event.key === "Enter") {
 		addTask(event);
 	}

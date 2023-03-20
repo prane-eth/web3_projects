@@ -92,13 +92,10 @@ export const getContract = async () => {
 		return false;
 	}
 
-	console.log("contractAddress", contractAddress);
-
 	const { provider, signer } = await getProviderAndSigner();
-	console.log("provider", provider);
-	// const signer = await provider.getSigner();
-	console.log("signer", signer);
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
+	console.log("provider", provider);
+	console.log("signer", signer);
 	console.log("contract", contract);
 
 	return contract;
