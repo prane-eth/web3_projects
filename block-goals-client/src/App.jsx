@@ -10,7 +10,7 @@ const App = () => {
 	const [account, setAccount] = useState(null);
 	const [darkMode, setDarkMode] = useState(false);
 	const allSupportedNetworks = Object.keys(supportedNetworks);
-	const supportedArray = allSupportedNetworks.map(network => ({chainId: network}))
+	const supportedArray = allSupportedNetworks.map(chainId => ({chainId}))
 
 	return (
 		<UseWalletProvider chainId={allSupportedNetworks[0]} providerOptions={{supportedArray}}>

@@ -1,14 +1,10 @@
 import { ethers } from "ethers";
-import { getEtherscanLink, getContract } from "./Utils";
-
-import { useHooksContext } from "./HooksContext";
-
+import { getEtherscanLink, getContract, getProviderAndSigner } from "./Utils";
 
 const { parseEther } = ethers;
 
 
-// function to set a new transaction link
-export const setNewTxnLink = async (miningTxn, setTxnLink) => {
+export const setNewTxnLink = async ({miningTxn, setTxnLink}) => {
 	if (miningTxn) {
 		const txnLink = await getEtherscanLink(miningTxn);
 		setTxnLink(txnLink);
@@ -17,18 +13,26 @@ export const setNewTxnLink = async (miningTxn, setTxnLink) => {
 	}
 };
 
-// function to get all tasks
-export async function getAllTasks() {
-	const { setLoadingMessage, setAllTasks } = useHooksContext();
-	setLoadingMessage("Loading tasks");
+const getTaskFromJson = (taskJson) => {
+	// convert from {0: 1679228096n, 1: 'testing the project', 2: false, 3: 10000000000000000n}
+	// to {timestamp: 1679228096n, description: 'testing the project', done: false, balance: 10000000000000000n}
+	return {
+		description: taskJson[1],
+		done: taskJson[2],
+		balance: ethers.formatEther(taskJson[3] || 0),
+	};
+};
+
+export const getAllTasks = async ({setAllTasks}) => {
 	const contract = await getContract();
 
-	let tasks = await contract.getAllTasks();
+	let tasksJson = await contract.getAllTasks();
+	if (tasksJson.length === 0) {
+		setAllTasks([]);
+		return;
+	}
 
-	tasks = tasks.map((task) => {
-		return { ...task };
-	});
-
+	const tasks = tasksJson.forEach(taskJson => getTaskFromJson(taskJson));
 	let finishedTasks = [];
 	for (var task of tasks) {
 		if (task.done) {
@@ -36,104 +40,89 @@ export async function getAllTasks() {
 			tasks.splice(tasks.indexOf(task), 1);
 		}
 	}
-
 	tasks.push(...finishedTasks);
-
 	setAllTasks(tasks);
-	setLoadingMessage(null);
 }
 
-// function to add a new task
-export async function addTask() {
-	const { setLoadingMessage, newTask, setNewTask, getAllTasks } = useHooksContext();
+export const addTask = async ({ setLoadingMessage, newTask, setNewTask, depositAmount, setAllTasks }) => {
+	newTask = newTask.trim();
 	if (!newTask) {
 		setLoadingMessage("Task is empty!");
+		setNewTask("");
+		setTimeout(() => setLoadingMessage(null), 1000);
 		return;
 	}
 	setLoadingMessage("Adding task");
-	console.log("adding a newTask: ", newTask);
+	console.info("adding a newTask: ", newTask);
 
-	const contract = await getContract();
+	try {
+		const contract = await getContract();
 
-	const txn = await contract.addTask(newTask);
-	await txn.wait();
-	setNewTask("");
-	getAllTasks();
-	setLoadingMessage(null);
-}
-
-// function to finish a task
-export async function finishTask(taskId) {
-	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
-	setLoadingMessage("Finishing task...");
-
-	const contract = await getContract();
-
-	const txn = await contract.finishTask(taskId);
-	setMiningTxn(txn);
-	await txn.wait();
-	setLoadingMessage("Done");
-
-	getAllTasks();
-}
-
-// function to delete a task
-export async function deleteTask(taskPos) {
-	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
-	setLoadingMessage("Deleting task..,");
-
-	const contract = await getContract();
-
-	const txn = await contract.deleteTask(taskPos);
-	setMiningTxn(txn);
-	await txn.wait();
-	setLoadingMessage("Done");
-
-	getAllTasks();
-}
-
-// function to deposit ETH to a task
-export async function depositEth(taskPos) {
-	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
-	setLoadingMessage("Depositing ETH to task...");
-
-	const contract = await getContract();
-	const txn = await contract.deposit(taskPos, {
-		value: parseEther("0.01"),
-	});
-	setMiningTxn(txn);
-	await txn.wait();
-	setLoadingMessage("Done");
-
-	getAllTasks();
-}
-
-// function to refund to owner
-export async function refundToOwner() {
-	const { setLoadingMessage, setMiningTxn, getAllTasks } = useHooksContext();
-	setLoadingMessage("Refunding to owner...");
-
-	const contract = await getContract();
-	const txn = await contract.refundToOwner();
-	setMiningTxn(txn);
-	await txn.wait();
-	setLoadingMessage("Done");
-
-	getAllTasks();
-}
-
-// function to verify owner
-export async function verifyOwner() {
-	const { setIsOwner } = useHooksContext();
-	const contract = await getContract();
-	const owner = await contract.owner();
-	setIsOwner(owner === window.ethereum.selectedAddress);
-}
-
-// function to add task on pressing enter key
-export function submitOnEnter(event) {
-	const { addTask } = useHooksContext();
-	if (event.key === "Enter") {
-		addTask(event);
+		const txn = await contract.addTask(newTask, {
+			value: parseEther(""+depositAmount),
+		});
+		console.log("txn: ", txn);
+		await txn.wait();
+		setNewTask("");
+		getAllTasks({setAllTasks});
+		setLoadingMessage("Task added!");
+	} catch (error) {
+		console.error(error);
+		setLoadingMessage("Error adding task");
 	}
 }
+
+export const finishTask = async (taskPos, {setLoadingMessage, setMiningTxn, setAllTasks}) => {
+	setLoadingMessage("Finishing task...");
+
+	try {
+		const contract = await getContract();
+
+		const txn = await contract.finishTask(taskPos);
+		setMiningTxn(txn);
+		await txn.wait();
+		setLoadingMessage("Done");
+
+		getAllTasks({ setAllTasks });
+	} catch (error) {
+		console.error(error);
+		setLoadingMessage("Error finishing task");
+	}
+}
+
+export const deleteTask = async (taskPos, {setLoadingMessage, setMiningTxn, setAllTasks}) => {
+	setLoadingMessage("Deleting task...");
+
+	try {
+		const contract = await getContract();
+		const txn = await contract.deleteTask(taskPos);
+		setMiningTxn(txn.hash);
+		await txn.wait();
+		setLoadingMessage("Task deleted!");
+		getAllTasks({ setAllTasks });
+	} catch (error) {
+		console.error(error);
+		setLoadingMessage("Error deleting task");
+	}
+}
+
+export const depositEth = async (taskPos, {setLoadingMessage, setMiningTxn, setAllTasks}) => {
+	setLoadingMessage("Depositing ETH to task...");
+
+	try {
+		const contract = await getContract();
+		const txn = await contract.deposit(taskPos, {
+			value: parseEther("0.01"),
+		});
+		setMiningTxn(txn);
+		await txn.wait();
+		setLoadingMessage("Amount deposited!");
+
+		getAllTasks({ setAllTasks });
+	} catch (error) {
+		console.error(error);
+		setLoadingMessage("Error depositing amount");
+	}
+}
+
+

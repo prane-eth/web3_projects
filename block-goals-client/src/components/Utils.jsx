@@ -33,7 +33,7 @@ export const supportedNetworks = {
 	},
 }
 
-const getProviderAndSigner = async () => {
+export const getProviderAndSigner = async () => {
 	if (!window.ethereum) {
 		console.log("MetaMask not installed; using read-only defaults");
 		const provider = ethers.getDefaultProvider();
@@ -89,14 +89,11 @@ export const getContract = async () => {
 	// always the same first contract after starting a node
 	else {
 		alert("Network not supported for this contract");
-		return false;
+		throw new Error("Network not supported for this contract");
+		// return false;
 	}
-
-	const { provider, signer } = await getProviderAndSigner();
+	const { signer } = await getProviderAndSigner();
 	const contract = new ethers.Contract(contractAddress, config.abi, signer);
-	console.log("provider", provider);
-	console.log("signer", signer);
-	console.log("contract", contract);
 
 	return contract;
 };

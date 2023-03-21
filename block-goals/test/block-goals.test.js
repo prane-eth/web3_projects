@@ -1,7 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { parseEther, formatEther } = ethers.utils;
-// const { getBalance } = ethers.provider;
 
 const deployContract = async (contractName, ...args) => {
 	const contract = await ethers
@@ -11,13 +10,13 @@ const deployContract = async (contractName, ...args) => {
 	return contract;
 };
 
-// const deployProxy = async (contractName, ...args) => {
-// 	const contract = await ethers
-// 		.getContractFactory(contractName)
-// 		.then(contractFactory => upgrades.deployProxy(contractFactory, [...args]));
-// 	await contract.deployed();
-// 	return contract;
-// };
+const deployProxy = async (contractName, ...args) => {
+	const contract = await ethers
+		.getContractFactory(contractName)
+		.then(contractFactory => upgrades.deployProxy(contractFactory, [...args]));
+	await contract.deployed();
+	return contract;
+};
 
 describe("BlockGoals", function () {
 	var contract, owner, user;
@@ -61,13 +60,8 @@ describe("BlockGoals", function () {
 		await contract.deleteTask(targetIndex);
 		expect(await contract.getAllTasks()).to.have.lengthOf(1);
 	});
-	it("Should refund ether to owner", async function () {
-		await contract.addTask("Test this contract");
-		await contract.deposit(targetIndex, { value: parseEther("1") });
-		const balanceBefore = await owner.getBalance();
-		await contract.refundToOwner();
-		const balanceAfter = await owner.getBalance();
-		const difference = formatEther(balanceAfter - balanceBefore + '');
-		expect(Number(difference)).to.be.within(0.99, 1);
+	it("Should be deployed as proxy", async function () {
+		const proxy = await deployProxy("BlockGoals");
+		expect(await proxy.deployed()).to.equal(proxy);
 	});
 });

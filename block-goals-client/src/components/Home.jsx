@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { ethers } from "ethers";
+import { useState, useEffect } from "react";
 
 import { FaEthereum } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -14,25 +13,22 @@ import {
 	finishTask,
 	deleteTask,
 	depositEth,
-	refundToOwner,
-	verifyOwner,
-	submitOnEnter
 } from "./ContractFunctions";
 
 
 const Home = () => {
-	const [allTasks, setAllTasks] = useState([]);
+	const [allTasks, setAllTasks] = useState(null);
 	const [newTask, setNewTask] = useState("");
+	const [depositAmount, setDepositAmount] = useState(undefined);
 	const [loadingMessage, setLoadingMessage] = useState(null);
-	const [isOwner, setIsOwner] = useState(false);
 	const [miningTxn, setMiningTxn] = useState(null);
 	const [txnLink, setTxnLink] = useState(null);
 	const wallet = useWallet();
-
-	// print newTask on change
-	useEffect(() => {
-		console.log(newTask);
-	}, [newTask]);
+	const allHooks = {
+		allTasks, setAllTasks, newTask, setNewTask, depositAmount,
+		setDepositAmount, loadingMessage, setLoadingMessage,
+		miningTxn, setMiningTxn, txnLink, setTxnLink
+	}
 
 	const Instructions = () => (
 		<div className="instructions">
@@ -40,27 +36,36 @@ const Home = () => {
 			<br />
 			Add a task using the input box
 			<br />
-			Deposit your valuable ETH to a task to increase your commitment
+			Deposit your valuable Matic/ETH to a task to increase your commitment
 			to the goals
 			<br />
-			Finish a task by clicking on the checkbox and get your ETH back
+			Finish a task by clicking on the checkbox and get your Matic/ETH back
 			(if any)
+			<br />
+			Note: It is recommended to enter at least 0.001 Matic/ETH for a good commitment
 		</div>
 	);
-
-	useEffect(setNewTxnLink, [miningTxn]);
+	const submitOnEnter = (event) => {
+		if (event.key === "Enter") {
+			addTask(event);
+		}
+	}
 
 	useEffect(() => {
-		// wallet.connect();
-		verifyOwner();
+		wallet.connect();
 		window.addEventListener("keydown", submitOnEnter);
 		// every 30 seconds, run getAllTasks
-		const interval = setInterval(() => getAllTasks, 30000);
+		const interval = setInterval(() => getAllTasks(allHooks), 30000);
+		getAllTasks(allHooks);
 		return () => {
 			window.removeEventListener("keydown", submitOnEnter);
 			clearInterval(interval);
 		};
 	}, []);
+
+	useEffect(async () => {
+		await setNewTxnLink(allHooks);
+	}, [miningTxn]);
 
 	if (wallet.status !== 'connected') {
 		return (
@@ -104,16 +109,31 @@ const Home = () => {
 						value={newTask}
 						onChange={(event) => setNewTask(event.target.value)}
 					/>
-					<button type="submit" onClick={addTask}>
+					<input
+						id="amountInput"
+						type="number"
+						className="textInput amountInput"
+						placeholder="Deposit amount"
+						value={depositAmount}
+						onChange={(event) => setDepositAmount(event.target.value)}
+						style={{ color: depositAmount >= 0.001 ? "green" : "red" }}
+					/>
+					<button type="submit" onClick={() => addTask(allHooks)}>
 						<FaRegPlusSquare color="white" size="24" />
 					</button>
 				</div>
 
-				<div id="tasks">
-					{allTasks.map((task, index) => {
-						let balance = ethers.utils.formatEther(task.balance);
+				{allTasks == null && (
+					<h3 className="mt-5"> Loading tasks... </h3>
+				)}
 
-						return (
+				{allTasks != null && allTasks.length === 0 && (
+					<h3 className="mt-5"> No tasks yet. Add a task to get started. </h3>
+				)}
+
+				{allTasks != null && (
+					<div id="tasks">
+						{allTasks.map((task, index) => (
 							<div className="taskDivLarge" key={index}>
 								<div
 									className={
@@ -126,9 +146,7 @@ const Home = () => {
 										type="checkbox"
 										checked={task.done}
 										disabled={task.done}
-										onChange={(event) =>
-											finishTask(event, task.id)
-										}
+										onChange={() => finishTask(index, allHooks)}
 									/>
 									{task.done ? (
 										<s>{task.description}</s>
@@ -139,40 +157,25 @@ const Home = () => {
 										{!task.done && (
 											<TbCurrencyEthereum
 												className="deposit"
-												onClick={(event) =>
-													depositEth(event, task.id)
-												}
+												onClick={() => depositEth(index, allHooks)}
 											/>
 										)}
 										<MdDelete
 											className="delete"
-											onClick={(event) =>
-												deleteTask(event, task.id)
-											}
+											onClick={() => deleteTask(index, allHooks)}
 										/>
 									</div>
 								</div>
-								{balance > 0 && (
-									<div className="ethDisplay wave-on-hover">
-										{balance} <FaEthereum />
+								{task.balance > 0 && (
+									<div className="ethDisplay wave-on-hover flex-horizontal">
+										{task.balance} <FaEthereum />
 									</div>
 								)}
 							</div>
-						);
-					})}
-				</div>
-
-				{allTasks.length === 0 && (
-					<div className="taskDivLarge">
-						<div className="taskDiv">
-							No tasks yet. Add a task to get started.
-						</div>
+						))}
 					</div>
 				)}
-
 			</div>
-
-			<button onClick={refundToOwner}> Refund to owner </button>
 
 			{loadingMessage ? (
 				<div className="container">

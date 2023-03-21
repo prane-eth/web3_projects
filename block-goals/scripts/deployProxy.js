@@ -15,7 +15,9 @@ async function main() {
 	console.log(
 		"Contract source code could be verified on Etherscan/Polygonscan using the following command:"
 	);
-	console.log();
+	console.log(
+		`npx hardhat verify ${proxy.address} --network ${network.name}`
+	);
 }
 
 main();

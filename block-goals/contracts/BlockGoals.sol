@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract BlockGoals is Ownable {
+contract BlockGoals is Initializable {
     struct Task {
         uint256 timestamp;
         string description;
@@ -96,14 +96,8 @@ contract BlockGoals is Ownable {
         // if task is finished, remaining amount is refunded after task is deleted
     }
 
-    // to call when contract should be closed
-    function refundToOwner() public onlyOwner nonReentrant {
-        (bool success, ) = msg.sender.call{value: address(this).balance}("");
-        require(success, "BlockGoals: Failed to refund Ether to owner");
-    }
-
     receive() external payable {
-        revert("BlockGoals: Fallback function receive() not allowed");
+        revert("BlockGoals: Fallback function fallback() not allowed");
     }
 
     fallback() external payable {

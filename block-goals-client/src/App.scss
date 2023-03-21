@@ -1,4 +1,3 @@
-/* @import "https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"; */
 
 .mainContainer {
 	background: linear-gradient(180deg, #7a0bf1 0%, #8196d3 100%);
@@ -65,6 +64,11 @@ input {
 		background: #00c853;
 		margin-left: 0;
 	}
+}
+
+.amountInput {
+	width: 12%;
+	font-size: 18px;
 }
 
 #newTaskDiv {
@@ -192,11 +196,12 @@ input {
 	text-align: center;
 	font-size: 15px;
 	font-weight: 600;
-	border: 3px solid transparent;
+	// border: 3px solid transparent;
+	border: 3px solid #f0f0f0;
 	padding: 0px 10px;
 	width: fit-content;
 	height: fit-content;
-	background-color: #f0f0f0;
+	// background-color: #f0f0f0;
 	border-radius: 0 0 50% 50%;
 	border-top: none;
 }
@@ -213,89 +218,7 @@ input {
 	color: red;
 }
 
-.mainApp {
-	background: transparent;
-
-	// &.darkmode {
-	// 	background: linear-gradient(180deg, #7a0bf1 0%, #804600 100%);
-
-	// 	button[type="submit"] {
-	// 		background: green;
-	// 		margin-left: 0;
-	// 	}
-
-	// 	.darkModeToggle {
-	// 		background: black;
-	// 		color: white;
-
-	// 		&:hover {
-	// 			background: slategrey;
-	// 		}
-	// 	}
-
-	// 	.loading {
-	// 		color: white;
-	// 	}
-
-	// 	.connectedAs {
-	// 		color: rgb(125, 246, 125);
-	// 	}
-
-	// 	input {
-	// 		background: #1d2230;
-	// 		color: white;
-	// 	}
-
-	// 	button {
-	// 		background: #1d2230;
-	// 		color: white;
-
-	// 		&:hover {
-	// 			cursor: pointer;
-	// 			border: 1px solid white;
-	// 		}
-
-	// 		&[type="submit"] {
-	// 			background: #008b00;
-	// 		}
-	// 	}
-
-	// 	.bio {
-	// 		color: #a0a0a0;
-	// 	}
-
-	// 	.toggle {
-	// 		background: #1d2230;
-	// 		color: white;
-
-	// 		&:hover {
-	// 			cursor: pointer;
-	// 			border: 1px solid white;
-	// 		}
-	// 	}
-
-	// 	.taskDiv {
-	// 		border: none;
-	// 		background: #1d2230;
-	// 		color: white;
-
-	// 		&:nth-child(odd) {
-	// 			background-color: #1d2230;
-	// 		}
-
-	// 		&:nth-child(even) {
-	// 			background-color: #2d2d2d;
-	// 		}
-	// 	}
-
-	// 	.ethDisplay {
-	// 		background: #1d2230;
-	// 		color: white;
-	// 	}
-	// }
-}
-
-// _______________________________________________________________________________________________
+// _________________________________________________________
 
 #navbar {
 	/* align items to left, middle and right */
@@ -308,7 +231,7 @@ input {
 
 	// always display navbar on top of page
 	// position: sticky;
-    position: fixed;
+	position: fixed;
 	z-index: 1;
 	background: #f9f9f9;
 	box-shadow: 0 0.5px 15px orange;
@@ -321,6 +244,7 @@ input {
 
 .homeContainer {
 	color: white;
+	// width: 110%;
 }
 
 .mainContainer {
@@ -331,7 +255,7 @@ input {
 	// 	rgba(229, 255, 204, 1) 67%
 	// );
 	height: 100%;
-    min-height: 100vh;
+	min-height: 100vh;
 
 	// display: unset;
 	display: flex;
@@ -360,9 +284,10 @@ input {
 	padding: 0.6rem;
 	font-size: 1.1rem;
 	font-weight: 600;
-    color: white;
-    background: #0a58ca;
+	color: white;
+	background: #0a58ca;
 }
+
 .darkModeToggle {
 	margin-right: 1rem;
 	width: fit-content;
@@ -370,6 +295,7 @@ input {
 	border-radius: 50%;
 	padding: 0.6rem;
 	cursor: pointer;
+
 	&:hover {
 		background: lightgrey;
 	}
@@ -380,10 +306,12 @@ input {
 	justify-content: center;
 	align-items: center;
 }
+
 .flex-horizontal {
 	@include flex-layout;
 	flex-direction: row;
 }
+
 .flex-vertical {
 	@include flex-layout;
 	flex-direction: column;
@@ -396,40 +324,48 @@ body {
 
 .darkmode {
 	transition: 1s;
-	background: radial-gradient(
-		circle,
-		rgba(30, 30, 30, 1) 0%,
-		rgba(60, 60, 60, 1) 67%
-	);
+	background: radial-gradient(circle,
+			rgba(30, 30, 30, 1) 0%,
+			rgba(60, 60, 60, 1) 67%);
 	color: white;
+
 	#navbar {
 		background-color: black;
 	}
+
 	.darkModeToggle {
 		color: orange;
 		box-shadow: 0 0.5px 15px orange;
+
 		&:hover {
 			background: slategrey;
 		}
 	}
-	.darkModeToggleText, .i-am-text {
+
+	.darkModeToggleText,
+	.i-am-text {
 		color: black;
 	}
+
 	.navbar-links {
 		a {
 			color: violet;
 		}
 	}
+
 	.instructions {
 		color: white;
 	}
+
 	.homeContainer {
 		color: white;
 	}
+
 	.sectionDiv {
 		background: #333;
 		color: white;
 	}
+
 	.sectionName {
 		color: white;
 	}
