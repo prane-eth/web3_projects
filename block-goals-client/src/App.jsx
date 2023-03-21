@@ -7,7 +7,6 @@ import { supportedNetworks } from "./components/Utils";
 import "./App.scss";
 
 const App = () => {
-	const [account, setAccount] = useState(null);
 	const [darkMode, setDarkMode] = useState(false);
 	const allSupportedNetworks = Object.keys(supportedNetworks);
 	const supportedArray = allSupportedNetworks.map(chainId => ({chainId}))
@@ -16,12 +15,7 @@ const App = () => {
 		<UseWalletProvider chainId={allSupportedNetworks[0]} providerOptions={{supportedArray}}>
 			<div className={darkMode ? "mainContainer darkmode" : "mainContainer"}>
 				<div className="container text-center flex-vertical">
-					<Navbar
-						account={account}
-						setAccount={setAccount}
-						darkMode={darkMode}
-						setDarkMode={setDarkMode}
-					/>
+					<Navbar darkMode={darkMode} setDarkMode={setDarkMode}/>
 					<Home/>
 				</div>
 			</div>

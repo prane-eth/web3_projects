@@ -12,7 +12,8 @@ import { SiBlockchaindotcom } from "react-icons/si";
 import { getConnectedNetwork } from "./Utils";
 
 
-const Navbar = ({ account, setAccount, darkMode, setDarkMode }) => {
+const Navbar = ({ darkMode, setDarkMode }) => {
+	const [account, setAccount] = useState(null);
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
 	const [accountShort, setAccountShort] = useState(null);

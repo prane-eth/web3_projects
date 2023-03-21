@@ -1,1 +1,0 @@
-/media/praneeth/HDD/Projects/web3_learn/create_project.sh
