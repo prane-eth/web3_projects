@@ -1,0 +1,88 @@
+
+Loading...
+<div id="blockchain">
+	<div class="block">
+		<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaggWNTF8EqFT5Qn5AoI-BupadaPsCkteMXL_RPWg&s" />
+	</div>
+	<div class="link"></div>
+	<div class="block">
+		<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaggWNTF8EqFT5Qn5AoI-BupadaPsCkteMXL_RPWg&s" />
+	</div>
+</div>
+
+<style>
+	body {
+		background-color: grey;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.block {
+		height: 6em;
+		width: 6em;
+		background-color: white;
+		color: white;
+		display: inline-block;
+	}
+	img {
+		height: 6em;
+		width: 6em;
+	}
+	.link {
+		color: white;
+		background-color: white;
+		padding: 0;
+		margin: 0;
+		height: 1em;
+		width: 6em;
+	}
+	#blockchain {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 10vh;
+		width: 100vw;
+	}
+</style>
+
+<!-- animate adding new blocks and removing old ones -->
+<script>
+	const randomColor = () => {
+		const letters = '0123456789ABCDEF';
+		let color = '#';
+		for (let i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
+	};
+
+	const addBlock = async () => {
+
+		const newLink = document.createElement('div');
+		newLink.style.backgroundColor = randomColor();
+		newLink.classList.add('link');
+		blockchain.removeChild(blockchain.firstChild);
+		blockchain.appendChild(newLink);
+
+		// sleep for 500
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
+		const newBlock = document.createElement('div');
+		// newBlock.style.backgroundColor = randomColor();
+		// newBlock.style.border = '1px solid ' + randomColor();
+		newBlock.classList.add('block');
+		newBlock.innerHTML = `
+			<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaggWNTF8EqFT5Qn5AoI-BupadaPsCkteMXL_RPWg&s" />
+		`;
+		blockchain.removeChild(blockchain.firstChild);
+		blockchain.appendChild(newBlock);
+
+		setTimeout(() => {
+			newBlock.style.opacity = "1";
+		}, 100);
+	};
+
+	setInterval(() => {
+		addBlock();
+	}, 1000);
+</script>

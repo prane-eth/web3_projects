@@ -32,7 +32,11 @@ export const getAllTasks = async ({setAllTasks}) => {
 		return;
 	}
 
-	const tasks = tasksJson.forEach(taskJson => getTaskFromJson(taskJson));
+	const tasks = tasksJson.map(taskJson => getTaskFromJson(taskJson));
+	if (!tasks) {
+		setAllTasks([]);
+		return;
+	}
 	let finishedTasks = [];
 	for (var task of tasks) {
 		if (task.done) {
@@ -44,15 +48,19 @@ export const getAllTasks = async ({setAllTasks}) => {
 	setAllTasks(tasks);
 }
 
-export const addTask = async ({ setLoadingMessage, newTask, setNewTask, depositAmount, setAllTasks }) => {
+export const addTask = async ({ setLoadingMessage, newTask, setNewTask, depositAmount, setAllTasks, setMiningTxn }) => {
 	newTask = newTask.trim();
 	if (!newTask) {
 		setLoadingMessage("Task is empty!");
-		setNewTask("");
 		setTimeout(() => setLoadingMessage(null), 1000);
 		return;
 	}
-	setLoadingMessage("Adding task");
+	if (!depositAmount) {
+		setLoadingMessage("Deposit amount is empty!");
+		setTimeout(() => setLoadingMessage(null), 2000);
+		return;
+	}
+	setLoadingMessage("Adding task...");
 	console.info("adding a newTask: ", newTask);
 
 	try {
@@ -61,14 +69,16 @@ export const addTask = async ({ setLoadingMessage, newTask, setNewTask, depositA
 		const txn = await contract.addTask(newTask, {
 			value: parseEther(""+depositAmount),
 		});
-		console.log("txn: ", txn);
+		setMiningTxn(txn);
 		await txn.wait();
 		setNewTask("");
 		getAllTasks({setAllTasks});
 		setLoadingMessage("Task added!");
+		setMiningTxn(null);
 	} catch (error) {
 		console.error(error);
 		setLoadingMessage("Error adding task");
+		setMiningTxn(null);
 	}
 }
 

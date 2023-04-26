@@ -14,6 +14,7 @@ import {
 	deleteTask,
 	depositEth,
 } from "./ContractFunctions";
+import { getConnectedNetwork } from "./Utils";
 
 
 const Home = () => {
@@ -22,6 +23,7 @@ const Home = () => {
 	const [depositAmount, setDepositAmount] = useState(undefined);
 	const [loadingMessage, setLoadingMessage] = useState(null);
 	const [miningTxn, setMiningTxn] = useState(null);
+	const [currency, setCurrency] = useState("MATIC/ETH");
 	const [txnLink, setTxnLink] = useState(null);
 	const wallet = useWallet();
 	const allHooks = {
@@ -36,13 +38,13 @@ const Home = () => {
 			<br />
 			Add a task using the input box
 			<br />
-			Deposit your valuable Matic/ETH to a task to increase your commitment
+			Deposit your valuable {currency} to a task to increase your commitment
 			to the goals
 			<br />
-			Finish a task by clicking on the checkbox and get your Matic/ETH back
+			Finish a task by clicking on the checkbox and get your {currency} back
 			(if any)
 			<br />
-			Note: It is recommended to enter at least 0.001 Matic/ETH for a good commitment
+			Note: It is recommended to enter at least 0.001 {currency} for a good commitment
 		</div>
 	);
 	const submitOnEnter = (event) => {
@@ -54,6 +56,12 @@ const Home = () => {
 	useEffect(() => {
 		wallet.connect();
 		window.addEventListener("keydown", submitOnEnter);
+		getConnectedNetwork().then((connectedNetwork) => {
+			if (connectedNetwork) {
+				setCurrency(connectedNetwork.currency);
+			}
+		});
+
 		// every 30 seconds, run getAllTasks
 		const interval = setInterval(() => getAllTasks(allHooks), 30000);
 		getAllTasks(allHooks);
