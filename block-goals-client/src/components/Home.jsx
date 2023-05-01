@@ -15,7 +15,7 @@ import {
 	depositEth,
 } from "./ContractFunctions";
 import { urlBase } from "./constants";
-import { getConnectedNetwork } from `${urlBase}/Utils.jsx`;
+const { getConnectedNetwork } = await import(`${urlBase}/Utils.jsx`);
 
 
 const Home = () => {

@@ -1,7 +1,11 @@
 import { ethers } from "ethers";
-import { getEtherscanLink, getContract, getProviderAndSigner } from "./Utils";
+const { parseEther, formatEther } = ethers;
+import { urlBase } from "./constants";
+const Utils = await import(`${urlBase}/Utils.jsx`);
 
-const { parseEther } = ethers;
+import config from "../assets/ContractABI.json"
+import contractAddress from "../assets/ContractAddress.json"
+const { getEtherscanLink, getContract } = await Utils(config, contractAddress)
 
 
 export const setNewTxnLink = async ({miningTxn, setTxnLink}) => {
@@ -19,7 +23,7 @@ const getTaskFromJson = (taskJson) => {
 	return {
 		description: taskJson[1],
 		done: taskJson[2],
-		balance: ethers.formatEther(taskJson[3] || 0),
+		balance: formatEther(taskJson[3] || 0),
 	};
 };
 
