@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
-import config from "../assets/ContractABI.json";
-import contractAddressJson from "../assets/ContractAddress.json";
+import config from "../block-goals-client/src/assets/ContractABI.json";
+import contractAddressJson from "../block-goals-client/src/assets/ContractAddress.json";
 
 
 if (!window.ethereum) {

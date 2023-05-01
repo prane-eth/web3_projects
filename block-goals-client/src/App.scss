@@ -85,24 +85,6 @@ input {
 	}
 }
 
-.connectedAs {
-	text-align: center;
-	color: rgb(125, 246, 125);
-}
-
-.darkModeToggle {
-	height: 20px;
-	width: 20px;
-	border-radius: 50%;
-	background: white;
-	padding: 5px;
-
-	&:hover {
-		cursor: pointer;
-		background-color: antiquewhite;
-	}
-}
-
 /* hand waving animation */
 /* https://codepen.io/jakejarvis/pen/pBZWZw */
 .waving-item,
@@ -220,28 +202,6 @@ input {
 
 // _________________________________________________________
 
-#navbar {
-	/* align items to left, middle and right */
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	top: 0;
-	width: 97vw;
-	margin-top: 1rem;
-
-	// always display navbar on top of page
-	// position: sticky;
-	position: fixed;
-	z-index: 1;
-	background: #f9f9f9;
-	box-shadow: 0 0.5px 15px orange;
-	border-radius: 0.5rem;
-	padding: 0.5rem;
-	margin-top: 0;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-}
-
 .homeContainer {
 	color: white;
 	// width: 110%;
@@ -266,39 +226,6 @@ input {
 .icon-large {
 	font-size: 2rem;
 	margin-right: 0.5rem;
-}
-
-#walletDiv {
-	/* align items to left and right */
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-#connectMetamask {
-	margin-right: 1rem;
-	width: fit-content;
-	box-shadow: 0 0.5px 15px blue;
-	cursor: pointer;
-	border-radius: 2em 2em 2em 2em;
-	padding: 0.6rem;
-	font-size: 1.1rem;
-	font-weight: 600;
-	color: white;
-	background: #0a58ca;
-}
-
-.darkModeToggle {
-	margin-right: 1rem;
-	width: fit-content;
-	box-shadow: 0 0.5px 15px grey;
-	border-radius: 50%;
-	padding: 0.6rem;
-	cursor: pointer;
-
-	&:hover {
-		background: lightgrey;
-	}
 }
 
 @mixin flex-layout {
@@ -328,30 +255,6 @@ body {
 			rgba(30, 30, 30, 1) 0%,
 			rgba(60, 60, 60, 1) 67%);
 	color: white;
-
-	#navbar {
-		background-color: black;
-	}
-
-	.darkModeToggle {
-		color: orange;
-		box-shadow: 0 0.5px 15px orange;
-
-		&:hover {
-			background: slategrey;
-		}
-	}
-
-	.darkModeToggleText,
-	.i-am-text {
-		color: black;
-	}
-
-	.navbar-links {
-		a {
-			color: violet;
-		}
-	}
 
 	.instructions {
 		color: white;

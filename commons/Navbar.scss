@@ -1,0 +1,155 @@
+
+
+.darkModeToggle {
+	height: 20px;
+	width: 20px;
+	border-radius: 50%;
+	background: white;
+	padding: 5px;
+
+	&:hover {
+		cursor: pointer;
+		background-color: antiquewhite;
+	}
+}
+
+
+#navbar {
+	/* align items to left, middle and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	top: 0;
+	width: 97vw;
+	margin-top: 1rem;
+
+	// always display navbar on top of page
+	// position: sticky;
+	position: fixed;
+	z-index: 1;
+	background: #f9f9f9;
+	box-shadow: 0 0.5px 15px orange;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	margin-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+
+#walletDiv {
+	/* align items to left and right */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+@mixin flex-layout {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.flex-horizontal {
+	@include flex-layout;
+	flex-direction: row;
+}
+
+.flex-vertical {
+	@include flex-layout;
+	flex-direction: column;
+}
+
+#connectMetamask {
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px blue;
+	cursor: pointer;
+	border-radius: 2em 2em 2em 2em;
+	padding: 0.6rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: white;
+	background: #0a58ca;
+}
+
+button,
+input {
+	cursor: pointer;
+	margin: 2%;
+	padding: 2%;
+	border: 0;
+	border-radius: 5px;
+
+	&[type="text"] {
+		cursor: unset;
+		font-size: 24px;
+		border: 3px solid transparent;
+
+		&:focus {
+			outline: none;
+			border-color: green;
+		}
+
+		&::placeholder {
+			color: gray;
+		}
+	}
+
+	&[type="submit"] {
+		background: #00c853;
+		margin-left: 0;
+	}
+}
+
+.darkModeToggle {
+	margin-right: 1rem;
+	width: fit-content;
+	box-shadow: 0 0.5px 15px grey;
+	border-radius: 50%;
+	padding: 0.6rem;
+	cursor: pointer;
+
+	&:hover {
+		background: lightgrey;
+	}
+}
+
+.connectedAs {
+	text-align: center;
+	color: rgb(125, 246, 125);
+}
+
+
+.darkmode {
+	transition: 1s;
+	background: radial-gradient(circle,
+			rgba(30, 30, 30, 1) 0%,
+			rgba(60, 60, 60, 1) 67%);
+	color: white;
+
+	#navbar {
+		background-color: black;
+	}
+
+	.darkModeToggle {
+		color: orange;
+		box-shadow: 0 0.5px 15px orange;
+
+		&:hover {
+			background: slategrey;
+		}
+	}
+
+	.darkModeToggleText,
+	.i-am-text {
+		color: black;
+	}
+
+	.navbar-links {
+		a {
+			color: violet;
+		}
+	}
+}
+

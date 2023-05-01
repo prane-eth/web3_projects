@@ -10,9 +10,10 @@ import { AiOutlineWallet } from "react-icons/ai";
 import { SiBlockchaindotcom } from "react-icons/si";
 
 import { getConnectedNetwork } from "./Utils";
+import './Navbar.scss';
 
 
-const Navbar = ({ darkMode, setDarkMode }) => {
+const Navbar = ({ darkMode, setDarkMode, projectName }) => {
 	const [account, setAccount] = useState(null);
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
@@ -84,7 +85,7 @@ const Navbar = ({ darkMode, setDarkMode }) => {
 	return (
 		<nav id="navbar">
 			<div className="emptyDiv"></div>
-			<h1>BlockGoals App</h1>
+			<h1>{projectName}</h1>
 			<div id="walletDiv" className="flex-horizontal">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}

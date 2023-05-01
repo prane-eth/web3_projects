@@ -14,7 +14,8 @@ import {
 	deleteTask,
 	depositEth,
 } from "./ContractFunctions";
-import { getConnectedNetwork } from "./Utils";
+import { urlBase } from "./constants";
+import { getConnectedNetwork } from `${urlBase}/Utils.jsx`;
 
 
 const Home = () => {
