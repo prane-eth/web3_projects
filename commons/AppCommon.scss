@@ -1,0 +1,275 @@
+
+.mainContainer {
+	background: linear-gradient(180deg, #7a0bf1 0%, #8196d3 100%);
+	height: 100%;
+	width: 100vw;
+	min-height: 100vh;
+
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.instructions {
+	text-align: center;
+	color: white;
+	font-size: 14px;
+	margin-top: 16px;
+}
+
+.dataContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	max-width: 600px;
+}
+
+.header {
+	text-align: center;
+	font-size: 32px;
+	font-weight: 600;
+	color: white;
+}
+
+.bio {
+	text-align: center;
+	color: gray;
+	margin-top: 16px;
+}
+
+button,
+input {
+	cursor: pointer;
+	margin: 2%;
+	padding: 2%;
+	border: 0;
+	border-radius: 5px;
+
+	&[type="text"] {
+		cursor: unset;
+		font-size: 24px;
+		border: 3px solid transparent;
+
+		&:focus {
+			outline: none;
+			border-color: green;
+		}
+
+		&::placeholder {
+			color: gray;
+		}
+	}
+
+	&[type="submit"] {
+		background: #00c853;
+		margin-left: 0;
+	}
+}
+
+.amountInput {
+	width: 12%;
+	font-size: 18px;
+}
+
+#newTaskDiv {
+	display: flex;
+
+	#newTaskInput {
+		margin-right: 0;
+		flex-grow: 1;
+	}
+
+	button[type="submit"] {
+		background: #00c853;
+		margin-left: 0;
+	}
+}
+
+/* hand waving animation */
+/* https://codepen.io/jakejarvis/pen/pBZWZw */
+.waving-item,
+.wave-on-hover:hover {
+	animation-name: wave-animation;
+	animation-duration: 2.5s;
+	animation-iteration-count: 5;
+	transform-origin: 70% 70%;
+	display: inline-block;
+}
+
+@keyframes wave-animation {
+	0% {
+		transform: rotate(0deg);
+	}
+	10% {
+		transform: rotate(14deg);
+	}
+	20% {
+		transform: rotate(-8deg);
+	}
+	30% {
+		transform: rotate(14deg);
+	}
+	40% {
+		transform: rotate(-4deg);
+	}
+	50% {
+		transform: rotate(10deg);
+	}
+	60% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+.taskDiv {
+	background-color: oldlace;
+	margin-top: 16px;
+	margin-bottom: 0px;
+	padding: 16px;
+	border: 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 10% / 50%;
+	width: 40vw;
+	min-width: 300px;
+	position: relative;
+	color: black;
+
+	&:nth-child(odd) {
+		background-color: #f0f0f0;
+	}
+
+	&:nth-child(even) {
+		background-color: #e0e0e0;
+	}
+
+	&.taskDivLarge {
+		margin-bottom: 16px;
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+	}
+
+	&.taskDoneDiv {
+		background-color: grey;
+		border-color: grey;
+	}
+
+	& > .taskDoneDiv {
+		background-color: grey;
+		border-color: grey;
+	}
+}
+
+.right {
+	cursor: pointer;
+	font-size: 24px;
+	float: right;
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	right: 1%;
+}
+
+.ethDisplay {
+	text-align: center;
+	font-size: 15px;
+	font-weight: 600;
+	// border: 3px solid transparent;
+	border: 3px solid #f0f0f0;
+	padding: 0px 10px;
+	width: fit-content;
+	height: fit-content;
+	// background-color: #f0f0f0;
+	border-radius: 0 0 50% 50%;
+	border-top: none;
+}
+
+.deposit {
+	color: green;
+
+	&:hover {
+		color: blue;
+	}
+}
+
+.delete:hover {
+	color: red;
+}
+
+// _________________________________________________________
+
+.homeContainer {
+	color: white;
+	// width: 110%;
+}
+
+.mainContainer {
+	transition: 1s;
+	// background: radial-gradient(
+	// 	circle,
+	// 	rgba(253, 255, 162, 1) 0%,
+	// 	rgba(229, 255, 204, 1) 67%
+	// );
+	height: 100%;
+	min-height: 100vh;
+
+	// display: unset;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.icon-large {
+	font-size: 2rem;
+	margin-right: 0.5rem;
+}
+
+@mixin flex-layout {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.flex-horizontal {
+	@include flex-layout;
+	flex-direction: row;
+}
+
+.flex-vertical {
+	@include flex-layout;
+	flex-direction: column;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.darkmode {
+	transition: 1s;
+	background: radial-gradient(circle,
+			rgba(30, 30, 30, 1) 0%,
+			rgba(60, 60, 60, 1) 67%);
+	color: white;
+
+	.instructions {
+		color: white;
+	}
+
+	.homeContainer {
+		color: white;
+	}
+
+	.sectionDiv {
+		background: #333;
+		color: white;
+	}
+
+	.sectionName {
+		color: white;
+	}
+}
