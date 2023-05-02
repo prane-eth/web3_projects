@@ -9,9 +9,14 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
 import { SiBlockchaindotcom } from "react-icons/si";
 
-import Utils from "./Utils";
-const getConnectedNetwork = new Utils('', '').getConnectedNetwork;
 import './Navbar.scss';
+
+// get Utils
+import config from "../assets/ContractABI.json"
+import contractAddress from "../assets/ContractAddress.json"
+
+const Utils = await import(`${urlBase}/Utils.jsx`);
+const utils = new Utils(config, contractAddress)
 
 
 const Navbar = ({ darkMode, setDarkMode, projectName }) => {
@@ -51,7 +56,7 @@ const Navbar = ({ darkMode, setDarkMode, projectName }) => {
 					setBalance(balanceShort);
 				}
 
-				const connectedNetwork = await getConnectedNetwork();
+				const connectedNetwork = await utils.getConnectedNetwork();
 				if (connectedNetwork === false) return;
 				setNetwork(connectedNetwork.name);
 				setCurrency(connectedNetwork.currency);

@@ -2,11 +2,12 @@ import { ethers } from "ethers";
 const { parseEther, formatEther } = ethers;
 import { urlBase } from "./constants";
 
+// get Utils
 import config from "../assets/ContractABI.json"
 import contractAddress from "../assets/ContractAddress.json"
 
 const Utils = await import(`${urlBase}/Utils.jsx`);
-const utils = Utils(config, contractAddress)
+const utils = new Utils(config, contractAddress)
 
 
 export const setNewTxnLink = async ({miningTxn, setTxnLink}) => {

@@ -4,11 +4,17 @@ import { UseWalletProvider } from 'use-wallet'
 import "./AppCommon.scss";
 import Navbar from "./Navbar";
 import { urlBase } from "./components/constants";
-import Utils from `${urlBase}/Utils.jsx`;
-const supportedNetworks = new Utils('', '').supportedNetworks;
 
-const allSupportedNetworks = Object.keys(supportedNetworks);
+// get Utils
+import config from "../assets/ContractABI.json"
+import contractAddress from "../assets/ContractAddress.json"
+
+const Utils = await import(`${urlBase}/Utils.jsx`);
+const utils = new Utils(config, contractAddress)
+
+const allSupportedNetworks = Object.keys(utils.supportedNetworks);
 const supportedArray = allSupportedNetworks.map(chainId => ({chainId}))
+
 
 const AppCommon = ({ projectName, Home }) => {
 	const [darkMode, setDarkMode] = useState(false);
