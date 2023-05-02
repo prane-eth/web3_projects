@@ -51,46 +51,46 @@ export default class Utils {
 			console.log('Make sure you have metamask!');
 			return false;
 		}
-	
+
 		// get connected network name
 		let network = await window.ethereum.request({ method: "net_version" });
 		// if networkCode is not in hex format, convert it to hex
 		if (!network.startsWith("0x"))
 			network = "0x" + parseInt(network).toString(16);
-		if (!supportedNetworks[network]) {
-			var networksList = Object.keys(supportedNetworks).map((key) => supportedNetworks[key].name);
+		if (!this.supportedNetworks[network]) {
+			var networksList = Object.keys(this.supportedNetworks).map((key) => this.supportedNetworks[key].name);
 			alert('Network not supported. Please switch to supported network: ' + networksList.join(', '));
 			// request user to switch to default network
 			await window.ethereum.request({
 				method: 'wallet_switchEthereumChain',
-				params: [{ chainId: Object.keys(supportedNetworks)[0] }],
+				params: [{ chainId: Object.keys(this.supportedNetworks)[0] }],
 			});
 			return false;
 		}
-	
-		return supportedNetworks[network];
+
+		return this.supportedNetworks[network];
 	}
 	getContract = async () => {
 		// get connected network name
-		const { name: networkName } = await getConnectedNetwork();
+		const { name: networkName } = await this.getConnectedNetwork();
 		const networkNameInJson = networkName.toLowerCase() + "Address";
 		var contractAddress;
 		if (networkNameInJson in this.contractAddressJson)
 			contractAddress = this.contractAddressJson[networkNameInJson];
 		else if (networkName === "Localhost")
 			contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-			// always the same address for first deployed contract after starting a node
+		// always the same address for first deployed contract after starting a node
 		else {
 			alert("Network not supported for this contract");
 			throw new Error("Network not supported for this contract");
 		}
-		const { signer } = await getProviderAndSigner();
+		const { signer } = await this.getProviderAndSigner();
 		const contract = new ethers.Contract(contractAddress, this.config.abi, signer);
-	
+
 		return contract;
 	}
 	getEtherscanLink = async (miningTxn) => {
-		const { url: domain } = await getConnectedNetwork();
+		const { url: domain } = await this.getConnectedNetwork();
 		const hash = await miningTxn.hash;
 		return `${domain}/tx/${hash}`;
 	}

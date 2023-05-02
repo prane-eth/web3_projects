@@ -1,22 +1,18 @@
 import { useState } from "react";
+import PropTypes from 'prop-types';
 import { UseWalletProvider } from 'use-wallet'
 
-import "./AppCommon.scss";
 import Navbar from "./Navbar";
-import { urlBase } from "./components/constants";
-
-// get Utils
-import config from "../assets/ContractABI.json"
-import contractAddress from "../assets/ContractAddress.json"
-
-const Utils = await import(`${urlBase}/Utils.jsx`);
-const utils = new Utils(config, contractAddress)
-
-const allSupportedNetworks = Object.keys(utils.supportedNetworks);
-const supportedArray = allSupportedNetworks.map(chainId => ({chainId}))
+import Utils from "./Utils";
+import "./AppCommon.scss";
 
 
-const AppCommon = ({ projectName, Home }) => {
+const AppCommon = ({ projectName, Home, config, contractAddress }) => {
+	const utils = new Utils(config, contractAddress)
+
+	const allSupportedNetworks = Object.keys(utils.supportedNetworks);
+	const supportedArray = allSupportedNetworks.map(chainId => ({ chainId }))
+	
 	const [darkMode, setDarkMode] = useState(false);
 
 	return (
@@ -30,4 +26,12 @@ const AppCommon = ({ projectName, Home }) => {
 		</UseWalletProvider>
 	);
 };
+
+AppCommon.propTypes = {
+	projectName: PropTypes.string.isRequired,
+	Home: PropTypes.func.isRequired,
+	config: PropTypes.object.isRequired,
+	contractAddress: PropTypes.string.isRequired,
+};
+
 export default AppCommon;

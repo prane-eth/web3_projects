@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import PropTypes from 'prop-types';
 import { useWallet } from "use-wallet";
 import { ethers } from "ethers";
 
@@ -9,17 +9,13 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
 import { SiBlockchaindotcom } from "react-icons/si";
 
+import Utils from "./Utils";
 import './Navbar.scss';
 
-// get Utils
-import config from "../assets/ContractABI.json"
-import contractAddress from "../assets/ContractAddress.json"
 
-const Utils = await import(`${urlBase}/Utils.jsx`);
-const utils = new Utils(config, contractAddress)
+const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddress }) => {
+	const utils = new Utils(config, contractAddress)
 
-
-const Navbar = ({ darkMode, setDarkMode, projectName }) => {
 	const [account, setAccount] = useState(null);
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
 	const [balance, setBalance] = useState(null);
@@ -126,6 +122,14 @@ const Navbar = ({ darkMode, setDarkMode, projectName }) => {
 			</div>
 		</nav>
 	);
+};
+
+Navbar.propTypes = {
+	darkMode: PropTypes.bool.isRequired,
+	setDarkMode: PropTypes.func.isRequired,
+	projectName: PropTypes.string.isRequired,
+	config: PropTypes.object.isRequired,
+	contractAddress: PropTypes.string.isRequired,
 };
 
 export default Navbar;
