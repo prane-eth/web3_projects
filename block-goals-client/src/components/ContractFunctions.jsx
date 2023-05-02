@@ -1,16 +1,17 @@
 import { ethers } from "ethers";
 const { parseEther, formatEther } = ethers;
 import { urlBase } from "./constants";
-const Utils = await import(`${urlBase}/Utils.jsx`);
 
 import config from "../assets/ContractABI.json"
 import contractAddress from "../assets/ContractAddress.json"
-const { getEtherscanLink, getContract } = await Utils(config, contractAddress)
+
+const Utils = await import(`${urlBase}/Utils.jsx`);
+const utils = Utils(config, contractAddress)
 
 
 export const setNewTxnLink = async ({miningTxn, setTxnLink}) => {
 	if (miningTxn) {
-		const txnLink = await getEtherscanLink(miningTxn);
+		const txnLink = await utils.getEtherscanLink(miningTxn);
 		setTxnLink(txnLink);
 	} else {
 		setTxnLink(null);
@@ -28,7 +29,7 @@ const getTaskFromJson = (taskJson) => {
 };
 
 export const getAllTasks = async ({setAllTasks}) => {
-	const contract = await getContract();
+	const contract = await utils.getContract();
 
 	let tasksJson = await contract.getAllTasks();
 	if (tasksJson.length === 0) {
@@ -68,7 +69,7 @@ export const addTask = async ({ setLoadingMessage, newTask, setNewTask, depositA
 	console.info("adding a newTask: ", newTask);
 
 	try {
-		const contract = await getContract();
+		const contract = await utils.getContract();
 
 		const txn = await contract.addTask(newTask, {
 			value: parseEther(""+depositAmount),
@@ -90,7 +91,7 @@ export const finishTask = async (taskPos, {setLoadingMessage, setMiningTxn, setA
 	setLoadingMessage("Finishing task...");
 
 	try {
-		const contract = await getContract();
+		const contract = await utils.getContract();
 
 		const txn = await contract.finishTask(taskPos);
 		setMiningTxn(txn);
@@ -108,7 +109,7 @@ export const deleteTask = async (taskPos, {setLoadingMessage, setMiningTxn, setA
 	setLoadingMessage("Deleting task...");
 
 	try {
-		const contract = await getContract();
+		const contract = await utils.getContract();
 		const txn = await contract.deleteTask(taskPos);
 		setMiningTxn(txn.hash);
 		await txn.wait();
@@ -124,7 +125,7 @@ export const depositEth = async (taskPos, {setLoadingMessage, setMiningTxn, setA
 	setLoadingMessage("Depositing ETH to task...");
 
 	try {
-		const contract = await getContract();
+		const contract = await utils.getContract();
 		const txn = await contract.deposit(taskPos, {
 			value: parseEther("0.01"),
 		});

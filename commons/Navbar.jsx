@@ -9,7 +9,8 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { AiOutlineWallet } from "react-icons/ai";
 import { SiBlockchaindotcom } from "react-icons/si";
 
-import { getConnectedNetwork } from "./Utils";
+import Utils from "./Utils";
+const getConnectedNetwork = new Utils('', '').getConnectedNetwork;
 import './Navbar.scss';
 
 
