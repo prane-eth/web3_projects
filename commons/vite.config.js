@@ -1,19 +1,18 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
 
-// https://vitejs.dev/config/
-export default defineConfig({
+export default {
 	plugins: [
 		react(),
 		federation({
-			name: "remote_app",
+			name: "commons_app",
 			filename: "remoteEntry.js",
 			exposes: {
-				"./Button": "./src/Button",
-				"./store": "./src/store",
+				"./AppCommon": "./src/AppCommon",
+				"./Navbar": "./src/Navbar",
+				"./Utils": "./src/Utils",
 			},
-			shared: ["react", "react-dom", "jotai"],
+			shared: ["react", "react-dom"],
 		}),
 	],
 	build: {
@@ -22,4 +21,4 @@ export default defineConfig({
 		minify: false,
 		cssCodeSplit: false,
 	},
-});
+};

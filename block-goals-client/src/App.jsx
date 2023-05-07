@@ -1,22 +1,9 @@
 import Home from "./components/Home";
 import "./App.scss";
-import { urlBase } from "./components/constants";
-const AppCommon = () => import(`${urlBase}/AppCommon.jsx`);
+import AppCommon from "commons_app/AppCommon.jsx";
 
-const App = () => {
-//   const [AppCommon, setAppCommon] = useState(null);
-
-//   useEffect(() => {
-//     AppCommonPromise.then(module => {
-//       setAppCommon(module.default);
-//     });
-//   }, []);
-
-  return (
-    <div>
-      {AppCommon && <AppCommon projectName="Block Goals" Home={Home} />}
-    </div>
-  );
-};
+const App = () => (
+  AppCommon ? <AppCommon projectName="Block Goals" Home={Home} /> : "Loading..."
+);
 
 export default App;

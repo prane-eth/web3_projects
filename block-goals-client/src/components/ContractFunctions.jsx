@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
 const { parseEther, formatEther } = ethers;
-import { urlBase } from "./constants";
 
-// get Utils
 import config from "../assets/ContractABI.json"
 import contractAddress from "../assets/ContractAddress.json"
-
-const Utils = await import(`${urlBase}/Utils.jsx`);
+import Utils from "commons_app/Utils.jsx";
 const utils = new Utils(config, contractAddress)
 
 

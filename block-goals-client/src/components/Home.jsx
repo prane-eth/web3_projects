@@ -14,8 +14,7 @@ import {
 	deleteTask,
 	depositEth,
 } from "./ContractFunctions";
-import { urlBase } from "./constants";
-const { getConnectedNetwork } = await import(`${urlBase}/Utils.jsx`);
+import { getConnectedNetwork } from "commons_app/Utils.jsx";
 
 
 const Home = () => {
