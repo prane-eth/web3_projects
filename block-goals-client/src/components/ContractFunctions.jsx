@@ -3,7 +3,7 @@ const { parseEther, formatEther } = ethers;
 
 import config from "../assets/ContractABI.json"
 import contractAddress from "../assets/ContractAddress.json"
-import Utils from "commons_app/Utils.jsx";
+import Utils from "commons-app/Utils";
 const utils = new Utils(config, contractAddress)
 
 

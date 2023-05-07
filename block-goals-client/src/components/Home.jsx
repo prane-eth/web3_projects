@@ -14,7 +14,7 @@ import {
 	deleteTask,
 	depositEth,
 } from "./ContractFunctions";
-import { getConnectedNetwork } from "commons_app/Utils.jsx";
+import { getConnectedNetwork } from "commons-app/Utils";
 
 
 const Home = () => {

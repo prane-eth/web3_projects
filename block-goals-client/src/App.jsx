@@ -1,6 +1,6 @@
 import Home from "./components/Home";
 import "./App.scss";
-import AppCommon from "commons_app/AppCommon.jsx";
+import { AppCommon } from "Commons";
 
 const App = () => (
   AppCommon ? <AppCommon projectName="Block Goals" Home={Home} /> : "Loading..."
