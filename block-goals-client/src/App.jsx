@@ -1,9 +1,10 @@
-import Home from "./components/Home";
+// import Home from "./components/Home";
 import "./App.scss";
-import { AppCommon } from "Commons";
+import { AppCommon } from "../../commons/src";
 
 const App = () => (
-  AppCommon ? <AppCommon projectName="Block Goals" Home={Home} /> : "Loading..."
+  <AppCommon projectName="Block Goals" //Home={Home}
+  />
 );
 
 export default App;

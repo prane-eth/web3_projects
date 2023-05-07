@@ -20,7 +20,7 @@
 		"sass": "^1.59.3",
 		"use-wallet": "^0.13.6",
 		"vite": "^4.2.0",
-		"commons-app": "file:../commons/Commons"
+		"my-commons": "file:../commons/src"
 	},
 	"devDependencies": {
 		"@types/react": "^18.0.27",
