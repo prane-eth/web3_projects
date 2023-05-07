@@ -7,9 +7,8 @@ import Utils from "./Utils";
 import "./AppCommon.scss";
 
 
-const AppCommon = ({ projectName, Home, config, contractAddress }) => {
-	const utils = new Utils(config, contractAddress)
-
+const AppCommon = ({ projectName, Home, config, contractAddresses }) => {
+	const utils = new Utils()
 	const allSupportedNetworks = Object.keys(utils.supportedNetworks);
 	const supportedArray = allSupportedNetworks.map(chainId => ({ chainId }))
 	
@@ -19,7 +18,10 @@ const AppCommon = ({ projectName, Home, config, contractAddress }) => {
 		<UseWalletProvider chainId={allSupportedNetworks[0]} providerOptions={{supportedArray}}>
 			<div className={darkMode ? "mainContainer darkmode" : "mainContainer"}>
 				<div className="container text-center flex-vertical">
-					<Navbar darkMode={darkMode} setDarkMode={setDarkMode} projectName={projectName} />
+					<Navbar
+						darkMode={darkMode} setDarkMode={setDarkMode} projectName={projectName}
+						config={config} contractAddresses={contractAddresses}
+					/>
 					<Home/>
 				</div>
 			</div>
@@ -30,8 +32,6 @@ const AppCommon = ({ projectName, Home, config, contractAddress }) => {
 AppCommon.propTypes = {
 	projectName: PropTypes.string.isRequired,
 	Home: PropTypes.func.isRequired,
-	config: PropTypes.object.isRequired,
-	contractAddress: PropTypes.string.isRequired,
 };
 
 export default AppCommon;

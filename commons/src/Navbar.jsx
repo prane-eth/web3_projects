@@ -11,10 +11,11 @@ import { SiBlockchaindotcom } from "react-icons/si";
 
 import Utils from "./Utils";
 import './Navbar.scss';
+const { formatEther } = ethers.utils;
 
 
-const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddress }) => {
-	const utils = new Utils(config, contractAddress)
+const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses }) => {
+	const utils = new Utils(config, contractAddresses)
 
 	const [account, setAccount] = useState(null);
 	const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -47,7 +48,7 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddress })
 				if (walletBalance == 0x0) {
 					setBalance('0.00');
 				} else {
-					const balance = ethers.formatEther(walletBalance);
+					const balance = formatEther(walletBalance);
 					const balanceShort = balance.slice(0, 5);
 					setBalance(balanceShort);
 				}
@@ -129,7 +130,7 @@ Navbar.propTypes = {
 	setDarkMode: PropTypes.func.isRequired,
 	projectName: PropTypes.string.isRequired,
 	config: PropTypes.object.isRequired,
-	contractAddress: PropTypes.string.isRequired,
+	contractAddresses: PropTypes.object.isRequired,
 };
 
 export default Navbar;

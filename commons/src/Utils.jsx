@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-
+console.log(ethers);
 
 export default class Utils {
 	constructor(_config, _contractAddressJson) {
