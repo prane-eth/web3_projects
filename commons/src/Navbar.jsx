@@ -14,7 +14,7 @@ import './Navbar.scss';
 const { formatEther } = ethers.utils;
 
 
-const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses }) => {
+const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses, web3Disabled }) => {
 	const utils = new Utils(config, contractAddresses)
 
 	const [account, setAccount] = useState(null);
@@ -26,9 +26,8 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses 
 	const wallet = useWallet()
 
 	const checkIfWalletIsConnected = async () => {
-		if (account) {
+		if (web3Disabled || account)
 			return;
-		}
 		try {
 			const { ethereum } = window;
 			if (!ethereum) {
@@ -72,15 +71,19 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses 
 	};
 
 	useEffect(() => {
+		const localDarkMode = localStorage.getItem("darkMode");
+		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
+
+		if (web3Disabled)  // make navbar suitable for projects that don't use web3
+			return;
 		if (window.ethereum) {
 			setIsWalletInstalled(true);
 		}
 		checkIfWalletIsConnected();
-
-		const localDarkMode = localStorage.getItem("darkMode");
-		if (localDarkMode) setDarkMode(JSON.parse(localDarkMode));
 	}, [checkIfWalletIsConnected, setDarkMode]);
 	useEffect(() => {
+		if (web3Disabled)
+			return;
 		const accountShortValue = account ? account.slice(0, 6) + "..." + account.slice(-2) : null;
 		setAccountShort(accountShortValue);
 	}, [account]);
@@ -88,12 +91,13 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses 
 	return (
 		<nav id="navbar">
 			<div className="emptyDiv"></div>
-			<h1>{projectName}</h1>
+			{projectName ?? <h1>{projectName}</h1>}
 			<div id="walletDiv" className="flex-horizontal">
 				<span className="darkModeToggle" onClick={toggleDarkMode}>
 					{darkMode ? <FaSun /> : <HiOutlineMoon />}
 				</span>
-				{wallet.status === 'connected' ? (
+				{!web3Disabled ??
+					wallet.status === 'connected' ? (
 					<div className="connectedAs" onClick={() => wallet.reset()} style={{ cursor: "pointer" }}>
 						<div>
 							<MdOutlineAccountBalance /> {accountShort}
@@ -119,7 +123,8 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses 
 					</button>
 				) : (
 					<p>Install Metamask wallet</p>
-				)}
+				)
+				}
 			</div>
 		</nav>
 	);
@@ -129,8 +134,9 @@ Navbar.propTypes = {
 	darkMode: PropTypes.bool.isRequired,
 	setDarkMode: PropTypes.func.isRequired,
 	projectName: PropTypes.string.isRequired,
-	config: PropTypes.object.isRequired,
-	contractAddresses: PropTypes.object.isRequired,
+	web3Disabled: PropTypes.bool,
+	contractAddresses: PropTypes.object,
+	config: PropTypes.object,
 };
 
 export default Navbar;
