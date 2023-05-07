@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-console.log(ethers);
 
 export default class Utils {
 	constructor(_config, _contractAddressJson) {
@@ -41,8 +40,8 @@ export default class Utils {
 			const signer = undefined;
 			return { provider, signer };
 		} else {
-			const provider = new ethers.BrowserProvider(window.ethereum);
-			const signer = await provider.getSigner();
+			const provider = new ethers.providers.Web3Provider(window.ethereum);
+			const signer = provider.getSigner();
 			return { provider, signer };
 		}
 	}
