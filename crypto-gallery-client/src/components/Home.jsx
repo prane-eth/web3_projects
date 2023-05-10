@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "use-wallet";
 
-import { data, handleMint, imageSize, pricePerToken } from "./ContractFunctions";
-import { getEtherscanLink, getConnectedNetwork } from "./Utils";
+import { data, handleMint, imageSize, pricePerToken } from "Components/ContractFunctions";
+import Utils from "Commons/Utils";
+import config from "Assets/ContractABI.json"
+import contractAddresses from "Assets/ContractAddresses.json"
+const utils = new Utils(config, contractAddresses)
 
 
 const Home = () => {
@@ -14,13 +17,13 @@ const Home = () => {
 
 	useEffect(async () => {
 		if (mintingTxn) {
-			setTxnLink(await getEtherscanLink(mintingTxn));
+			setTxnLink(await utils.getEtherscanLink(mintingTxn));
 		} else {
 			setTxnLink(null);
 		}
 	}, [mintingTxn]);
 	useEffect(async () => {
-		const connectedNetwork = await getConnectedNetwork();
+		const connectedNetwork = await utils.getConnectedNetwork();
 		if (connectedNetwork) {
 			setCurrency(connectedNetwork.currency);
 		}

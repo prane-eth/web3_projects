@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { useWallet } from "use-wallet";
-import { ethers } from "ethers";
 
 import { FaSun } from "react-icons/fa";
 import { HiOutlineMoon } from "react-icons/hi";
@@ -11,7 +10,6 @@ import { SiBlockchaindotcom } from "react-icons/si";
 
 import Utils from "./Utils";
 import './Navbar.scss';
-const { formatEther } = ethers.utils;
 
 
 const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses, web3Disabled }) => {

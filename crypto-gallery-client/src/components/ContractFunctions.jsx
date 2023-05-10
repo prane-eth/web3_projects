@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
-import { getContract } from "./Utils";
 
+import Utils from "Commons/Utils";
+import config from "Assets/ContractABI.json"
+import contractAddresses from "Assets/ContractAddresses.json"
+const utils = new Utils(config, contractAddresses)
 
 const { parseEther, formatEther } = ethers;
 
@@ -13,7 +16,7 @@ const metadataURL = `https://ipfs.io/ipfs/QmWZdF6MjqXk3mZHFiWgZ5rkR4GPnc38MCpUYc
 
 // functions
 export async function isAvailable(tokenUrl) {
-	const contract = await getContract();
+	const contract = await utils.getContract();
 	const available = contract.isAvailable(tokenUrl);
 	return available;
 }
@@ -39,7 +42,7 @@ export async function handleMint(item, setMintingTxn, setLoadingMessage) {
 	// }
 
 	try {
-		const contract = await getContract();
+		const contract = await utils.getContract();
 		const txn = await contract.mintNFT(tokenURI, { value: parseEther("" + pricePerToken) });
 		setLoadingMessage("Minting NFT...");
 		setMintingTxn(txn);
@@ -54,16 +57,17 @@ export async function handleMint(item, setMintingTxn, setLoadingMessage) {
 }
 
 // wait for wallet to get unlocked
-await window.ethereum.enable();
-await window.ethereum.request({ method: 'eth_requestAccounts' });
+// await window.ethereum.enable();
+// await window.ethereum.request({ method: 'eth_requestAccounts' });
 
 // show wallet popup to unlock wallet
-const provider = new ethers.BrowserProvider(window.ethereum);
-const hasWalletPermissions = await provider.send('wallet_getPermissions');
-console.log('hasWalletPermissions', hasWalletPermissions);
+// const provider = new ethers.BrowserProvider(window.ethereum);
+// const hasWalletPermissions = await provider.send('wallet_getPermissions');
+// console.log('hasWalletPermissions', hasWalletPermissions);
 
-const contract = await getContract();
+const contract = await utils.getContract();
 const price = await contract.PRICE_PER_TOKEN();
+console.log("price", price);
 export const pricePerToken = formatEther("" + price).toString();
 
 // create new list of NFTs
@@ -71,6 +75,7 @@ export const data = [];
 const nftCount = await contract.MAX_SUPPLY();
 for (let i = 1; i <= nftCount; i++) {
 	const available = await isAvailable(metadataURL + i + ".json");
+	console.log("available", available);
 	data.push({
 		id: i,
 		imageURL: imagesURL + i + ".png",

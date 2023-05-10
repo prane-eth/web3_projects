@@ -35,7 +35,7 @@ export const getAllTasks = async ({ setAllTasks }) => {
 		return;
 	}
 
-	const tasks = tasksJson.map(taskJson => getTaskFromJson(taskJson));
+	const tasks = tasksJson.map(getTaskFromJson);
 	console.log("tasks: ", tasks);
 	if (!tasks) {
 		setAllTasks([]);
