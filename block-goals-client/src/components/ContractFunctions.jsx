@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
 const { parseEther, formatEther } = ethers.utils;
 
-import Utils from "my-commons/Utils";
-import config from "../assets/ContractABI.json"
-import contractAddresses from "../assets/ContractAddresses.json"
+import Utils from "Commons/Utils";
+import config from "Assets/ContractABI.json"
+import contractAddresses from "Assets/ContractAddresses.json"
 const utils = new Utils(config, contractAddresses)
 
 

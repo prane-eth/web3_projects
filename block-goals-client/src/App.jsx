@@ -1,12 +1,13 @@
-import Home from "./components/Home";
+import Home from "Components/Home";
 import "./App.scss";
-import AppCommon from "my-commons/AppCommon";
+import AppCommon from "Commons/AppCommon";
+import { projectName } from "Components/constants";
 
-import config from "./assets/ContractABI.json"
-import contractAddresses from "./assets/ContractAddresses.json"
+import config from "Assets/ContractABI.json"
+import contractAddresses from "Assets/ContractAddresses.json"
 
 const App = () => (
-  <AppCommon projectName="Block Goals" Home={Home} config={config} contractAddresses={contractAddresses} />
+  <AppCommon projectName={projectName} Home={Home} config={config} contractAddresses={contractAddresses} />
 );
 
 export default App;
