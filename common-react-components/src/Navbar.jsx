@@ -36,6 +36,7 @@ const Navbar = ({ darkMode, setDarkMode, projectName, config, contractAddresses,
 			}
 
 			const accounts = await ethereum.request({ method: "eth_accounts" });
+			wallet.connect();
 			if (accounts) {
 				setAccount(window.ethereum.selectedAddress);
 				setIsWalletInstalled(true);

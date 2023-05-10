@@ -14,7 +14,8 @@ export default class Utils {
 				window.location.reload();
 			});
 			window.ethereum.on('accountsChanged', () => {
-				window.location.reload();
+				if (window.ethereum.selectedAddress) // if address is not null
+					window.location.reload();
 			});
 		}
 		this.supportedNetworks = {

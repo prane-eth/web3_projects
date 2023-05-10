@@ -19,8 +19,7 @@
 		"react-router-dom": "^6.9.0",
 		"sass": "^1.59.3",
 		"use-wallet": "^0.13.6",
-		"vite": "^4.2.0",
-		"my-commons": "file:../commons/src"
+		"vite": "^4.2.0"
 	},
 	"devDependencies": {
 		"@types/react": "^18.0.27",

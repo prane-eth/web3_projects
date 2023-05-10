@@ -15,8 +15,7 @@ import {
 	depositEth,
 } from "./ContractFunctions";
 
-import { getCommons } from "./constants";
-const { Utils } = getCommons();
+import Utils from "my-commons/Utils";
 import config from "../assets/ContractABI.json"
 import contractAddresses from "../assets/ContractAddresses.json"
 const utils = new Utils(config, contractAddresses)
@@ -59,7 +58,6 @@ const Home = () => {
 	}
 
 	useEffect(() => {
-		wallet.connect();
 		window.addEventListener("keydown", submitOnEnter);
 		utils.getConnectedNetwork().then((connectedNetwork) => {
 			if (connectedNetwork) {

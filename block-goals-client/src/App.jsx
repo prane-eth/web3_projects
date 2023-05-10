@@ -1,7 +1,6 @@
 import Home from "./components/Home";
 import "./App.scss";
-import { getCommons } from "./components/constants";
-const { AppCommon } = getCommons();
+import AppCommon from "my-commons/AppCommon";
 
 import config from "./assets/ContractABI.json"
 import contractAddresses from "./assets/ContractAddresses.json"
