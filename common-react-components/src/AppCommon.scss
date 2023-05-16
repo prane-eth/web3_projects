@@ -66,25 +66,6 @@ input {
 	}
 }
 
-.amountInput {
-	width: 12%;
-	font-size: 18px;
-}
-
-#newTaskDiv {
-	display: flex;
-
-	#newTaskInput {
-		margin-right: 0;
-		flex-grow: 1;
-	}
-
-	button[type="submit"] {
-		background: #00c853;
-		margin-left: 0;
-	}
-}
-
 /* hand waving animation */
 /* https://codepen.io/jakejarvis/pen/pBZWZw */
 .waving-item,
@@ -122,45 +103,6 @@ input {
 		transform: rotate(0deg);
 	}
 }
-.taskDiv {
-	background-color: oldlace;
-	margin-top: 16px;
-	margin-bottom: 0px;
-	padding: 16px;
-	border: 0;
-	border: 1px solid #e0e0e0;
-	border-radius: 10% / 50%;
-	width: 40vw;
-	min-width: 300px;
-	position: relative;
-	color: black;
-
-	&:nth-child(odd) {
-		background-color: #f0f0f0;
-	}
-
-	&:nth-child(even) {
-		background-color: #e0e0e0;
-	}
-
-	&.taskDivLarge {
-		margin-bottom: 16px;
-		align-items: center;
-		display: flex;
-		justify-content: center;
-		flex-direction: column;
-	}
-
-	&.taskDoneDiv {
-		background-color: grey;
-		border-color: grey;
-	}
-
-	& > .taskDoneDiv {
-		background-color: grey;
-		border-color: grey;
-	}
-}
 
 .right {
 	cursor: pointer;
@@ -174,37 +116,10 @@ input {
 	right: 1%;
 }
 
-.ethDisplay {
-	text-align: center;
-	font-size: 15px;
-	font-weight: 600;
-	// border: 3px solid transparent;
-	border: 3px solid #f0f0f0;
-	padding: 0px 10px;
-	width: fit-content;
-	height: fit-content;
-	// background-color: #f0f0f0;
-	border-radius: 0 0 50% 50%;
-	border-top: none;
-}
-
-.deposit {
-	color: green;
-
-	&:hover {
-		color: blue;
-	}
-}
-
-.delete:hover {
-	color: red;
-}
-
 // _________________________________________________________
 
 .homeContainer {
 	color: white;
-	// width: 110%;
 }
 
 .mainContainer {

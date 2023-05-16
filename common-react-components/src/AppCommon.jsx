@@ -22,7 +22,7 @@ const AppCommon = ({ projectName, Home, config, contractAddresses }) => {
 						darkMode={darkMode} setDarkMode={setDarkMode} projectName={projectName}
 						config={config} contractAddresses={contractAddresses}
 					/>
-					<Home/>
+					<Home projectName={projectName} />
 				</div>
 			</div>
 		</UseWalletProvider>

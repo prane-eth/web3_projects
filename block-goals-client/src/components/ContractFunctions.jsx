@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
-const { parseEther, formatEther } = ethers.utils;
 
 import Utils from "Commons/Utils";
 import config from "Assets/ContractABI.json"
 import contractAddresses from "Assets/ContractAddresses.json"
 const utils = new Utils(config, contractAddresses)
+
+const { parseEther, formatEther } = ethers.utils || ethers;
 
 
 export const setNewTxnLink = async ({ miningTxn, setTxnLink }) => {

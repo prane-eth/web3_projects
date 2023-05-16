@@ -21,7 +21,7 @@ import contractAddresses from "Assets/ContractAddresses.json"
 const utils = new Utils(config, contractAddresses)
 
 
-const Home = () => {
+const Home = ({ projectName }) => {
 	const [allTasks, setAllTasks] = useState(null);
 	const [newTask, setNewTask] = useState("");
 	const [depositAmount, setDepositAmount] = useState(undefined);
@@ -35,6 +35,8 @@ const Home = () => {
 		setDepositAmount, loadingMessage, setLoadingMessage,
 		miningTxn, setMiningTxn, txnLink, setTxnLink
 	}
+	const projectNameWithoutSpaces = projectName.replace(/\s/g, "");
+	const projectNameKababCase = projectName.replace(/\s/g, "-").toLowerCase();
 
 	const Instructions = () => (
 		<div className="instructions">
@@ -82,7 +84,7 @@ const Home = () => {
 		return (
 			<div className='container homeContainer'>
 				<br />
-				<h2> BlockGoals </h2>
+				<h2> {projectNameWithoutSpaces} </h2>
 				<p>
 					Become a chain-goaler
 				</p>
@@ -98,11 +100,11 @@ const Home = () => {
 
 	return (
 		<div className='homeContainer'>
-			<h1 className="mt-5">
+			<h1 className="mt-5 flex-horizontal">
 				<span className="waving-item">👋</span>
-				Hello from block-goals project
+				Hello from {projectNameKababCase} project
 			</h1>
-			<p> Become a chain-goaler </p>
+			<p className="flex-horizontal"> Become a chain-goaler </p>
 
 			<div className="content-container mt-5 flex-vertical">
 				{wallet.status !== 'connected' ? 'Please connect to metamask' : null}
@@ -178,8 +180,10 @@ const Home = () => {
 									</div>
 								</div>
 								{task.balance > 0 && (
-									<div className="ethDisplay wave-on-hover flex-horizontal">
-										{task.balance} <FaEthereum />
+									<div className="flex-horizontal">
+										<div className="ethDisplay wave-on-hover">
+											{task.balance} <FaEthereum />
+										</div>
 									</div>
 								)}
 							</div>
