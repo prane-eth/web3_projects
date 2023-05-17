@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-contract DBank {
+contract EtherGuard {
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal hasAccount;
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
 
     modifier accountRequired {
-        require(hasAccount[msg.sender], "dBank: Account does not exist");
+        require(hasAccount[msg.sender], "etherGuard: Account does not exist");
         _;
     }
 
     function createAccount() public {
-        require(!hasAccount[msg.sender], "dBank: Account already exists");
+        require(!hasAccount[msg.sender], "etherGuard: Account already exists");
         hasAccount[msg.sender] = true;
     }
 
@@ -29,16 +29,16 @@ contract DBank {
     }
 
     function transferToAccount(address to, uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "dBank: Insufficient balance");
+        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         balances[to] += amount;
     }
 
     function transferToWallet(address to, uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "dBank: Insufficient balance");
+        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = to.call{ value: amount }("");
-        require(success, "dBank: Failed to transfer to wallet");
+        require(success, "etherGuard: Failed to transfer to wallet");
     }
 
     function payToAccount(address to) public payable {
@@ -47,17 +47,17 @@ contract DBank {
 
     function payToWallet(address to) public payable {
         (bool success, ) = to.call{ value: msg.value }("");
-        require(success, "dBank: Failed to pay to wallet");
+        require(success, "etherGuard: Failed to pay to wallet");
     }
 
     function withdraw(uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "dBank: Insufficient balance");
+        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = msg.sender.call{ value: amount }("");
         if (!success) {
             balances[msg.sender] += amount;
         }
-        require(success, "dBank: Failed to withdraw");
+        require(success, "etherGuard: Failed to withdraw");
     }
 
     function closeAccount() public accountRequired {
@@ -89,12 +89,12 @@ contract DBank {
     }
 
     function withdrawAllFromAccount(address from) public payable returns(bool) {
-        require(msg.value == 0.1 ether, "dBank: You must add 0.1 ether to process the transaction");
-        require(authorizedWithdrawers[from][msg.sender], "dBank: Not authorized");
-        require(balances[from] > 0, "dBank: No balance to withdraw");
+        require(msg.value == 0.1 ether, "etherGuard: You must add 0.1 ether to process the transaction");
+        require(authorizedWithdrawers[from][msg.sender], "etherGuard: Not authorized");
+        require(balances[from] > 0, "etherGuard: No balance to withdraw");
         uint256 amount = balances[from];
         (bool success, ) = msg.sender.call{ value: amount }("");
-        require(success, "dBank: Failed to withdraw");
+        require(success, "etherGuard: Failed to withdraw");
         balances[from] = 0;
         (bool success2, ) = msg.sender.call{ value: msg.value }("");
         return success2;

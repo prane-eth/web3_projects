@@ -1,13 +1,13 @@
 // unit testing smart contract using Chai
 const { expect } = require("chai");
 
-describe("DBank", function () {
+describe("EtherGuard", function () {
 	var contract, owner, addr1;
 	const parseEther = hre.ethers.utils.parseEther;
 	const formatEther = hre.ethers.utils.formatEther;
 	it("Should deploy without errors", async function () {
 		[owner, addr1] = await ethers.getSigners();
-		const Bank = await ethers.getContractFactory("DBank");
+		const Bank = await ethers.getContractFactory("EtherGuard");
 		contract = await Bank.deploy();
 		await contract.deployed();
 	});
