@@ -1,1 +1,1 @@
-Hosted link: ../README.md
+Hosted link: [../README.md](../README.md)
