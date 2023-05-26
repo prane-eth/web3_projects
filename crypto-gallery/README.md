@@ -1,13 +1,6 @@
-# Sample Hardhat Project
+# Crypto Gallery
+An NFT platform that has a minting limit per user
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Frontend client: [../crypto-gallery-client/](../crypto-gallery-client/)
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+Hosted link: [../README.md](../README.md)
