@@ -1,6 +1,6 @@
 const main = async () => {
   const myContractFactory = await hre.ethers.getContractFactory(
-      "Invoice"
+      "EtherInvoice"
   );
   const myContract = await myContractFactory.deploy();
 

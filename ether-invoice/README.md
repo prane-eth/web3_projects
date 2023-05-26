@@ -1,13 +1,9 @@
-# Sample Hardhat Project
+# EtherInvoice
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+1. Smart contract should be able to store invoice data on blockchain as follows:
+BuyerPAN, SellerPAN, Invoice Amount, Invoice Date etc.
+2. Sellers can be multiple and so the buyers, solution should focus on creating ledger of invoice
+transactions.
+3. At later stage smart contract should be able to capture payment status of particular invoice.
+4. Smart contact should be able to provide a list of previous invoices when searched with buyer
+PAN.
