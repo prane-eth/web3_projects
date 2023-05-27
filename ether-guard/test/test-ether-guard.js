@@ -76,7 +76,7 @@ describe("EtherGuard", function () {
 	});
 	it("Should not withdraw when account is closed", async function () {
 		const errorMessage =
-			"VM Exception while processing transaction: reverted with reason string 'Account does not exist'";
+			"VM Exception while processing transaction: reverted with reason string 'EtherGuard: Account does not exist'";
 		await expect(contract.withdraw(parseEther("0.1"))).to.be.revertedWith(
 			errorMessage
 		);
@@ -108,7 +108,7 @@ describe("EtherGuard", function () {
 	});
 	it("Should not allow unauthorized account to withdraw", async function () {
 		const errorMessage =
-			"VM Exception while processing transaction: reverted with reason string 'Not authorized'";
+			"VM Exception while processing transaction: reverted with reason string 'EtherGuard: Not authorized'";
 		await expect(
 			contract.connect(addr1).withdrawAllFromAccount(owner.address, {
 				value: parseEther("0.1"),

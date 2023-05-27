@@ -7,12 +7,12 @@ contract EtherGuard {
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
 
     modifier accountRequired {
-        require(hasAccount[msg.sender], "etherGuard: Account does not exist");
+        require(hasAccount[msg.sender], "EtherGuard: Account does not exist");
         _;
     }
 
     function createAccount() public {
-        require(!hasAccount[msg.sender], "etherGuard: Account already exists");
+        require(!hasAccount[msg.sender], "EtherGuard: Account already exists");
         hasAccount[msg.sender] = true;
     }
 
@@ -29,16 +29,16 @@ contract EtherGuard {
     }
 
     function transferToAccount(address to, uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
+        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         balances[to] += amount;
     }
 
     function transferToWallet(address to, uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
+        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = to.call{ value: amount }("");
-        require(success, "etherGuard: Failed to transfer to wallet");
+        require(success, "EtherGuard: Failed to transfer to wallet");
     }
 
     function payToAccount(address to) public payable {
@@ -47,17 +47,17 @@ contract EtherGuard {
 
     function payToWallet(address to) public payable {
         (bool success, ) = to.call{ value: msg.value }("");
-        require(success, "etherGuard: Failed to pay to wallet");
+        require(success, "EtherGuard: Failed to pay to wallet");
     }
 
     function withdraw(uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "etherGuard: Insufficient balance");
+        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = msg.sender.call{ value: amount }("");
         if (!success) {
             balances[msg.sender] += amount;
         }
-        require(success, "etherGuard: Failed to withdraw");
+        require(success, "EtherGuard: Failed to withdraw");
     }
 
     function closeAccount() public accountRequired {
@@ -89,12 +89,12 @@ contract EtherGuard {
     }
 
     function withdrawAllFromAccount(address from) public payable returns(bool) {
-        require(msg.value == 0.1 ether, "etherGuard: You must add 0.1 ether to process the transaction");
-        require(authorizedWithdrawers[from][msg.sender], "etherGuard: Not authorized");
-        require(balances[from] > 0, "etherGuard: No balance to withdraw");
+        require(msg.value == 0.1 ether, "EtherGuard: You must add 0.1 ether to process the transaction");
+        require(authorizedWithdrawers[from][msg.sender], "EtherGuard: Not authorized");
+        require(balances[from] > 0, "EtherGuard: No balance to withdraw");
         uint256 amount = balances[from];
         (bool success, ) = msg.sender.call{ value: amount }("");
-        require(success, "etherGuard: Failed to withdraw");
+        require(success, "EtherGuard: Failed to withdraw");
         balances[from] = 0;
         (bool success2, ) = msg.sender.call{ value: msg.value }("");
         return success2;
