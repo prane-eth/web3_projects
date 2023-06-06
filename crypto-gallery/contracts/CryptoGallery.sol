@@ -48,19 +48,19 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
         require(
             PRICE_PER_TOKEN <= msg.value,
             // concatenate string with price
-            string(abi.encodePacked("CollectionApp: Ether paid is less than ", PRICE_PER_TOKEN))
+            string(abi.encodePacked("CryptoGallery: Ether paid is less than ", PRICE_PER_TOKEN))
         );
         require(
             _tokenId.current() + 1 <= MAX_SUPPLY,
-            "CollectionApp: You have exceeded Max Supply. No more tokens left to mint"
+            "CryptoGallery: You have exceeded Max Supply. No more tokens left to mint"
         );
         require(
             !isTokenMinted[tokenURI],
-            "CollectionApp: This NFT has already been minted"
+            "CryptoGallery: This NFT has already been minted"
         );
         require(
             mintedForAddress[msg.sender] < LIMIT_PER_ADDRESS,
-            "CollectionApp: You have exceeded minting limit per address"
+            "CryptoGallery: You have exceeded minting limit per address"
         );
 
         // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png"
@@ -68,7 +68,7 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
         // for security reasons, minting is after payment and increments
         // due to this, we do not need a ReentrancyGuard
         (bool success, ) = owner().call{value: msg.value}("");
-        require(success, "CollectionApp: Failed to pay Ether to owner");
+        require(success, "CryptoGallery: Failed to pay Ether to owner");
 
         isTokenMinted[tokenURI] = true;
         mintedForAddress[msg.sender] += 1;

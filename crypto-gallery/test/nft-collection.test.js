@@ -78,7 +78,7 @@ describe("CryptoGallery", function () {
 				value: pricePerToken,
 			})
 		).to.be.revertedWith(
-			"CollectionApp: You have exceeded minting limit per address"
+			"CryptoGallery: You have exceeded minting limit per address"
 		);
 	});
 
