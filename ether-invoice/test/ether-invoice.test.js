@@ -13,7 +13,6 @@ describe("EtherInvoice", function () {
 	const { parseEther } =
 		ethers.utils || ethers || hre.ethers.utils || hre.ethers;
 	const oneEther = parseEther("1.0");
-	const halfEther = parseEther("0.5");
 	const buyerPAN = "AAAAA0000A";
 	const sellerPAN = "BBBBB1111B";
 	const nonExistentPAN = "CCCCC2222C";
@@ -102,7 +101,7 @@ describe("EtherInvoice", function () {
 		const lastIndex = invoices.length - 1;
 		await expect(
 			contractUser.payInvoiceByPAN(buyerPAN, lastIndex, {
-				value: halfEther,
+				value: parseEther("0.5"),
 			})
 		).to.be.revertedWith("Amount not matched");
 
