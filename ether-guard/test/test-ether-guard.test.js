@@ -1,4 +1,3 @@
-// unit testing smart contract using Chai
 const { expect } = require("chai");
 
 describe("EtherGuard", function () {

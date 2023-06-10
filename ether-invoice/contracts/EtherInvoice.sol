@@ -35,7 +35,7 @@ contract EtherInvoice {
     function payInvoiceByPAN(string memory _buyerPAN, uint256 _index) public payable {
         require(
             invoiceData[_buyerPAN][_index].invoiceAmount == msg.value,
-            "Amount not matched"
+            "InvoiceApp: Amount not matched"
         );
         invoiceData[_buyerPAN][_index].paid = true;
     }
