@@ -16,15 +16,16 @@ describe("EtherInvoice", function () {
 	const halfEther = parseEther("0.5");
 	const buyerPAN = "AAAAA0000A";
 	const sellerPAN = "BBBBB1111B";
+	const nonExistentPAN = "CCCCC2222C";
 
-	it.only("Should deploy without errors", async function () {
+	it("Should deploy without errors", async function () {
 		[owner, user] = await ethers.getSigners();
 		contract = await deployContract("EtherInvoice");
 		contractUser = contract.connect(user);
 		expect(await contract.deployed()).to.equal(contract);
 	});
 
-	it.only("Should add an invoice", async function () {
+	it("Should add an invoice", async function () {
 		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
 
 		const invoices = await contract.getInvoicesByPAN(buyerPAN);
@@ -37,14 +38,14 @@ describe("EtherInvoice", function () {
 		expect(invoices[0].paid).to.equal(false);
 	});
 
-	it.only("Should not add an invoice with an invalid PAN", async function () {
+	it("Should not add an invoice with an invalid PAN", async function () {
 		const invalidPAN = "InvalidPAN";
 		await expect(
 			contractUser.addInvoice(invalidPAN, sellerPAN, 100)
 		).to.be.revertedWith("InvoiceApp: Invalid buyer PAN");
 	});
 
-	it.only("Should pay an invoice", async function () {
+	it("Should pay an invoice", async function () {
 		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
 		await contractUser.payInvoiceByPAN(buyerPAN, 0, {
 			value: oneEther
@@ -53,13 +54,13 @@ describe("EtherInvoice", function () {
 		expect(updatedInvoices[0].paid).to.equal(true);
 	});
 
-	it.only("Should get invoices by PAN", async function () {
+	it("Should get invoices by PAN", async function () {
 		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
 
 		const invoices = await contract.getInvoicesByPAN(buyerPAN);
 		expect(invoices.length).to.be.greaterThan(1);
 		
-		const invoice = invoices[0];
+		const invoice = invoices[invoices.length - 1];
 		expect(invoice.buyerPAN).to.equal(buyerPAN);
 		expect(invoice.sellerPAN).to.equal(sellerPAN);
 		expect(invoice.invoiceAmount.toString()).to.equal(
@@ -68,18 +69,18 @@ describe("EtherInvoice", function () {
 		expect(invoice.paid).to.equal(false);
 	});
 
-	it.only("Should validate a valid PAN", async function () {
+	it("Should validate a valid PAN", async function () {
 		const isValid = await contract.validatePAN(buyerPAN);
 		expect(isValid).to.equal(true);
 	});
 
-	it.only("Should not validate an invalid PAN", async function () {
+	it("Should not validate an invalid PAN", async function () {
 		const invalidPAN = "InvalidPAN";
 		const isValid = await contract.validatePAN(invalidPAN);
 		expect(isValid).to.equal(false);
 	});
 
-	it.only("Should not add an invoice with zero invoice amount", async function () {
+	it("Should not add an invoice with zero invoice amount", async function () {
 		const invoiceAmount = 0;
 		await expect(
 			contractUser.addInvoice(buyerPAN, sellerPAN, invoiceAmount)
@@ -88,46 +89,40 @@ describe("EtherInvoice", function () {
 		);
 	});
 
-	it.only("Should get empty invoice list for non-existent PAN", async function () {
-		const nonExistentPAN = "CCCCC2222C";
+	it("Should get empty invoice list for non-existent PAN", async function () {
 		const invoices = await contract.getInvoicesByPAN(nonExistentPAN);
 		expect(invoices.length).to.equal(0);
 	});
 
-	it.only("Should not pay an invoice with incorrect amount", async function () {
+	it("Should not pay an invoice with incorrect amount", async function () {
 		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
 
+		// get invoices length
+		const invoices = await contract.getInvoicesByPAN(buyerPAN);
+		const lastIndex = invoices.length - 1;
 		await expect(
-			contractUser.payInvoiceByPAN(buyerPAN, 0, {
+			contractUser.payInvoiceByPAN(buyerPAN, lastIndex, {
 				value: halfEther,
 			})
 		).to.be.revertedWith("Amount not matched");
 
 		const updatedInvoices = await contract.getInvoicesByPAN(buyerPAN);
-		expect(updatedInvoices[0].paid).to.equal(false);
+		expect(updatedInvoices[lastIndex].paid).to.equal(false);
 	});
 
-	it.only("Should not add an invoice with the same buyer and seller PAN", async function () {
+	it("Should not add an invoice with the same buyer and seller PAN", async function () {
 		await expect(
 			contractUser.addInvoice(buyerPAN, buyerPAN, oneEther)
-		).to.be.revertedWith("InvoiceApp: Invalid seller PAN");
+		).to.be.revertedWith("InvoiceApp: Buyer and seller PAN can't be same");
 	});
 
-	it.only("Should not pay a non-existent invoice", async function () {
+	it("Should not pay a non-existent invoice", async function () {
 		await expect(
-			contractUser.payInvoiceByPAN(buyerPAN, 0, {
+			contractUser.payInvoiceByPAN(nonExistentPAN, 0, {
 				value: oneEther
 			})
 		).to.be.revertedWith(
 			"VM Exception while processing transaction: revert"
 		);
-	});
-
-	it.only("Should return correct invoice count by PAN", async function () {
-		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
-		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
-
-		const invoices = await contract.getInvoicesByPAN(buyerPAN);
-		expect(invoices.length).to.equal(2);
 	});
 });

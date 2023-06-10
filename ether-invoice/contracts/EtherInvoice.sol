@@ -19,6 +19,11 @@ contract EtherInvoice {
         // validations
         require(validatePAN(_buyerPAN), "InvoiceApp: Invalid buyer PAN");
         require(validatePAN(_sellerPAN), "InvoiceApp: Invalid seller PAN");
+        require(
+            keccak256(abi.encodePacked(_buyerPAN)) !=
+                keccak256(abi.encodePacked(_sellerPAN)),
+            "InvoiceApp: Buyer and seller PAN can't be same"
+        );
         require(_invoiceAmount > 0, "InvoiceApp: Invoice amount should be greater than 0");
 
         uint256 invoiceDate = block.timestamp;
