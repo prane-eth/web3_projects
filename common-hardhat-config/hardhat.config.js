@@ -1,7 +1,7 @@
 require('@nomiclabs/hardhat-waffle');
-require('dotenv').config();
 require('@nomiclabs/hardhat-etherscan');
 require('@openzeppelin/hardhat-upgrades');
+require("dotenv").config({ path: "../common-hardhat-config/.env" });
 
 const {
 	GOERLI_RPC_URL,
