@@ -17,14 +17,14 @@ contract EtherInvoice {
         uint256 _invoiceAmount
     ) public {
         // validations
-        require(validatePAN(_buyerPAN), "InvoiceApp: Invalid buyer PAN");
-        require(validatePAN(_sellerPAN), "InvoiceApp: Invalid seller PAN");
+        require(validatePAN(_buyerPAN), "EtherInvoice: Invalid buyer PAN");
+        require(validatePAN(_sellerPAN), "EtherInvoice: Invalid seller PAN");
         require(
             keccak256(abi.encodePacked(_buyerPAN)) !=
                 keccak256(abi.encodePacked(_sellerPAN)),
-            "InvoiceApp: Buyer and seller PAN can't be same"
+            "EtherInvoice: Buyer and seller PAN can't be same"
         );
-        require(_invoiceAmount > 0, "InvoiceApp: Invoice amount should be greater than 0");
+        require(_invoiceAmount > 0, "EtherInvoice: Invoice amount should be greater than 0");
 
         uint256 invoiceDate = block.timestamp;
         invoiceData[_buyerPAN].push(
@@ -40,7 +40,11 @@ contract EtherInvoice {
     function payInvoiceByPAN(string memory _buyerPAN, uint256 _index) public payable {
         require(
             invoiceData[_buyerPAN][_index].invoiceAmount == msg.value,
-            "InvoiceApp: Amount not matched"
+            "EtherInvoice: Amount not matched"
+        );
+        require(
+            _index < invoiceData[_buyerPAN].length,
+            "EtherInvoice: Invoice not found"
         );
         invoiceData[_buyerPAN][_index].paid = true;
     }

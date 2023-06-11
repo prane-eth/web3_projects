@@ -13,7 +13,7 @@ Status | Project name | Description | Smart contract (Polygon Mumbai) | Frontend
 ### Changes made after creation:
 
 - Added common components folder in all projects to reduce code duplication.
+- Reduce as many lines as possible
 - Finished test cases.
 - Deployed the contracts on multiple networks. Deployed the frontend code.
-
 

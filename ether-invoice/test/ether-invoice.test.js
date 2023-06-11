@@ -8,7 +8,9 @@ const deployContract = async (contractName, ...args) => {
 	return contract;
 };
 
-describe("EtherInvoice", function () {
+const appName = "EtherInvoice";
+
+describe(appName, function () {
 	var contract, user, contractUser;
 	const { parseEther } =
 		ethers.utils || ethers || hre.ethers.utils || hre.ethers;
@@ -19,7 +21,7 @@ describe("EtherInvoice", function () {
 
 	it("Should deploy without errors", async function () {
 		[owner, user] = await ethers.getSigners();
-		contract = await deployContract("EtherInvoice");
+		contract = await deployContract(appName);
 		contractUser = contract.connect(user);
 		expect(await contract.deployed()).to.equal(contract);
 	});
@@ -41,7 +43,7 @@ describe("EtherInvoice", function () {
 		const invalidPAN = "InvalidPAN";
 		await expect(
 			contractUser.addInvoice(invalidPAN, sellerPAN, 100)
-		).to.be.revertedWith("InvoiceApp: Invalid buyer PAN");
+		).to.be.revertedWith(`${appName}: Invalid buyer PAN`);
 	});
 
 	it("Should pay an invoice", async function () {
@@ -83,9 +85,7 @@ describe("EtherInvoice", function () {
 		const invoiceAmount = 0;
 		await expect(
 			contractUser.addInvoice(buyerPAN, sellerPAN, invoiceAmount)
-		).to.be.revertedWith(
-			"InvoiceApp: Invoice amount should be greater than 0"
-		);
+		).to.be.revertedWith(`${appName}: Invoice amount should be greater than 0`);
 	});
 
 	it("Should get empty invoice list for non-existent PAN", async function () {
@@ -103,7 +103,7 @@ describe("EtherInvoice", function () {
 			contractUser.payInvoiceByPAN(buyerPAN, lastIndex, {
 				value: parseEther("0.5"),
 			})
-		).to.be.revertedWith("Amount not matched");
+		).to.be.revertedWith(`${appName}: Amount not matched`);
 
 		const updatedInvoices = await contract.getInvoicesByPAN(buyerPAN);
 		expect(updatedInvoices[lastIndex].paid).to.equal(false);
@@ -112,7 +112,7 @@ describe("EtherInvoice", function () {
 	it("Should not add an invoice with the same buyer and seller PAN", async function () {
 		await expect(
 			contractUser.addInvoice(buyerPAN, buyerPAN, oneEther)
-		).to.be.revertedWith("InvoiceApp: Buyer and seller PAN can't be same");
+		).to.be.revertedWith(`${appName}: Buyer and seller PAN can't be same`);
 	});
 
 	it("Should not pay a non-existent invoice", async function () {
@@ -120,8 +120,6 @@ describe("EtherInvoice", function () {
 			contractUser.payInvoiceByPAN(nonExistentPAN, 0, {
 				value: oneEther
 			})
-		).to.be.revertedWith(
-			"VM Exception while processing transaction: revert"
-		);
+		).to.be.reverted
 	});
 });

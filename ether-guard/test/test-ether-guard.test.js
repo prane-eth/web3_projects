@@ -1,12 +1,14 @@
 const { expect } = require("chai");
 
-describe("EtherGuard", function () {
+const appName = "EtherGuard";
+
+describe(appName, function () {
 	var contract, owner, addr1;
 	const parseEther = hre.ethers.utils.parseEther;
 	const formatEther = hre.ethers.utils.formatEther;
 	it("Should deploy without errors", async function () {
 		[owner, addr1] = await ethers.getSigners();
-		const Bank = await ethers.getContractFactory("EtherGuard");
+		const Bank = await ethers.getContractFactory(appName);
 		contract = await Bank.deploy();
 		await contract.deployed();
 	});
@@ -74,8 +76,7 @@ describe("EtherGuard", function () {
 			.and.lessThan(20000);
 	});
 	it("Should not withdraw when account is closed", async function () {
-		const errorMessage =
-			"VM Exception while processing transaction: reverted with reason string 'EtherGuard: Account does not exist'";
+		const errorMessage = `VM Exception while processing transaction: reverted with reason string '${appName}: Account does not exist'`;
 		await expect(contract.withdraw(parseEther("0.1"))).to.be.revertedWith(
 			errorMessage
 		);
@@ -106,8 +107,7 @@ describe("EtherGuard", function () {
 		);
 	});
 	it("Should not allow unauthorized account to withdraw", async function () {
-		const errorMessage =
-			"VM Exception while processing transaction: reverted with reason string 'EtherGuard: Not authorized'";
+		const errorMessage = `VM Exception while processing transaction: reverted with reason string '${appName}: Not authorized'`;
 		await expect(
 			contract.connect(addr1).withdrawAllFromAccount(owner.address, {
 				value: parseEther("0.1"),

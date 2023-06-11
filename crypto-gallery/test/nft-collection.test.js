@@ -11,7 +11,9 @@ const deployContract = async (contractName, ...args) => {
 	return contract;
 };
 
-describe("CryptoGallery", function () {
+const appName = "CryptoGallery";
+
+describe(appName, function () {
 	let contract, owner, customer, attacker;
 	const folderURL =
 		"https://ipfs.io/ipfs/QmXZ3TgRgd5EZEk2DhwGvjf8f6sQJNCrnHzrEw1oHufgnL/";
@@ -19,7 +21,7 @@ describe("CryptoGallery", function () {
 
 	it("Should deploy without errors", async function () {
 		[owner, customer, attacker] = await ethers.getSigners();
-		contract = await deployContract("CryptoGallery");
+		contract = await deployContract(appName);
 		expect(contract.address).to.properAddress;
 	});
 
@@ -78,7 +80,7 @@ describe("CryptoGallery", function () {
 				value: pricePerToken,
 			})
 		).to.be.revertedWith(
-			"CryptoGallery: You have exceeded minting limit per address"
+			`${appName}: You have exceeded minting limit per address`
 		);
 	});
 

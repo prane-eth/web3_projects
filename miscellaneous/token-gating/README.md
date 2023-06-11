@@ -1,1 +1,0 @@
-This project is about displaying a page only if the user owns a specific NFT.
