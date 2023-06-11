@@ -2,6 +2,7 @@ require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-etherscan');
 require('@openzeppelin/hardhat-upgrades');
 require("dotenv").config({ path: "../common-hardhat-config/.env" });
+require("hardhat-gas-reporter");
 
 const {
 	GOERLI_RPC_URL,
@@ -13,7 +14,7 @@ const {
 } = process.env;
 
 module.exports = {
-	solidity: '0.8.19',
+	solidity: "0.8.19",
 	networks: {
 		mumbai: {
 			url: MUMBAI_RPC_URL,
@@ -28,10 +29,10 @@ module.exports = {
 			accounts: [PRIVATE_KEY],
 		},
 		localhost: {
-			url: 'http://localhost:8545',
+			url: "http://localhost:8545",
 			accounts: [
-				// first private key when we run 
-				'0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+				// first private key when we run
+				"0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
 			],
 		},
 	},
@@ -46,6 +47,18 @@ module.exports = {
 			polygon: POLYGONSCAN_API_KEY,
 			polygonMumbai: POLYGONSCAN_API_KEY,
 		},
+	},
+	settings: {
+		optimizer: {
+			enabled: true,
+			runs: 300,
+		},
+	},
+	gasReporter: {
+		// outputFile: "gas-report.txt",
+		// noColors: true,
+		currency: "USD",
+		token: "ETH",
 	},
 };
 

@@ -76,17 +76,14 @@ describe(appName, function () {
 			.and.lessThan(20000);
 	});
 	it("Should not withdraw when account is closed", async function () {
-		const errorMessage = `VM Exception while processing transaction: reverted with reason string '${appName}: Account does not exist'`;
 		await expect(contract.withdraw(parseEther("0.1"))).to.be.revertedWith(
-			errorMessage
+			`${appName}: Account does not exist`
 		);
 	});
 	it("Should authorize withdrawer", async function () {
 		await contract.createAccount();
 		await contract.authorizeWithdrawer(addr1.address);
-		expect(await contract.isAuthorizedWithdrawer(addr1.address)).to.equal(
-			true
-		);
+		expect(await contract.isAuthorizedWithdrawer(addr1.address)).to.equal(true);
 	});
 	it("Should withdraw all from account", async function () {
 		await contract.deposit({ value: parseEther("1") });
@@ -107,11 +104,10 @@ describe(appName, function () {
 		);
 	});
 	it("Should not allow unauthorized account to withdraw", async function () {
-		const errorMessage = `VM Exception while processing transaction: reverted with reason string '${appName}: Not authorized'`;
 		await expect(
 			contract.connect(addr1).withdrawAllFromAccount(owner.address, {
 				value: parseEther("0.1"),
 			})
-		).to.be.revertedWith(errorMessage);
+		).to.be.revertedWith(`${appName}: Not authorized`);
 	});
 });
