@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity 0.8.19;
 
-contract EtherGuard {
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract EtherGuard is ReentrancyGuard {
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal hasAccount;
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
@@ -34,7 +36,7 @@ contract EtherGuard {
         balances[to] += amount;
     }
 
-    function transferToWallet(address to, uint256 amount) public accountRequired {
+    function transferToWallet(address to, uint256 amount) public accountRequired nonReentrant {
         require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = to.call{ value: amount }("");
@@ -45,12 +47,12 @@ contract EtherGuard {
         balances[to] += msg.value;
     }
 
-    function payToWallet(address to) public payable {
+    function payToWallet(address to) public payable nonReentrant {
         (bool success, ) = to.call{ value: msg.value }("");
         require(success, "EtherGuard: Failed to pay to wallet");
     }
 
-    function withdraw(uint256 amount) public accountRequired {
+    function withdraw(uint256 amount) public accountRequired nonReentrant {
         require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
         balances[msg.sender] -= amount;
         (bool success, ) = msg.sender.call{ value: amount }("");
@@ -88,7 +90,8 @@ contract EtherGuard {
         authorizedWithdrawers[msg.sender][withdrawer] = false;
     }
 
-    function withdrawAllFromAccount(address from) public payable returns(bool) {
+    function withdrawAllFromAccount(address from) public payable nonReentrant returns(bool) {
+        // allow authorized withdrawers to withdraw all funds from an account
         require(msg.value == 0.1 ether, "EtherGuard: You must add 0.1 ether to process the transaction");
         require(authorizedWithdrawers[from][msg.sender], "EtherGuard: Not authorized");
         require(balances[from] > 0, "EtherGuard: No balance to withdraw");

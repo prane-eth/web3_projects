@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract BlockGoals is Initializable {
+contract BlockGoals is Initializable, ReentrancyGuard {
     struct Task {
         uint256 timestamp;
         string description;
@@ -13,14 +14,6 @@ contract BlockGoals is Initializable {
 
     mapping(address => Task[]) private tasks;
     mapping(address => bool) private isWithdrawing; // to prevent reentrancy attack
-
-    modifier nonReentrant() {
-        // defining on our own without using OpenZeppelin
-        require(!isWithdrawing[msg.sender], "BlockGoals: Already withdrawing");
-        isWithdrawing[msg.sender] = true;
-        _;
-        isWithdrawing[msg.sender] = false;
-    }
 
     function addTask(string memory _description) public payable {
         tasks[msg.sender].push(
