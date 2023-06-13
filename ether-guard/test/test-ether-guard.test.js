@@ -41,24 +41,20 @@ describe(appName, function () {
 			.and.lessThan(0.201);
 	});
 	it("Should pay Ether to another account", async function () {
-		await contract.payToAccount(addr1.address, {
+		await contract.depositToAccount(addr1.address, {
 			value: parseEther("0.3"),
 		});
 		expect(await contract.connect(addr1).getBalance()).to.equal(
 			parseEther("0.6")
 		);
 	});
-	it("Should pay Ether to another wallet", async function () {
-		const balanceBefore = formatEther(await addr1.getBalance());
-		await contract.payToWallet(addr1.address, {
-			value: parseEther("0.3"),
-		});
-		const balanceAfter = formatEther(await addr1.getBalance());
-		expect(balanceAfter - balanceBefore)
-			.to.be.greaterThan(0.29)
-			.and.lessThan(0.31);
-	});
 	it("Should close account", async function () {
+		// contract balance
+		const contractBalance = await contract.getBalance();
+		console.log("contractBalance", formatEther(contractBalance));
+		// owner balance
+		const ownerBalance = await owner.getBalance();
+		console.log("ownerBalance", formatEther(ownerBalance));
 		await contract.closeAccount();
 		expect(await contract.userHasAccount()).to.equal(false);
 	});

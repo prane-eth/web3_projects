@@ -2,9 +2,13 @@
 pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-contract BlockGoals is Initializable, ReentrancyGuard {
+contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
+    function initialize() public initializer {
+        __ReentrancyGuard_init();
+    }
+
     struct Task {
         uint256 timestamp;
         string description;
@@ -13,7 +17,6 @@ contract BlockGoals is Initializable, ReentrancyGuard {
     }
 
     mapping(address => Task[]) private tasks;
-    mapping(address => bool) private isWithdrawing; // to prevent reentrancy attack
 
     function addTask(string memory _description) public payable {
         tasks[msg.sender].push(
@@ -60,13 +63,13 @@ contract BlockGoals is Initializable, ReentrancyGuard {
         );
         require(
             _index < tasks[msg.sender].length,
-            "BlockGoals: Index out of bounds"
+            "BlockGoals: Index out of limits"
         );
-        // make sure uint256 can hold the value
+        // make sure uint256 can hold the value, and no underflow
         require(
             tasks[msg.sender][_index].balance + msg.value >=
                 tasks[msg.sender][_index].balance,
-            "BlockGoals: Value too large"
+            "BlockGoals: Value too large to store"
         );
         tasks[msg.sender][_index].balance += msg.value;
         return true;
@@ -74,26 +77,23 @@ contract BlockGoals is Initializable, ReentrancyGuard {
 
     function withdrawForTask(uint256 _index) internal nonReentrant {
         uint256 amountToRefund = tasks[msg.sender][_index].balance;
+        // if no enough ether, refund partially.remaining amount is refunded after task is deleted
         if (amountToRefund > address(this).balance) {
             amountToRefund = address(this).balance;
         }
-
         if (amountToRefund <= 0)
             return;
         
+        tasks[msg.sender][_index].balance -= amountToRefund;
         (bool success, ) = msg.sender.call{value: amountToRefund}("");
         require(success, "BlockGoals: Failed to withdraw Ether");
-        tasks[msg.sender][_index].balance = tasks[msg.sender][_index].balance - amountToRefund;
-        
-        // if no enough ether, refund partially
-        // if task is finished, remaining amount is refunded after task is deleted
     }
 
     receive() external payable {
-        revert("BlockGoals: Fallback function fallback() not allowed");
+        revert("BlockGoals: Fallback function receive() is not allowed");
     }
 
     fallback() external payable {
-        revert("BlockGoals: Fallback function fallback() not allowed");
+        revert("BlockGoals: Fallback function fallback() is not allowed");
     }
 }
