@@ -20,11 +20,11 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
 
     string constant ERR_AMOUNT_TOO_LARGE = "EtherGuard: Amount too large to store";
 
-    function checkOverflow(uint256 a, uint256 b) internal pure {
-        require(a + b > a, ERR_AMOUNT_TOO_LARGE);
+    function avoidOverflow(uint256 balance, uint256 amount) internal pure {
+        require(balance + amount >= balance, ERR_AMOUNT_TOO_LARGE);
     }
-    function checkUnderflow(uint256 a, uint256 b) internal pure {
-        require(a - b < a, ERR_AMOUNT_TOO_LARGE);
+    function avoidUnderflow(uint256 balance, uint256 amount) internal pure {
+        require(balance - amount <= balance, ERR_AMOUNT_TOO_LARGE);
     }
 
     function createAccount() public {
@@ -46,21 +46,21 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
 
     function depositToAccount(address to) public payable {
         require(hasAccount[to], "EtherGuard: Receiver has no account");
-        checkOverflow(balances[to], msg.value);
+        avoidOverflow(balances[to], msg.value);
         balances[to] += msg.value;
     }
 
     function transferToAccount(address to, uint256 amount) public accountRequired {
         require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
-        checkOverflow(balances[to], amount);
-        checkUnderflow(balances[msg.sender], amount);
+        avoidOverflow(balances[to], amount);
+        avoidUnderflow(balances[msg.sender], amount);
         balances[msg.sender] -= amount;
         balances[to] += amount;
     }
 
     function transferToWallet(address to, uint256 amount) public accountRequired nonReentrant {
         require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
-        checkUnderflow(balances[msg.sender], amount);
+        avoidUnderflow(balances[msg.sender], amount);
         balances[msg.sender] -= amount;
         (bool success, ) = to.call{ value: amount }("");
         require(success, "EtherGuard: Failed to transfer to wallet");
@@ -68,19 +68,16 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
 
     function withdraw(uint256 amount) public accountRequired nonReentrant {
         require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
-        checkUnderflow(balances[msg.sender], amount);
+        avoidUnderflow(balances[msg.sender], amount);
         balances[msg.sender] -= amount;
         (bool success, ) = msg.sender.call{ value: amount }("");
         require(success, "EtherGuard: Failed to withdraw");
     }
 
     function closeAccount() public accountRequired {
+        require(address(this).balance > balances[msg.sender], "EtherGuard: Insufficient contract balance to withdraw");
         uint256 amountToRefund = balances[msg.sender];
-        if (amountToRefund > address(this).balance) {
-            amountToRefund = address(this).balance;
-        }
-        require(amountToRefund > 0, "EtherGuard: Insufficient contract balance to withdraw");
-        balances[msg.sender] -= amountToRefund;
+        balances[msg.sender] = 0;
         (bool success, ) = msg.sender.call{ value: amountToRefund }("");
         require(success, "EtherGuard: Failed to withdraw");
         require(balances[msg.sender] == 0, "EtherGuard: Failed to withdraw all funds");
@@ -130,5 +127,8 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
             createAccount();
         }
         deposit();
+    }
+    fallback() external payable {
+        revert("EtherGuard: Fallback function is not allowed");
     }
 }

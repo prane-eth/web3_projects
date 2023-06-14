@@ -49,12 +49,6 @@ describe(appName, function () {
 		);
 	});
 	it("Should close account", async function () {
-		// contract balance
-		const contractBalance = await contract.getBalance();
-		console.log("contractBalance", formatEther(contractBalance));
-		// owner balance
-		const ownerBalance = await owner.getBalance();
-		console.log("ownerBalance", formatEther(ownerBalance));
 		await contract.closeAccount();
 		expect(await contract.userHasAccount()).to.equal(false);
 	});
@@ -84,9 +78,9 @@ describe(appName, function () {
 	it("Should withdraw all from account", async function () {
 		await contract.deposit({ value: parseEther("1") });
 		const balanceBefore = formatEther(await addr1.getBalance());
-		await contract.connect(addr1).withdrawAllFromAccount(owner.address, {
-			value: parseEther("0.1"),
-		});
+		
+		await contract.connect(addr1).withdrawAllFromAccount(owner.address);
+
 		const balanceAfter = formatEther(await addr1.getBalance());
 		expect(balanceAfter - balanceBefore)
 			.to.be.greaterThan(0.999)
@@ -101,9 +95,7 @@ describe(appName, function () {
 	});
 	it("Should not allow unauthorized account to withdraw", async function () {
 		await expect(
-			contract.connect(addr1).withdrawAllFromAccount(owner.address, {
-				value: parseEther("0.1"),
-			})
+			contract.connect(addr1).withdrawAllFromAccount(owner.address)
 		).to.be.revertedWith(`${appName}: Not authorized`);
 	});
 });
