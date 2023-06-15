@@ -2,8 +2,17 @@
 
 # This file pushes latest code from laptop to GitHub
 
-message=${1:-'Updated code'}    
+# ignore if message is "-f"
+if [ "$1" == "-f" ]; then
+    message='Updated code'
+else
+    message=${1:-'Updated code'}
+fi
 
 git add .
 git commit -m "$message"
-git push ${@:2}  # to add more args like 'origin newBranch'
+if [ "$1" == "-f" ]; then
+    git push -f ${@:2}
+else
+    git push ${@:2}
+fi

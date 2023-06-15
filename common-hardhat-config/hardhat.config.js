@@ -14,7 +14,15 @@ const {
 } = process.env;
 
 module.exports = {
-	solidity: "0.8.19",
+	solidity: {
+	  version: "0.8.19",
+	  settings: {
+		optimizer: {
+		  enabled: true,
+		  runs: 300,
+		},
+	  },
+	},
 	networks: {
 		mumbai: {
 			url: MUMBAI_RPC_URL,
@@ -46,12 +54,6 @@ module.exports = {
 			//polygon
 			polygon: POLYGONSCAN_API_KEY,
 			polygonMumbai: POLYGONSCAN_API_KEY,
-		},
-	},
-	settings: {
-		optimizer: {
-			enabled: true,
-			runs: 300,
 		},
 	},
 	gasReporter: {

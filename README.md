@@ -10,10 +10,11 @@ Status | Project name | Description | Smart contract (Polygon Mumbai) | Frontend
 :heavy_check_mark: | [Block Goals](./block-goals/) | To create a task and deposit ETH for commitment towards it, and to get refund only after finishing the task | [0x2857...81](https://mumbai.polygonscan.com/address/0x2857c840096F63c5Ab0C8eF6733C92668f314481) | [lowly-plain-farmer.glitch.me](https://lowly-plain-farmer.glitch.me/)
 
 
-### Changes made after creation:
+### Changes made after creation of each project:
 
-- Added common components folder in all projects to reduce code duplication.
+- Added common components folder in all projects to reduce code duplication
 - Reduce as many lines as possible
-- Finished test cases.
-- Deployed the contracts on multiple networks. Deployed the frontend code.
-- Scanned with [Slither](https://github.com/crytic/slither) and fixed the issues.
+- Created test cases
+- Deployed the contracts on multiple networks. Deployed the frontend code
+- Scanned with [Slither](https://github.com/crytic/slither) and fixed the issues
+- Reduced gas cost by optimizer, and will do with code changes
