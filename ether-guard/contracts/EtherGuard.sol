@@ -74,15 +74,14 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         require(success, "EtherGuard: Failed to withdraw");
     }
 
-    function closeAccount() public accountRequired {
+    function closeAccount() public accountRequired nonReentrant {
         require(address(this).balance > balances[msg.sender], "EtherGuard: Insufficient contract balance to withdraw");
+        require(hasAccount[msg.sender], "EtherGuard: Account does not exist");
         uint256 amountToRefund = balances[msg.sender];
-        balances[msg.sender] = 0;
-        (bool success, ) = msg.sender.call{ value: amountToRefund }("");
-        require(success, "EtherGuard: Failed to withdraw");
-        require(balances[msg.sender] == 0, "EtherGuard: Failed to withdraw all funds");
         delete balances[msg.sender];
         delete hasAccount[msg.sender];
+        (bool success, ) = msg.sender.call{ value: amountToRefund }("");
+        require(success, "EtherGuard: Failed to withdraw");
     }
 
     // function getAuthorizedWithdrawers() public view accountRequired returns (address[] memory) {

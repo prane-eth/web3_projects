@@ -18,7 +18,9 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
 
     mapping(address => Task[]) private tasks;
 
-    function addTask(string memory _description) public payable {
+    string constant INDEX_OUT_OF_BOUNDS = "BlockGoals: Task does not exist. Please refresh";
+
+    function addTask(string memory _description) public payable  {
         tasks[msg.sender].push(
             Task(block.timestamp, _description, false, msg.value)
         );
@@ -26,33 +28,6 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
 
     function getAllTasks() public view returns (Task[] memory) {
         return tasks[msg.sender];
-    }
-
-    function finishTask(uint256 _index) public {
-        require(
-            _index < tasks[msg.sender].length,
-            "BlockGoals: Index out of bounds"
-        );
-
-        // if task has balance, send it back to the creator
-        withdrawForTask(_index);
-
-        tasks[msg.sender][_index].done = true;
-    }
-
-    function deleteTask(uint256 _index) public {
-        finishTask(_index); // if task is not finished, finish it first
-        require(
-            tasks[msg.sender][_index].balance == 0,
-            "BlockGoals: Task has balance"
-        );
-
-        // delete item from array in solidity, reordering the array
-        uint256 lastIndex = tasks[msg.sender].length - 1;
-        for (uint256 i = _index; i < lastIndex; i++) {
-            tasks[msg.sender][i] = tasks[msg.sender][i + 1];
-        }
-        tasks[msg.sender].pop();
     }
 
     function deposit(uint256 _index) public payable returns (bool) {
@@ -63,7 +38,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         );
         require(
             _index < tasks[msg.sender].length,
-            "BlockGoals: Index out of limits"
+            INDEX_OUT_OF_BOUNDS
         );
         // make sure uint256 can hold the value, and no underflow
         require(
@@ -75,7 +50,34 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         return true;
     }
 
-    function withdrawForTask(uint256 _index) internal nonReentrant {
+    function finishTask(uint256 _index) public nonReentrant  {
+        require(_index < tasks[msg.sender].length, INDEX_OUT_OF_BOUNDS);
+
+        tasks[msg.sender][_index].done = true;
+
+        // if task has balance, send it back to the creator
+        withdrawAfterFinish(_index);
+    }
+
+    function deleteTask(uint256 _index) public nonReentrant  {
+        require(_index < tasks[msg.sender].length, INDEX_OUT_OF_BOUNDS);
+        require(
+            address(this).balance >= tasks[msg.sender][_index].balance,
+            "BlockGoals: Not enough contract balance to refund"
+        );
+        uint256 amountToRefund = tasks[msg.sender][_index].balance;
+
+        // delete item - move item to last, then pop it
+        uint256 lastIndex = tasks[msg.sender].length - 1;
+        for (uint256 i = _index; i < lastIndex; i++) {
+            tasks[msg.sender][i] = tasks[msg.sender][i + 1];
+        }
+        tasks[msg.sender].pop();
+        (bool success, ) = msg.sender.call{value: amountToRefund}("");
+        require(success, "BlockGoals: Failed to withdraw Ether");
+    }
+
+    function withdrawAfterFinish(uint256 _index) internal {
         uint256 amountToRefund = tasks[msg.sender][_index].balance;
         // if no enough ether, refund partially.remaining amount is refunded after task is deleted
         if (amountToRefund > address(this).balance) {

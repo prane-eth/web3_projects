@@ -16,4 +16,4 @@ Status | Project name | Description | Smart contract (Polygon Mumbai) | Frontend
 - Reduce as many lines as possible
 - Finished test cases.
 - Deployed the contracts on multiple networks. Deployed the frontend code.
-
+- Scanned with [Slither](https://github.com/crytic/slither) and fixed the issues.
