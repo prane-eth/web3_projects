@@ -6,8 +6,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
+contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGuardUpgradeable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
     
@@ -44,11 +45,10 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
 
     function mintNFT(
         string memory tokenURI
-    ) external payable returns (uint256) {
+    ) external payable nonReentrant returns (uint256) {
         require(
             PRICE_PER_TOKEN <= msg.value,
-            // concatenate string with price
-            string(abi.encodePacked("CryptoGallery: Ether paid is less than ", PRICE_PER_TOKEN))
+            addStrings("CryptoGallery: Ether paid is less than ", PRICE_PER_TOKEN)
         );
         require(
             _tokenId.current() + 1 <= MAX_SUPPLY,
@@ -65,11 +65,6 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
 
         // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png"
 
-        // for security reasons, minting is after payment and increments
-        // due to this, we do not need a ReentrancyGuard
-        (bool success, ) = owner().call{value: msg.value}("");
-        require(success, "CryptoGallery: Failed to pay Ether to owner");
-
         isTokenMinted[tokenURI] = true;
         mintedForAddress[msg.sender] += 1;
         _tokenId.increment();
@@ -82,6 +77,13 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable {
         // increase the price for next token by 20%
         // PRICE_PER_TOKEN = (PRICE_PER_TOKEN * 12) / 10;
 
+        (bool success, ) = owner().call{value: msg.value}("");
+        require(success, "CryptoGallery: Failed to pay Ether to owner");
+
         return newItemId;
+    }
+
+    function addStrings(string memory a, uint256 b) internal pure returns (string memory) {
+        return string(abi.encodePacked(a, b));
     }
 }
