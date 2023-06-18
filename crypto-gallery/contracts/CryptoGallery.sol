@@ -46,22 +46,18 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
     function mintNFT(
         string memory tokenURI
     ) external payable nonReentrant returns (uint) {
-        require(
-            PRICE_PER_TOKEN <= msg.value,
-            addStrings("CryptoGallery: Amount paid is less than ", PRICE_PER_TOKEN)
-        );
-        require(
-            _tokenId.current() + 1 <= MAX_SUPPLY,
-            "CryptoGallery: You have exceeded Max Supply. No more tokens left to mint"
-        );
-        require(
-            !isTokenMinted[tokenURI],
-            "CryptoGallery: This NFT has already been minted"
-        );
-        require(
-            mintedForAddress[msg.sender] < LIMIT_PER_ADDRESS,
-            "CryptoGallery: You have exceeded minting limit per address"
-        );
+        if (msg.value < PRICE_PER_TOKEN) {
+            revert("CryptoGallery: Amount paid is less than PRICE_PER_TOKEN");
+        }
+        if (_tokenId.current() + 1 > MAX_SUPPLY) {
+            revert("CryptoGallery: You have exceeded Max Supply. No more tokens left to mint");
+        }
+        if (isTokenMinted[tokenURI]) {
+            revert("CryptoGallery: This NFT has already been minted");
+        }
+        if (mintedForAddress[msg.sender] >= LIMIT_PER_ADDRESS) {
+            revert("CryptoGallery: You have exceeded minting limit per address");
+        }
 
         // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png", or "ipfs://" + ....
 

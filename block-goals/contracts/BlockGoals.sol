@@ -23,51 +23,74 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         tasks[msg.sender].push(Task(block.timestamp, _bytes, false, msg.value));
     }
 
-    function deposit(uint256 _index) external payable returns (bool) {
-        require(msg.value > 0, "BlockGoals: Value must be greater than 0");
-        require(msg.value < 10 ether, "BlockGoals: Value must be less than 10 Ether");
-        require(_index < tasks[msg.sender].length, "BlockGoals: Task does not exist. Please refresh");
+    function deposit(uint256 _index) external payable {
+        if (msg.value <= 0) {
+            revert("BlockGoals: Value must be greater than 0");
+        }
+        if (msg.value >= 5 ether) {
+            revert("BlockGoals: Value must be less than 5 Ether");
+        }
+        Task[] storage userTasks = tasks[msg.sender];
+        if (_index >= userTasks.length) {
+            revert("BlockGoals: Task does not exist. Please refresh");
+        }
 
-        uint256 newBalance = tasks[msg.sender][_index].balance + msg.value;
-        require(newBalance >= tasks[msg.sender][_index].balance, "BlockGoals: Value too large to store");  // overflow check
+        uint256 newBalance = userTasks[_index].balance + msg.value;
+        if (newBalance < userTasks[_index].balance) {
+            revert("BlockGoals: Value too large to store");  // overflow check
+        }
 
-        tasks[msg.sender][_index].balance = newBalance;
-        return true;
+        userTasks[_index].balance = newBalance;
     }
 
     function finishTask(uint256 _index) external nonReentrant {
-        require(_index < tasks[msg.sender].length, "BlockGoals: Task does not exist. Please refresh");
+        Task[] storage userTasks = tasks[msg.sender];
+        if (_index >= userTasks.length) {
+            revert("BlockGoals: Task does not exist. Please refresh");
+        }
 
-        tasks[msg.sender][_index].done = true;
+        userTasks[_index].done = true;
 
         // if task has balance, send it back to the creator
         withdrawAfterFinish(_index);
     }
 
     function deleteTask(uint256 _index) external nonReentrant {
-        require(_index < tasks[msg.sender].length, "BlockGoals: Task does not exist. Please refresh");
+        Task[] storage userTasks = tasks[msg.sender];
+        if (_index >= userTasks.length) {
+            revert("BlockGoals: Task does not exist. Please refresh");
+        }
 
-        uint256 amountToRefund = tasks[msg.sender][_index].balance;
-        require(address(this).balance >= amountToRefund, "BlockGoals: Not enough contract balance to refund");
+        uint256 amountToRefund = userTasks[_index].balance;
+        if (address(this).balance < amountToRefund) {
+            amountToRefund = address(this).balance;
+        }
+        if (amountToRefund > 0) {
+            userTasks[_index].balance -= amountToRefund;
+            (bool success, ) = msg.sender.call{value: amountToRefund}("");
+            if (!success) {
+                revert("BlockGoals: Failed to withdraw Ether");
+            }
+        }
 
         // delete item - move item to last, then pop it
-        uint256 lastIndex = tasks[msg.sender].length - 1;
-        tasks[msg.sender][_index] = tasks[msg.sender][lastIndex];
-        tasks[msg.sender].pop();
-
-        (bool success, ) = msg.sender.call{value: amountToRefund}("");
-        require(success, "BlockGoals: Failed to withdraw Ether");
+        uint256 lastIndex = userTasks.length - 1;
+        userTasks[_index] = userTasks[lastIndex];
+        userTasks.pop();
     }
 
     function withdrawAfterFinish(uint256 _index) internal {
-        uint256 amountToRefund = tasks[msg.sender][_index].balance;
+        Task[] storage userTasks = tasks[msg.sender];
+        uint256 amountToRefund = userTasks[_index].balance;
         if (amountToRefund > address(this).balance) {
             amountToRefund = address(this).balance;
         }
         if (amountToRefund > 0) {
-            tasks[msg.sender][_index].balance -= amountToRefund;
+            userTasks[_index].balance -= amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
-            require(success, "BlockGoals: Failed to withdraw Ether");
+            if (!success) {
+                revert("BlockGoals: Failed to withdraw Ether");
+            }
         }
     }
 
