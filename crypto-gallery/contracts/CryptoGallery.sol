@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
@@ -12,31 +12,31 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
     using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
     
-    mapping(address => uint8) private mintedForAddress;
+    mapping(address => uint) private mintedForAddress;
     mapping(string => bool) private isTokenMinted;
     
-    uint256 public PRICE_PER_TOKEN = 0.01 ether;
-    uint256 public LIMIT_PER_ADDRESS = 2;
-    uint256 public MAX_SUPPLY = 5;
+    uint public PRICE_PER_TOKEN = 0.01 ether;
+    uint public LIMIT_PER_ADDRESS = 2;
+    uint public MAX_SUPPLY = 5;
     // string public IPFS_FOLDER = "";
-    event Minted(address indexed to, uint256 indexed tokenId);
+    event Minted(address indexed to, uint indexed tokenId);
 
     constructor() ERC721("CryptoGallery", "CGNFT") {}
 
-    function setPrice(uint256 price) external onlyOwner {
+    function setPrice(uint price) external onlyOwner {
         PRICE_PER_TOKEN = price;
     }
 
-    function getPrice() external view returns (uint256) {
+    function getPrice() external view returns (uint) {
         return PRICE_PER_TOKEN;
     }
 
-    function setLimit(uint256 limit) external onlyOwner {
+    function setLimit(uint limit) external onlyOwner {
         LIMIT_PER_ADDRESS = limit;
     }
 
-    function setMaxSupply(uint256 max_supply) external onlyOwner {
-        MAX_SUPPLY = max_supply;
+    function setMaxSupply(uint maxSupply) external onlyOwner {
+        MAX_SUPPLY = maxSupply;
     }
 
     function isAvailable(string memory tokenURI) external view returns (bool) {
@@ -45,10 +45,10 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
 
     function mintNFT(
         string memory tokenURI
-    ) external payable nonReentrant returns (uint256) {
+    ) external payable nonReentrant returns (uint) {
         require(
             PRICE_PER_TOKEN <= msg.value,
-            addStrings("CryptoGallery: Ether paid is less than ", PRICE_PER_TOKEN)
+            addStrings("CryptoGallery: Amount paid is less than ", PRICE_PER_TOKEN)
         );
         require(
             _tokenId.current() + 1 <= MAX_SUPPLY,
@@ -63,13 +63,13 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
             "CryptoGallery: You have exceeded minting limit per address"
         );
 
-        // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png"
+        // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png", or "ipfs://" + ....
 
         isTokenMinted[tokenURI] = true;
         mintedForAddress[msg.sender] += 1;
         _tokenId.increment();
 
-        uint256 newItemId = _tokenId.current();
+        uint newItemId = _tokenId.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
         emit Minted(msg.sender, newItemId);
@@ -83,7 +83,7 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
         return newItemId;
     }
 
-    function addStrings(string memory a, uint256 b) internal pure returns (string memory) {
-        return string(abi.encodePacked(a, b));
+    function addStrings(string memory a, uint b) internal pure returns (string memory result) {
+        result = string(abi.encodePacked(a, b));
     }
 }

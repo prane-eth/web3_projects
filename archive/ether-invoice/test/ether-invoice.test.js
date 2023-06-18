@@ -71,14 +71,23 @@ describe(appName, function () {
 	});
 
 	it("Should validate a valid PAN", async function () {
-		const isValid = await contract.validatePAN(buyerPAN);
-		expect(isValid).to.equal(true);
+		const oldInvoices = await contract.getInvoicesByPAN(buyerPAN);
+		const oldLength = oldInvoices.length;
+		await contractUser.addInvoice(buyerPAN, sellerPAN, oneEther);
+		const newInvoices = await contract.getInvoicesByPAN(buyerPAN);
+		const newLength = newInvoices.length;
+		expect(newLength).to.equal(oldLength + 1);
 	});
 
 	it("Should not validate an invalid PAN", async function () {
 		const invalidPAN = "InvalidPAN";
-		const isValid = await contract.validatePAN(invalidPAN);
-		expect(isValid).to.equal(false);
+		await expect(
+			contractUser.addInvoice(invalidPAN, sellerPAN, 100)
+		).to.be.revertedWith(`${appName}: Invalid buyer PAN`);
+
+		await expect(
+			contractUser.addInvoice(buyerPAN, invalidPAN, 100)
+		).to.be.revertedWith(`${appName}: Invalid seller PAN`);
 	});
 
 	it("Should not add an invoice with zero invoice amount", async function () {

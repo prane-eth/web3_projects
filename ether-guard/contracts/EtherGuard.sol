@@ -9,7 +9,7 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         __ReentrancyGuard_init();
     }
     
-    mapping(address => uint256) internal balances;
+    mapping(address => uint) internal balances;
     mapping(address => bool) internal hasAccount;
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
 
@@ -18,12 +18,12 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         _;
     }
 
-    string constant ERR_AMOUNT_TOO_LARGE = "EtherGuard: Amount too large to store";
+    string constant internal ERR_AMOUNT_TOO_LARGE = "EtherGuard: Amount too large to store";
 
-    function avoidOverflow(uint256 balance, uint256 amount) internal pure {
+    function avoidOverflow(uint balance, uint amount) internal pure {
         require(balance + amount >= balance, ERR_AMOUNT_TOO_LARGE);
     }
-    function avoidUnderflow(uint256 balance, uint256 amount) internal pure {
+    function avoidUnderflow(uint balance, uint amount) internal pure {
         require(balance - amount <= balance, ERR_AMOUNT_TOO_LARGE);
     }
 
@@ -36,7 +36,7 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         return hasAccount[msg.sender];
     }
 
-    function getBalance() public view accountRequired returns (uint256) {
+    function getBalance() external view accountRequired returns (uint) {
         return balances[msg.sender];
     }
 
@@ -44,53 +44,57 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         balances[msg.sender] += msg.value;
     }
 
-    function depositToAccount(address to) public payable {
+    function depositToAccount(address to) external payable {
         require(hasAccount[to], "EtherGuard: Receiver has no account");
         avoidOverflow(balances[to], msg.value);
         balances[to] += msg.value;
     }
 
-    function transferToAccount(address to, uint256 amount) public accountRequired {
-        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
+    function transferToAccount(address to, uint amount) external accountRequired {
+        address sender = msg.sender;
+        require(balances[sender] >= amount, "EtherGuard: Insufficient balance");
         avoidOverflow(balances[to], amount);
-        avoidUnderflow(balances[msg.sender], amount);
-        balances[msg.sender] -= amount;
+        avoidUnderflow(balances[sender], amount);
+        balances[sender] -= amount;
         balances[to] += amount;
     }
 
-    function transferToWallet(address to, uint256 amount) public accountRequired nonReentrant {
-        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
-        avoidUnderflow(balances[msg.sender], amount);
-        balances[msg.sender] -= amount;
+    function transferToWallet(address to, uint amount) external accountRequired nonReentrant {
+        address sender = msg.sender;
+        require(balances[sender] >= amount, "EtherGuard: Insufficient balance");
+        avoidUnderflow(balances[sender], amount);
+        balances[sender] -= amount;
         (bool success, ) = to.call{ value: amount }("");
         require(success, "EtherGuard: Failed to transfer to wallet");
     }
 
-    function withdraw(uint256 amount) public accountRequired nonReentrant {
-        require(balances[msg.sender] >= amount, "EtherGuard: Insufficient balance");
-        avoidUnderflow(balances[msg.sender], amount);
-        balances[msg.sender] -= amount;
-        (bool success, ) = msg.sender.call{ value: amount }("");
+    function withdraw(uint amount) external accountRequired nonReentrant {
+        address sender = msg.sender;
+        require(balances[sender] >= amount, "EtherGuard: Insufficient balance");
+        avoidUnderflow(balances[sender], amount);
+        balances[sender] -= amount;
+        (bool success, ) = sender.call{ value: amount }("");
         require(success, "EtherGuard: Failed to withdraw");
     }
 
-    function closeAccount() public accountRequired nonReentrant {
-        require(address(this).balance > balances[msg.sender], "EtherGuard: Insufficient contract balance to withdraw");
-        require(hasAccount[msg.sender], "EtherGuard: Account does not exist");
-        uint256 amountToRefund = balances[msg.sender];
-        delete balances[msg.sender];
-        delete hasAccount[msg.sender];
-        (bool success, ) = msg.sender.call{ value: amountToRefund }("");
+    function closeAccount() external accountRequired nonReentrant {
+        address sender = msg.sender;
+        require(address(this).balance > balances[sender], "EtherGuard: Insufficient contract balance to withdraw");
+        require(hasAccount[sender], "EtherGuard: Account does not exist");
+        uint amountToRefund = balances[sender];
+        delete balances[sender];
+        delete hasAccount[sender];
+        (bool success, ) = sender.call{ value: amountToRefund }("");
         require(success, "EtherGuard: Failed to withdraw");
     }
 
-    // function getAuthorizedWithdrawers() public view accountRequired returns (address[] memory) {
+    // function getAuthorizedWithdrawers() external view accountRequired returns (address[] memory) {
     //     address[] memory withdrawers = new address[](10);
-    //     uint256 count = 0;
-    //     for (uint256 i = 0; i < 10; i++) {
+    //     uint count;
+    //     for (uint i; i < 10; ++i) {
     //         if (authorizedWithdrawers[msg.sender][withdrawers[i]]) {
     //             withdrawers[count] = withdrawers[i];
-    //             count++;
+    //             ++count;
     //         }
     //     }
     //     assembly {
@@ -99,23 +103,23 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
     //     return withdrawers;
     // }
 
-    function authorizeWithdrawer(address withdrawer) public accountRequired {
+    function authorizeWithdrawer(address withdrawer) external accountRequired {
         authorizedWithdrawers[msg.sender][withdrawer] = true;
     }
 
-    function isAuthorizedWithdrawer(address withdrawer) public view accountRequired returns (bool) {
+    function isAuthorizedWithdrawer(address withdrawer) external view accountRequired returns (bool) {
         return authorizedWithdrawers[msg.sender][withdrawer];
     }
 
-    function revokeWithdrawer(address withdrawer) public accountRequired {
+    function revokeWithdrawer(address withdrawer) external accountRequired {
         authorizedWithdrawers[msg.sender][withdrawer] = false;
     }
 
-    function withdrawAllFromAccount(address from) public nonReentrant {
+    function withdrawAllFromAccount(address from) external nonReentrant {
         // called by authorized withdrawers to withdraw all funds from an account
         require(authorizedWithdrawers[from][msg.sender], "EtherGuard: Not authorized");
         require(balances[from] > 0, "EtherGuard: No balance to withdraw");
-        uint256 amount = balances[from];
+        uint amount = balances[from];
         balances[from] = 0;
         (bool success, ) = msg.sender.call{ value: amount }("");
         require(success, "EtherGuard: Failed to withdraw");
