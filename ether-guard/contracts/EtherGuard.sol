@@ -12,24 +12,23 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
     mapping(address => uint) internal balances;
     mapping(address => bool) internal hasAccount;
     mapping(address => mapping(address => bool)) internal authorizedWithdrawers;
+    string internal constant ERROR_INSUFFICIENT_BALANCE = "EtherGuard: Insufficient balance";
+    string internal constant ERROR_WITHDRAW_FAIL = "BlockGoals: Failed to withdraw Ether";
 
     modifier accountRequired() {
-        if (!(hasAccount[msg.sender])) {
+        if (!hasAccount[msg.sender])
             revert("EtherGuard: Account does not exist");
-        }
         _;
     }
 
     function avoidOverflow(uint balance, uint amount) internal pure {
-        if (balance + amount < balance) {
+        if (balance + amount < balance)
             revert("EtherGuard: Amount too large to store");
-        }
     }
 
     function avoidUnderflow(uint balance, uint amount) internal pure {
-        if (balance - amount > balance) {
+        if (balance - amount > balance)
             revert("EtherGuard: Amount too small to store");
-        }
     }
 
     function deposit() public payable accountRequired {
@@ -40,9 +39,8 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
     }
 
     function depositToAccount(address to) external payable {
-        if (!(hasAccount[to])) {
+        if (!hasAccount[to])
             revert("EtherGuard: Receiver has no account");
-        }
         avoidOverflow(balances[to], msg.value);
         unchecked {
             balances[to] = balances[to] + msg.value;
@@ -51,9 +49,8 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
 
     function transferToAccount(address to, uint amount) external accountRequired nonReentrant {
         address sender = msg.sender;
-        if (!(balances[sender] >= amount)) {
-            revert("EtherGuard: Insufficient balance");
-        }
+        if (balances[sender] < amount)
+            revert(ERROR_INSUFFICIENT_BALANCE);
         avoidOverflow(balances[to], amount);
         avoidUnderflow(balances[sender], amount);
         unchecked {
@@ -67,32 +64,28 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
         uint amount
     ) external accountRequired nonReentrant {
         address sender = msg.sender;
-        if (!(balances[sender] >= amount)) {
-            revert("EtherGuard: Insufficient balance");
-        }
+        if (balances[sender] < amount)
+            revert(ERROR_INSUFFICIENT_BALANCE);
         avoidUnderflow(balances[sender], amount);
         unchecked {
             balances[sender] = balances[sender] - amount;
         }
         (bool success, ) = to.call{value: amount}("");
-        if (!(success)) {
+        if (!success)
             revert("EtherGuard: Failed to transfer to wallet");
-        }
     }
 
     function withdraw(uint amount) external accountRequired nonReentrant {
         address sender = msg.sender;
-        if (!(balances[sender] >= amount)) {
-            revert("EtherGuard: Insufficient balance");
-        }
+        if (!(balances[sender] >= amount))
+            revert(ERROR_INSUFFICIENT_BALANCE);
         avoidUnderflow(balances[sender], amount);
         unchecked {
             balances[sender] = balances[sender] - amount;
         }
         (bool success, ) = sender.call{value: amount}("");
-        if (!(success)) {
-            revert("EtherGuard: Failed to withdraw");
-        }
+        if (!success)
+            revert(ERROR_WITHDRAW_FAIL);
     }
 
     function authorizeWithdrawer(address withdrawer) external accountRequired {
@@ -104,65 +97,55 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
     }
 
     function createAccount() public {
-        if (hasAccount[msg.sender]) {
+        if (hasAccount[msg.sender])
             revert("EtherGuard: Account already exists");
-        }
         hasAccount[msg.sender] = true;
     }
 
     function closeAccount() external accountRequired nonReentrant {
         address sender = msg.sender;
-        if (!(address(this).balance > balances[sender])) {
+        if (address(this).balance < balances[sender])
             revert("EtherGuard: Insufficient contract balance to withdraw");
-        }
-        if (!(hasAccount[sender])) {
+        if (!hasAccount[sender])
             revert("EtherGuard: Account does not exist");
-        }
         uint amountToRefund = balances[sender];
         delete balances[sender];
         delete hasAccount[sender];
         (bool success, ) = sender.call{value: amountToRefund}("");
-        if (!(success)) {
-            revert("EtherGuard: Failed to withdraw");
-        }
+        if (!success)
+            revert(ERROR_WITHDRAW_FAIL);
     }
 
     function withdrawAllFromAccount(address from) external nonReentrant {
         // called by authorized withdrawers to withdraw all funds from an account
-        if (!(authorizedWithdrawers[from][msg.sender])) {
+        if (!authorizedWithdrawers[from][msg.sender])
             revert("EtherGuard: Not authorized");
-        }
-        if (!(balances[from] > 0)) {
+        if (balances[from] <= 0)
             revert("EtherGuard: No balance to withdraw");
-        }
         uint amount = balances[from];
         balances[from] = 0;
         (bool success, ) = msg.sender.call{value: amount}("");
-        if (!(success)) {
-            revert("EtherGuard: Failed to withdraw");
-        }
+        if (!success)
+            revert(ERROR_WITHDRAW_FAIL);
     }
 
-    function userHasAccount() public view returns (bool) {
-        return hasAccount[msg.sender];
+    function userHasAccount() public view returns (bool accountExists) {
+        accountExists = hasAccount[msg.sender];
     }
 
-    function getBalance() external view accountRequired returns (uint) {
-        return balances[msg.sender];
+    function getBalance() external view accountRequired returns (uint accountBalance) {
+        accountBalance = balances[msg.sender];
     }
 
-    function isAuthorizedWithdrawer(
-        address withdrawer
-    ) external view accountRequired returns (bool) {
-        return authorizedWithdrawers[msg.sender][withdrawer];
+    function isAuthorizedWithdrawer(address withdrawer) external view accountRequired returns (bool isAuthorized) {
+        isAuthorized = authorizedWithdrawers[msg.sender][withdrawer];
     }
 
     // function getAuthorizedWithdrawers() external view accountRequired returns (address[] memory) { }
 
     receive() external payable {
-        if (!(userHasAccount())) {
+        if (!userHasAccount())
             createAccount();
-        }
         deposit();
     }
 

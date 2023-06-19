@@ -27,8 +27,8 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
         PRICE_PER_TOKEN = price;
     }
 
-    function getPrice() external view returns (uint) {
-        return PRICE_PER_TOKEN;
+    function getPrice() external view returns (uint price) {
+        price = PRICE_PER_TOKEN;
     }
 
     function setLimit(uint limit) external onlyOwner {
@@ -39,25 +39,21 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
         MAX_SUPPLY = maxSupply;
     }
 
-    function isAvailable(string memory tokenURI) external view returns (bool) {
-        return !isTokenMinted[tokenURI];
+    function isAvailable(string memory tokenURI) external view returns (bool available) {
+        available = !isTokenMinted[tokenURI];
     }
 
     function mintNFT(
         string memory tokenURI
-    ) external payable nonReentrant returns (uint) {
-        if (msg.value < PRICE_PER_TOKEN) {
+    ) external payable nonReentrant returns (uint newTokenID) {
+        if (msg.value < PRICE_PER_TOKEN)
             revert("CryptoGallery: Amount paid is less than PRICE_PER_TOKEN");
-        }
-        if (_tokenId.current() + 1 > MAX_SUPPLY) {
+        if (_tokenId.current() + 1 > MAX_SUPPLY)
             revert("CryptoGallery: You have exceeded Max Supply. No more tokens left to mint");
-        }
-        if (isTokenMinted[tokenURI]) {
+        if (isTokenMinted[tokenURI])
             revert("CryptoGallery: This NFT has already been minted");
-        }
-        if (mintedForAddress[msg.sender] >= LIMIT_PER_ADDRESS) {
+        if (mintedForAddress[msg.sender] >= LIMIT_PER_ADDRESS)
             revert("CryptoGallery: You have exceeded minting limit per address");
-        }
 
         // better if tokenURI = "https://ipfs.io/ipfs/" + getIpfsFolder() + "/" + tokenID + ".png", or "ipfs://" + ....
 
@@ -65,18 +61,19 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
         mintedForAddress[msg.sender] += 1;
         _tokenId.increment();
 
-        uint newItemId = _tokenId.current();
-        _mint(msg.sender, newItemId);
-        _setTokenURI(newItemId, tokenURI);
-        emit Minted(msg.sender, newItemId);
+        newTokenID = _tokenId.current();
+        _mint(msg.sender, newTokenID);
+        _setTokenURI(newTokenID, tokenURI);
+        emit Minted(msg.sender, newTokenID);
 
         // increase the price for next token by 20%
         // PRICE_PER_TOKEN = (PRICE_PER_TOKEN * 12) / 10;
 
         (bool success, ) = owner().call{value: msg.value}("");
-        require(success, "CryptoGallery: Failed to pay Ether to owner");
+        if (!success)
+            revert("CryptoGallery: Failed to pay Ether to owner");
 
-        return newItemId;
+        return newTokenID;
     }
 
     function addStrings(string memory a, uint b) internal pure returns (string memory result) {

@@ -6,10 +6,10 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
     struct Task {
-        uint256 timestamp;
+        uint timestamp;
         bytes32 description;
         bool done;
-        uint256 balance;
+        uint balance;
     }
 
     mapping(address => Task[]) private tasks;
@@ -18,36 +18,35 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         __ReentrancyGuard_init();
     }
 
+    string internal constant ERROR_TASK_DOES_NOT_EXIST = "BlockGoals: Task does not exist. Please refresh";
+    string internal constant ERROR_WITHDRAW_FAIL = "BlockGoals: Failed to withdraw Ether";
+
     function addTask(string memory _description) external payable {
         bytes32 _bytes = bytes32(bytes(_description));
         tasks[msg.sender].push(Task(block.timestamp, _bytes, false, msg.value));
     }
 
-    function deposit(uint256 _index) external payable {
-        if (msg.value <= 0) {
+    function deposit(uint _index) external payable {
+        if (msg.value <= 0)
             revert("BlockGoals: Value must be greater than 0");
-        }
-        if (msg.value >= 5 ether) {
+        if (msg.value >= 5 ether)
             revert("BlockGoals: Value must be less than 5 Ether");
-        }
+        
         Task[] storage userTasks = tasks[msg.sender];
-        if (_index >= userTasks.length) {
-            revert("BlockGoals: Task does not exist. Please refresh");
-        }
+        if (_index >= userTasks.length)
+            revert(ERROR_TASK_DOES_NOT_EXIST);
 
-        uint256 newBalance = userTasks[_index].balance + msg.value;
-        if (newBalance < userTasks[_index].balance) {
+        uint newBalance = userTasks[_index].balance + msg.value;
+        if (newBalance < userTasks[_index].balance)
             revert("BlockGoals: Value too large to store");  // overflow check
-        }
 
         userTasks[_index].balance = newBalance;
     }
 
-    function finishTask(uint256 _index) external nonReentrant {
+    function finishTask(uint _index) external nonReentrant {
         Task[] storage userTasks = tasks[msg.sender];
-        if (_index >= userTasks.length) {
-            revert("BlockGoals: Task does not exist. Please refresh");
-        }
+        if (_index >= userTasks.length)
+            revert(ERROR_TASK_DOES_NOT_EXIST);
 
         userTasks[_index].done = true;
 
@@ -55,42 +54,37 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         withdrawAfterFinish(_index);
     }
 
-    function deleteTask(uint256 _index) external nonReentrant {
+    function deleteTask(uint _index) external nonReentrant {
         Task[] storage userTasks = tasks[msg.sender];
-        if (_index >= userTasks.length) {
-            revert("BlockGoals: Task does not exist. Please refresh");
-        }
+        uint lastIndex = userTasks.length - 1;
+        if (_index > lastIndex)
+            revert(ERROR_TASK_DOES_NOT_EXIST);
 
-        uint256 amountToRefund = userTasks[_index].balance;
-        if (address(this).balance < amountToRefund) {
+        uint amountToRefund = userTasks[_index].balance;
+        if (address(this).balance < amountToRefund)
             amountToRefund = address(this).balance;
-        }
         if (amountToRefund > 0) {
             userTasks[_index].balance -= amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
-            if (!success) {
-                revert("BlockGoals: Failed to withdraw Ether");
-            }
+            if (!success)
+                revert(ERROR_WITHDRAW_FAIL);
         }
 
         // delete item - move item to last, then pop it
-        uint256 lastIndex = userTasks.length - 1;
         userTasks[_index] = userTasks[lastIndex];
         userTasks.pop();
     }
 
-    function withdrawAfterFinish(uint256 _index) internal {
+    function withdrawAfterFinish(uint _index) internal {
         Task[] storage userTasks = tasks[msg.sender];
-        uint256 amountToRefund = userTasks[_index].balance;
-        if (amountToRefund > address(this).balance) {
+        uint amountToRefund = userTasks[_index].balance;
+        if (amountToRefund > address(this).balance)
             amountToRefund = address(this).balance;
-        }
         if (amountToRefund > 0) {
             userTasks[_index].balance -= amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
-            if (!success) {
-                revert("BlockGoals: Failed to withdraw Ether");
-            }
+            if (!success)
+                revert(ERROR_WITHDRAW_FAIL);
         }
     }
 

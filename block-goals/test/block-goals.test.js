@@ -21,11 +21,11 @@ const deployProxy = async (contractName, ...args) => {
 const appName = "BlockGoals";
 
 describe(appName, function () {
-	var contract, owner, user;
+	var contract, owner, allTasks;
 	const smallAmount = parseEther("0.1");
 
 	it("Should deploy without errors", async function () {
-		[owner, user] = await ethers.getSigners();
+		[owner] = await ethers.getSigners();
 		contract = await deployContract(appName);
 		expect(await contract.deployed()).to.equal(contract);
 	});
@@ -41,7 +41,7 @@ describe(appName, function () {
 	var index = 1;
 	it("Should deposit for a task", async function () {
 		await contract.deposit(index, { value: smallAmount });
-		var allTasks = await contract.getAllTasks();
+		allTasks = await contract.getAllTasks();
 		expect(allTasks[index].balance).to.equal(smallAmount);
 	});
 	it("Should finish a task and refund ether", async function () {
@@ -50,15 +50,16 @@ describe(appName, function () {
 		const balanceAfter = await owner.getBalance();
 		const difference = formatEther(balanceAfter - balanceBefore + "");
 
-		const allTasks = await contract.getAllTasks();
+		allTasks = await contract.getAllTasks();
 		var task = allTasks[index];
 		expect(task.done).to.equal(true);
 		expect(task.balance).to.equal(0);
 		expect(Number(difference)).to.be.within(0.09, 0.1);
 	});
 	it("Should delete a task", async function () {
+		allTasks = await contract.getAllTasks();
 		await contract.deleteTask(index);
-		expect(await contract.getAllTasks()).to.have.lengthOf(1);
+		expect(await contract.getAllTasks()).to.have.lengthOf(allTasks.length - 1);
 	});
 	it("Should be deployed as proxy", async function () {
 		const proxy = await deployProxy(appName);
