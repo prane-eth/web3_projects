@@ -12,10 +12,6 @@ describe(appName, function () {
 		contract = await Bank.deploy();
 		await contract.deployed();
 	});
-	it("Should create an account", async function () {
-		await contract.createAccount();
-		expect(await contract.userHasAccount()).to.equal(true);
-	});
 	it("Should deposit Ether", async function () {
 		await contract.deposit({ value: parseEther("1") });
 		expect(await contract.getBalance()).to.equal(parseEther("1"));
@@ -25,7 +21,6 @@ describe(appName, function () {
 		expect(await contract.getBalance()).to.equal(parseEther("0.3"));
 	});
 	it("Should transfer Ether to another account", async function () {
-		await contract.connect(addr1).createAccount();
 		await contract.transferToAccount(addr1.address, parseEther("0.3"));
 		expect(await contract.connect(addr1).getBalance()).to.equal(
 			parseEther("0.3")
@@ -48,10 +43,6 @@ describe(appName, function () {
 			parseEther("0.6")
 		);
 	});
-	it("Should close account", async function () {
-		await contract.closeAccount();
-		expect(await contract.userHasAccount()).to.equal(false);
-	});
 	it("Should ensure no Ether is lost when closing account", async function () {
 		let ownerWalletBalance = await owner.getBalance();
 		ownerWalletBalance = Number(formatEther(ownerWalletBalance));
@@ -65,13 +56,7 @@ describe(appName, function () {
 			.to.be.greaterThan(19999.99)
 			.and.lessThan(20000);
 	});
-	it("Should not withdraw when account is closed", async function () {
-		await expect(contract.withdraw(parseEther("0.1"))).to.be.revertedWith(
-			`${appName}: Account does not exist`
-		);
-	});
 	it("Should authorize withdrawer", async function () {
-		await contract.createAccount();
 		await contract.authorizeWithdrawer(addr1.address);
 		expect(await contract.isAuthorizedWithdrawer(addr1.address)).to.equal(true);
 	});

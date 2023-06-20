@@ -27,18 +27,18 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
     }
 
     function deposit(uint _index) external payable {
-        if (msg.value <= 0)
+        if (msg.value == 0)
             revert("BlockGoals: Value must be greater than 0");
-        if (msg.value >= 5 ether)
-            revert("BlockGoals: Value must be less than 5 Ether");
+        if (msg.value > 5 ether)
+            revert("BlockGoals: Value must be up to 5 Ether");
         
         Task[] storage userTasks = tasks[msg.sender];
         if (_index >= userTasks.length)
             revert(ERROR_TASK_DOES_NOT_EXIST);
 
         uint newBalance = userTasks[_index].balance + msg.value;
-        if (newBalance < userTasks[_index].balance)
-            revert("BlockGoals: Value too large to store");  // overflow check
+        if (newBalance < userTasks[_index].balance)  // overflow check
+            revert("BlockGoals: Value too large to store");
 
         userTasks[_index].balance = newBalance;
     }
@@ -64,7 +64,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         if (address(this).balance < amountToRefund)
             amountToRefund = address(this).balance;
         if (amountToRefund > 0) {
-            userTasks[_index].balance -= amountToRefund;
+            userTasks[_index].balance = userTasks[_index].balance - amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
             if (!success)
                 revert(ERROR_WITHDRAW_FAIL);
@@ -81,7 +81,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         if (amountToRefund > address(this).balance)
             amountToRefund = address(this).balance;
         if (amountToRefund > 0) {
-            userTasks[_index].balance -= amountToRefund;
+            userTasks[_index].balance = userTasks[_index].balance - amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
             if (!success)
                 revert(ERROR_WITHDRAW_FAIL);
