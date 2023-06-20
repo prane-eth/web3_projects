@@ -17,4 +17,5 @@ Status | Project name | Description | Smart contract (Polygon Mumbai) | Frontend
 - Created test cases
 - Deployed the contracts on multiple networks. Deployed the frontend code
 - Scanned with [Slither](https://github.com/crytic/slither) and fixed the issues
-- Reduced gas cost by optimizer, and will do with code changes
+- Reduced gas cost with code changes and optimizer
+

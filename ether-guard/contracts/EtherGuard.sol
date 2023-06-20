@@ -16,7 +16,7 @@ contract EtherGuard is Initializable, ReentrancyGuardUpgradeable {
 
     function avoidOverflow(uint balance, uint amount) internal pure {
         if (balance + amount < balance)
-            revert("EtherGuard: Amount too large to store");
+            revert("EtherGuard: Amount too large to store");  // less gas than require()
     }
 
     function avoidUnderflow(uint balance, uint amount) internal pure {

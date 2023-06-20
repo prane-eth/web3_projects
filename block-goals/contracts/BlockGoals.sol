@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
     struct Task {
         uint timestamp;
-        bytes32 description;
+        string description;
         bool done;
         uint balance;
     }
@@ -22,19 +22,15 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
     string internal constant ERROR_WITHDRAW_FAIL = "BlockGoals: Failed to withdraw Ether";
 
     function addTask(string memory _description) external payable {
-        bytes32 _bytes = bytes32(bytes(_description));
-        tasks[msg.sender].push(Task(block.timestamp, _bytes, false, msg.value));
+        tasks[msg.sender].push(Task(block.timestamp, _description, false, msg.value));
     }
 
     function deposit(uint _index) external payable {
-        if (msg.value == 0)
-            revert("BlockGoals: Value must be greater than 0");
-        if (msg.value > 5 ether)
-            revert("BlockGoals: Value must be up to 5 Ether");
+        require(msg.value > 0, "BlockGoals: Value must be greater than 0");
+        require(msg.value < 5 ether, "BlockGoals: Value must be up to 5 Ether");
         
         Task[] storage userTasks = tasks[msg.sender];
-        if (_index >= userTasks.length)
-            revert(ERROR_TASK_DOES_NOT_EXIST);
+        require(_index < userTasks.length, ERROR_TASK_DOES_NOT_EXIST);
 
         uint newBalance = userTasks[_index].balance + msg.value;
         if (newBalance < userTasks[_index].balance)  // overflow check
@@ -43,7 +39,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         userTasks[_index].balance = newBalance;
     }
 
-    function finishTask(uint _index) external nonReentrant {
+    function finishTask(uint _index) external {
         Task[] storage userTasks = tasks[msg.sender];
         if (_index >= userTasks.length)
             revert(ERROR_TASK_DOES_NOT_EXIST);
@@ -54,11 +50,10 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         withdrawAfterFinish(_index);
     }
 
-    function deleteTask(uint _index) external nonReentrant {
+    function deleteTask(uint _index) external {
         Task[] storage userTasks = tasks[msg.sender];
         uint lastIndex = userTasks.length - 1;
-        if (_index > lastIndex)
-            revert(ERROR_TASK_DOES_NOT_EXIST);
+        require(_index <= lastIndex, ERROR_TASK_DOES_NOT_EXIST);
 
         uint amountToRefund = userTasks[_index].balance;
         if (address(this).balance < amountToRefund)
@@ -66,8 +61,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         if (amountToRefund > 0) {
             userTasks[_index].balance = userTasks[_index].balance - amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
-            if (!success)
-                revert(ERROR_WITHDRAW_FAIL);
+            require(success, ERROR_WITHDRAW_FAIL);
         }
 
         // delete item - move item to last, then pop it
@@ -75,7 +69,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         userTasks.pop();
     }
 
-    function withdrawAfterFinish(uint _index) internal {
+    function withdrawAfterFinish(uint _index) internal nonReentrant {
         Task[] storage userTasks = tasks[msg.sender];
         uint amountToRefund = userTasks[_index].balance;
         if (amountToRefund > address(this).balance)
@@ -83,8 +77,7 @@ contract BlockGoals is Initializable, ReentrancyGuardUpgradeable {
         if (amountToRefund > 0) {
             userTasks[_index].balance = userTasks[_index].balance - amountToRefund;
             (bool success, ) = msg.sender.call{value: amountToRefund}("");
-            if (!success)
-                revert(ERROR_WITHDRAW_FAIL);
+            require(success, ERROR_WITHDRAW_FAIL);
         }
     }
 

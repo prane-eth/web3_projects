@@ -47,7 +47,7 @@ contract CryptoGallery is ERC721URIStorage, Ownable, Initializable, ReentrancyGu
         string memory tokenURI
     ) external payable nonReentrant returns (uint newTokenID) {
         if (msg.value < PRICE_PER_TOKEN)
-            revert("CryptoGallery: Amount paid is less than PRICE_PER_TOKEN");
+            revert("CryptoGallery: Amount paid is less than PRICE_PER_TOKEN");  // less gas than require()
         if (_tokenId.current() + 1 > MAX_SUPPLY)
             revert("CryptoGallery: You have exceeded Max Supply. No more tokens left to mint");
         if (isTokenMinted[tokenURI])

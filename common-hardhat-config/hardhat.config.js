@@ -57,8 +57,8 @@ module.exports = {
 		},
 	},
 	gasReporter: {
-		// outputFile: "gas-report.txt",
-		// noColors: true,
+		outputFile: "gas-report-new.txt",
+		noColors: true,
 		currency: "USD",
 		token: "ETH",
 	},

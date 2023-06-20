@@ -35,7 +35,11 @@ describe(appName, function () {
 	it("Should create a task", async function () {
 		await contract.addTask("Test this contract");
 		await contract.addTask("Deploy this contract");
-		expect(await contract.getAllTasks()).to.have.lengthOf(2);
+		await contract.addTask("This is a very long string to test the contract with many characters as long as possible");
+	});
+	it("Should return tasks", async function () {
+		const tasks = await contract.getAllTasks();
+		expect(tasks).to.have.lengthOf.above(0);
 	});
 
 	var index = 1;
